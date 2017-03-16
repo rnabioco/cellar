@@ -1,0 +1,286 @@
+---
+title: "Illumina ddsq single cell demo analysis"
+author: "Kent Riemondy RBI"
+date: "January 31, 2017"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    fig_caption: yes
+    fig_retina: 1 
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache.lazy = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+
+
+```{r libs, message=FALSE, warning=FALSE, echo=FALSE}
+library(Seurat)
+library(readr)
+library(tidyr)
+library(plyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(cowplot)
+library(RColorBrewer)
+library(Matrix)
+library(purrr)
+```
+
+
+## Data Summary
+  The goal of this single cell RNA-Seq experiment is to analyze the transcriptomes of mucous cells in airway epithelium to characterize heterogeneous sub-populations of mucousal cells. The samples are human airway epithelial cells treated with various insults to provoke different inflammatory states.  
+  
+Sample | Treatment
+-------- | ----------  
+Sample 1 | (–)
+Sample 2 | IL-13 
+Sample 3 | HRV-16
+Sample 4 |  IL-13 + HRV-16
+Sample 5 | Air
+Sample 6 | Air + HRV-16
+Sample 7 |  Cigarette smoke
+Sample 8 |  Cigarette smoke + HRV-16
+
+
+
+```{r chu_data, eval = F}
+samples <- dir("../../data/Project_Chu/dgematrix/", pattern = "matrix.txt", full.names = T)
+
+dat <- map(samples, ~read_tsv(.x))
+saveRDS(dat, "all_count_data.rds")
+
+#tidy up names
+names(dat) <- basename(samples) %>% 
+  str_split("_", simplify = T) %>%  
+  .[, 2] %>% 
+  str_replace("Sample", "") %>% 
+  str_c("sample", .)
+
+#append sample id to cell id, dont modify genes column
+colnames_dat <- map2(dat, names(dat),
+                  ~str_c(.y, "_", colnames(.x)) %>%  str_replace("sample[0-9]_GENE", "gene"))
+
+change_colnames <- function(df, .colnames){
+  colnames(df) <- .colnames
+  df
+}
+
+dat <- map2(dat, colnames_dat, ~change_colnames(.x, .y))
+
+
+dat <- Reduce(function(x, y) full_join(x, y, by = "gene"), dat)
+
+dat <- as.data.frame(dat)
+rownames(dat) <- dat$gene
+dat <- dat[, -1]
+
+dat[is.na(dat)] <- 0
+saveRDS(dat, "all_count_data_combined.rds")
+sdat<- as(as.matrix(dat), "sparseMatrix")
+saveRDS(sdat, "all_count_data_combined_smatrix.rds")
+```
+
+## QC
+```{r examine_umi_and_ngenes, cache.lazy=FALSE, fig.width = 10, fig.height = 8, warning = F}
+dat <- readRDS("all_count_data_combined.rds")
+
+summary_dat <- data_frame(cell = colnames(dat), 
+                          nUMIs = colSums(dat),
+                          nGenes = colSums(dat > 0))
+
+summary_dat <- separate(summary_dat, cell, c("sample", "cellid"), sep = "_")
+
+
+summary_dat <- summary_dat %>% group_by(sample) %>% arrange(desc(nUMIs))
+n_cells <- summary_dat %>%  group_by(sample) %>%  summarize(n_cells = n(),
+                                                            median_UMIs = median(nUMIs),
+                                                            median_Genes = median(nGenes))
+
+knitr::kable(n_cells,
+             caption = "Number of cells prior to filtering and summary statistics")
+
+a <- ggplot(summary_dat, aes(sample, log10(nUMIs))) +
+  geom_violin(aes(fill = sample)) +
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Number of UMIs (Log10)") +
+  theme(axis.text.x = element_blank())
+
+b <- ggplot(summary_dat, aes(sample, log10(nGenes))) +
+    geom_violin(aes(fill = sample)) +
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Number of Genes (at least 1 UMI) Log10") +
+  theme(axis.text.x = element_blank())
+plot_grid(a, b)
+```
+
+```{r write_matrix, eval =F}
+system("mkdir -p count_matrix/")
+write_tsv(dat, "count_matrix/all_samples_raw_counts_matrix.txt")
+system("gzip count_matrix/all_samples_raw_counts_matrix.txt")
+```
+
+```{r utility_fxn}
+cell_counts <- function(seurat_object){
+  #returns tbl_df with number of cells per sample type in seurat object
+  map_df(levels(seurat_object@ident), 
+         ~data_frame(sample = .x, 
+                     n_cells = length(WhichCells(seurat_object, ident = .x))))
+}
+```
+
+```{r, eval = F}
+sdat <- readRDS("all_count_data_combined_smatrix.rds")
+epi <- new("seurat", raw.data = sdat)
+
+epi <- Setup(epi, min.cells = 5, min.genes = 100, do.logNormalize = T, total.expr = 1e4, project = "chu", names.field = 1, names.delim = "_")
+saveRDS(epi, "unfiltered_seurat_analysis.rds")
+```
+
+```{r QC, cache.lazy=FALSE}
+epi <- readRDS("unfiltered_seurat_analysis.rds")
+mito.genes <- grep("^MT-", rownames(epi@data), value = T)
+proportion.mito <- colSums(expm1(epi@data[mito.genes, ]))/colSums(expm1(epi@data))
+
+epi <- AddMetaData(epi, proportion.mito, "proportion.mito")
+VlnPlot(epi, "nGene")
+VlnPlot(epi, "nUMI")
+VlnPlot(epi, "proportion.mito")
+
+knitr::kable(cell_counts(epi),
+             caption = "Number of cells passing a filter of needing at least 100 genes detected (>0 UMIs per gene) and each gene being present in at least 5 cells")
+```
+
+The percentage of reads aligning to mitochondria is often an indicator of cell quality. Cells that have lysed prior to capture preferentially retain mitochondial RNA, but lose cellular cyotplasmic mRNA. As shown below there is a strong negative correlation with the number of UMIs and the proportion of reads aligning to mitochondria. Cells with less than 15% mitochondrial reads will be retained for further analysis. The title of plots indicates the correlation coefficent (pearson) between the two plotted variables. Each color represents a different sample. 
+
+```{r qc_mito_problems}
+par(mfrow = c(1, 2))
+GenePlot(epi, "nUMI", "proportion.mito")
+GenePlot(epi, "nUMI", "nGene")
+```
+
+```{r}
+epi <- SubsetData(epi, subset.name = "proportion.mito", accept.high = 0.15)
+
+knitr::kable(cell_counts(epi),
+             caption = "Number of cells passing an additional filter requiring < 15% of the UMIs be derived from mitochondria")
+```
+
+```{r ngenes_filter}
+epi <- SubsetData(epi, subset.name = "nGene", accept.low =500)
+
+knitr::kable(cell_counts(epi),
+             caption = "Number of cells passing an additional filter requiring at least 500 genes detected")
+```
+
+After filtering the distribution of UMIs, Genes, and Proportion of mitochondrial reads is shown below:
+
+```{r ngenes_post_filter}
+VlnPlot(epi, "nGene")
+VlnPlot(epi, "nUMI")
+VlnPlot(epi, "proportion.mito")
+
+```
+
+```{r regress_out_umi_and_mito, eval = F}
+epi <- RegressOut(epi, latent.vars = c("nUMI", "proportion.mito"))
+saveRDS(epi, "regressed_seurat_obj.rds")
+```
+
+```{r get_variable_genes, eval =F}
+epi <- readRDS("regressed_seurat_obj.rds")
+epi <- MeanVarPlot(epi ,fxn.x = expMean, fxn.y = logVarDivMean, x.low.cutoff = 0.0125, x.high.cutoff = 3, y.cutoff = 0.5, do.contour = F, do.plot = FALSE)
+
+length(epi@var.genes)
+
+```
+
+```{r PCA_tsne_calc, eval = F}
+epi <- PCA(epi, pc.genes = epi@var.genes, do.print = TRUE, pcs.print = 5, genes.print = 5)
+
+epi <- ProjectPCA(epi)
+epi <- RunTSNE(epi, dims.use = 1:12, do.fast = T)
+saveRDS(epi, "processed_seurat.rds")
+```
+## PCA
+  To get an overview of the relationships between different cell types, PCA will be used. Shown below is a plot of the first two prinicipal components computed using highly variable genes (approx ~4000 genes). The first two componenets of the PCA rarely capture all of the variation in the data, as can be seen in the second plot.  
+  
+```{r plot_pca}
+epi <- readRDS("processed_seurat.rds")
+PCAPlot(epi, 1, 2)
+PCElbowPlot(epi)
+#PCHeatmap(epi, pc.use = 1:12, cells.use = 2000, do.balanced = TRUE, label.columns = FALSE, use.full = FALSE)
+```
+
+## TSNE projection
+  PCA analysis is useful for examining the most variable dimensions in the dataset. However in single cell datasets there are often many dimensions that are informative for clustering the cells. [TSNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) is a new non-linear dimensionality reduction algorithm that is particularly well-suited for projecting multidimensional data in two dimensional space. 
+  
+  Shown below is a TSNE projection of the single cell data, with each cell colored by the sample type. Overall there are some apparenet clusters in the data, particularly noteable is the large sample2 cluster. Additionally the other samples appear to cluster independently of sample2. 
+  
+```{r plot_TSNE}
+TSNEPlot(epi)
+```
+
+## Potential Confounding Factors
+  A challenge with single-cell RNA-Seq is the high degree of technical noise. Variables such as the number of detected genes or UMIs can drive apparent differences in sample transcriptomes. Shown below is the same `TSNE` projection with each cell colored by the number of genes, umis, or percent mitochondria detected. It appears that sample 2 is dominated by mitochondrial genes, which may be the primary driver of the clustering pattern observed for sample 2. 
+  
+```{r find_confounding_issues}
+FeaturePlot(epi, "nGene")
+FeaturePlot(epi, "nUMI")
+FeaturePlot(epi, "proportion.mito")
+```
+
+## Marker genes for each sample type
+  Next we will determine genes enriched in each sample by comparing gene expression in each sample to all other samples. Plotted below are the top 10 enriched genes detected in each sample for all cell transcriptomes (Yellow is high, purple is low).
+  
+```{r find_markers, fig.width = 14, fig.height = 14, warning=FALSE}
+epi_markers <- FindAllMarkers(epi, only.pos = TRUE, min.pct = 0.25, thresh.use = 0.25)
+epi_markers %>% group_by(cluster) %>% top_n(10, avg_diff) -> top10
+DoHeatmap(epi, genes.use = top10$gene, order.by.ident = TRUE, slim.col.label = TRUE, cexRow = 0.75, remove.key = TRUE,  margins = c(8, 8))
+```
+
+  Plotted below are the abundances of the top marker genes detected per sample (red is high, yellow is low) projected onto the TSNE map. 
+  
+```{r genes_enriched_per_cluster, fig.width = 10, fig.height= 10 }
+top6_genenames <- split(top10, top10$cluster) %>% map(., ~.x[1:6, ]$gene)
+
+plot_tsnes <- function(x, y) {
+  #par(mar=c(0,0,1,0))
+  #plot(0,type='n',axes=FALSE,main = y, ylab = "", xlab = "") 
+  print(y)
+  FeaturePlot(epi, x, pt.size = 0.2)
+} 
+
+walk2(top6_genenames, names(top6_genenames), ~plot_tsnes(.x, .y))
+
+```
+
+  The enriched gene sets have been written out to text files (expression_tables/sample_name_enriched_genes.txt)
+```{r genes_enriched_output, fig.width = 10, fig.height= 10 }
+system("mkdir -p expression_tables/")
+epi_markers_list <- split(epi_markers, epi_markers$cluster)
+outnames <- names(epi_markers_list)
+outnames <- str_c("expression_tables/", outnames, "_enriched_genes.txt")
+walk2(epi_markers_list, outnames, ~write_tsv(.x, .y))
+```
+
+```{r muc_plots}
+library(scran)
+library(RBGL)
+
+FeaturePlot(epi, c("MUC5AC" , "FOXJ1"), pt.size = 1)
+VlnPlot(epi, c("MUC5AC" , "FOXJ1"))
+TSNEPlot(epi)
+
+#pbmc <- FindClusters(pbmc, pc.use = 1:10, resolution = 0.6, print.output = 0, save.SNN = T)
+
+#cor_genes <- scran::correlatePairs(epi@scale.data, subset.row = epi@var.genes)
+```

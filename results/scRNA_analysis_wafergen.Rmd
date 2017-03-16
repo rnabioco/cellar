@@ -1,0 +1,797 @@
+---
+title: "Single Cell QC Analysis"
+Author: "Kent Riemondy, RBI"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    theme: cosmo
+    highlight: tango
+    fig_caption: true
+    code_folding: hide
+params:
+  Project: "Project_Degregori"
+  species: "mouse"
+  alignments: "umi"
+  groups: "Young|Old"
+  read_cutoff: 5000
+  gene_cutoff: 250
+  mito_cutoff: 50
+  genes_to_plot:  [Gm10260, Prdx1,Ly6e, Serbp1, Macf1, Cd81, Kit, Cd63] 
+  genes_to_tsne: [Cd63, Macf1]
+  relevel_factor:  "Young"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+```
+
+```{r libs, message=FALSE, warning=FALSE, echo=FALSE}
+library(scater)
+library(monocle)
+library(readr)
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(cowplot)
+library(RColorBrewer)
+library(grid)
+library(gtable)
+library(gridExtra)
+library(scran)
+library(DESeq2)
+library(BiocParallel)
+```
+
+Data analysis for `r params$Project` using `r params$species` data and alignment counts generated using `r params$alignments`
+
+
+## Analysis Approach 
+
+  1) Demultiplex R1 reads based on provided Well Barcode from CellSelect Software using `Fastx_barcode_splitter.pl` with an allowed mismatch of 1. The well barcodes have a minimum hamming distance of 3, based on analyzing the barcodes of 1 library, so allowing 1 mismatch will error correct up to 1 mismatch. The well barcode is the first 10 nucleotides of R1.
+  2) Extract out R1 `read_ids` and use to extract R2 reads using [extract_read_ids.py](../../bin/extract_read_ids.py) and Heng Li's [seqtk](https://github.com/lh3/seqtk).
+  3) Trim polyA from end of cDNA reads using `cutadapt` keeping only reads at least `20` nucleotides in length.
+  4) Extract UMI from R1 (NNNNNNNNNNTTTTT from 3' end) and append to R2.fastq read_id using [umi_to_fqname.py](../../bin/umi_to_fqname.py) based on [umitools](https://github.com/brwnj/umitools).
+  5) Align reads to the transcriptome and the genome using `Hisat2`, using Ensembl annotations (release 85 m38 or h38 depending on species) . Reads were also aligned to just the transcriptome using using `Kallisto`, but more reads were recovered using Hisat2, so it was used for all of the presented data.    
+  6) For libraries prepard with the standard protocol, Unique Molecular Identifier (UMI) information can be used to collapse PCR duplicates, which skew the gene abundances calculations. [UMI-Tools](https://github.com/CGATOxford/UMI-tools) was used to collapse UMIs using the `directional adjaceny` method. Two samples however were prepared with a new chemisty (`In-Well`) that prevents the use of UMI information (Project_Bentley_newchem and Project_Torchia), so for these samples, reads were not collapsed based on UMIs. 
+  7) Use `featureCounts` on `Hisat2` output to count UMIs overlapping exonic sequences per gene using the above mentioned
+  `ensembl` transcriptome.
+  8) Use the `scater` and `DESeq2` `R` packages to produce visualizations and compute differential expression between sample types. 
+  
+  
+```{r, message=FALSE, warning=FALSE}
+combine_featureCounts <- function(in_dir, pattern){
+  files <- list.files(path = in_dir, 
+                      pattern = pattern,
+                      full.names = T)
+  dat <-  lapply(files,  readr::read_tsv, col_names = T, col_types = "c-----i", skip = 1, progress = F)
+  dat <- Reduce(function(x, y) inner_join(x, y, by = "Geneid" ), dat)
+  dat <- as.data.frame(dat)
+  rownames(dat) <- dat$Geneid
+  dat[, 1] <- NULL
+  colnames(dat) <- str_match(colnames(dat), "(Cell_\\w+_\\d+_\\d+).*.bam")[, 2]
+  dat <- dat[, !is.na(colnames(dat)) ]
+  dat
+}
+
+combine_mapping_stats <- function(in_dir){
+  files <- list.files(path = in_dir, 
+                      pattern = "_stats.txt",
+                      full.names = T)
+  dat <-  lapply(files,  readr::read_tsv, col_names = F, col_types = "ccd")
+  dat <- bind_rows(dat)
+  colnames(dat) <- c("cell", "mapping_stat", "counts")
+  dat <- spread(dat, mapping_stat, counts)
+  dat$sample <- str_match(dat$cell, "Cell_(\\w+)_\\d+_\\d.*.bam")[, 2]
+  dat[grepl("unmatched", dat$cell), "sample"] <- "no barcode"
+  dat <- dat %>%
+  mutate(percent_unique = 100 * `unique alignments` / (`unique alignments` + `multiple alignments`),
+         `total reads` = log10(`total reads`),
+         umi = ifelse(grepl("umidedup.bam", dat$cell), "umi", "noumi"))
+  dat
+}
+
+get_featureCounts_stats <- function(in_dir, pattern){
+  files <- list.files(path = in_dir, 
+                      pattern = pattern,
+                      full.names = T)
+  dat <-  lapply(files,  readr::read_tsv, col_names = F, col_types = "ci", skip = 1, progress = F)
+  dat <- bind_rows(dat)
+  dat <- dat %>% filter(X1 == "Assigned") %>% summarize(sum(X2)) %>% unlist
+  dat
+}
+
+read_kallisto_data <- function(in_dir){
+  dat <- read_rds(in_dir)
+  dat <- dat[, !grepl("unmatched", colnames(dat)) ]
+  dat
+}
+```
+
+```{r define variables, message=FALSE, warning=FALSE}
+
+DGE_samples <- params$groups
+read_cutoff <- as.integer(params$read_cutoff)
+gene_cutoff <- as.integer(params$gene_cutoff)
+mito_cutoff <- as.integer(params$mito_cutoff)
+refactor_degregori = FALSE
+refactor_torchia = FALSE
+if(params$Project == "Project_Degregori"){
+  refactor_degregori = TRUE
+}
+
+if(params$Project == "Project_Torchia"){
+  refactor_torchia = TRUE
+}
+
+
+if (params$alignments == "kallisto"){
+  #kallisto data
+  kallisto_dir <- paste0(params$Project, "_kallisto_genes.rds")
+  dat <- read_kallisto_data(kallisto_dir)
+} else if (params$alignments == "hisat2"){
+           # hisat2 data
+  in_dir = paste0("../../data/", params$Project, "/hisat2/feature_counts")
+  pattern = "sorted.tsv$"
+  dat <- combine_featureCounts(in_dir, pattern)
+} else if (params$alignments == "umi"){
+# umi data
+  in_dir = paste0("../../data/", params$Project, "/hisat2/feature_counts")
+  pattern = "sorted_dedup.tsv$"
+  dat <- combine_featureCounts(in_dir, pattern)
+} else {
+  stop(paste0(params$alignments, " not a valid alignment variable for params input"))
+}
+
+if (params$species == "mouse"){
+  mito_gene_pattern = "^mt-"
+  kal_annotation_data = "../../dbases/ensemblid_to_gene_mouse.txt"
+} else if (params$species == "human") {
+  mito_gene_pattern = "^MT-"
+  kal_annotation_data = "../../dbases/ensemblid_to_gene_human.txt"
+} else {
+  stop("unknown species, use either mouse or human")
+}
+
+
+```
+
+
+## QC analysis
+### Bulk Mapping Statistics
+```{r mapping stats, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 12}
+in_dir <- paste0("../../data/", params$Project, "/fastq/stats")
+pattern <- "mapping_stats.txt"
+files <- list.files(path = in_dir, 
+                      pattern = pattern,
+                      full.names = T)
+map_dat <- read_tsv(files, col_names = F)
+colnames(map_dat) <- c("fastq", "counts")
+map_dat <- map_dat[c(1:2), ]
+map_dat[3, ]<- map_dat[1, 2 ] - map_dat[2, 2]
+map_dat <- map_dat[-2, ]
+map_dat$type <- c("Raw Reads", "Reads Assigned \nto Cells")
+map_dat[, 1] <- NULL
+
+hisat2_alignments <- paste0("../../data/", params$Project, "/hisat2/align_stats/")
+cell_map_dat <- combine_mapping_stats(hisat2_alignments)
+cell_map_dat <- cell_map_dat %>% filter(!grepl("unmatched", cell),
+                                        !grepl("umidedup", cell)) %>%
+                mutate(mapped_reads = (10 ^ `total reads`) - `unmapped reads`)
+
+map_dat[3, 1] <- sum(10 ^ cell_map_dat$`total reads`)
+map_dat[3, 2] <- c("Reads remaining\n after Trimming")
+map_dat[4, 1] <- sum(cell_map_dat$mapped_reads)
+map_dat[4, 2] <- c("Reads aligned \nwith Hisat2")
+
+hisat2_features <- paste0("../../data/", params$Project, "/hisat2/feature_counts/")
+assigned_counts <- get_featureCounts_stats(hisat2_features, "*sorted.tsv.summary")
+
+map_dat[5, 1] <- assigned_counts
+map_dat[5, 2] <- c("Reads assigned \n to exons with \n Hisat2")
+
+kallisto_alignments <- paste0("../../data/", params$Project, "/kallisto_aln/align_stats/")
+cell_map_dat <- combine_mapping_stats(kallisto_alignments)
+cell_map_dat <- cell_map_dat %>% filter(!grepl("unmatched", cell),
+                                        !grepl("umidedup", cell)) %>%
+                mutate(mapped_reads = (10 ^ `total reads`) - `unmapped reads`)
+
+map_dat[6, 1] <- sum(cell_map_dat$mapped_reads)
+map_dat[6, 2] <- c("Reads assigned \n to exons \n with kallisto")
+
+hisat2_features <- paste0("../../data/", params$Project, "/hisat2/feature_counts/")
+assigned_counts <- get_featureCounts_stats(hisat2_features, "*sorted_dedup.tsv.summary")
+
+map_dat[7, 1] <- assigned_counts
+map_dat[7, 2] <- c("UMI exon counts \n  from hisat2 \n alignments")
+
+map_dat$counts <- map_dat$counts / 1e6
+n_cells <- nrow(cell_map_dat)
+
+fontsize <- theme(axis.text=element_text(size=9), 
+                  axis.title=element_text(size=12))
+
+ggplot(map_dat, aes(reorder(type, -counts), counts)) + 
+  geom_bar(stat = "identity") + xlab("") + ylab("Millions of Reads") +
+  annotate(geom = "text", x = 7, y = max(map_dat$counts)* .9, label = paste0(n_cells, " Cells")) +
+  geom_text(aes(label = paste(signif(counts, 3))), parse = T, nudge_y = 15) +
+  ggtitle("Bulk Read Statistics") + fontsize
+ggsave(paste0(params$Project, "/plots/read_mapping_stats.pdf"), width =12)
+```
+
+With this depth of sequencing one would expect on average `r prettyNum((1e6 * as.data.frame(map_dat[1,1])[1,1, drop = T] / n_cells), big.mark=",")` reads per cell.  
+
+```{r read_in_expression_matrices}
+
+# remove cells with no counts
+keep_feature <- colSums(dat) > 0
+dat <- dat[, keep_feature]
+
+sample_info <- data.frame(sample = colnames(dat))
+rownames(sample_info) <- colnames(dat)
+sample_info$cell_type <- str_match(colnames(dat), "Cell_(\\w+)_\\d+_\\d+")[, 2]
+sample_info[, 1] <- NULL
+
+pd <- new("AnnotatedDataFrame", data = sample_info)
+
+
+gene_df <- data.frame(Gene = rownames(dat))
+rownames(gene_df) <- gene_df$Gene
+fd <- new("AnnotatedDataFrame", data = gene_df)
+
+
+  
+sce <- newSCESet(countData = dat, 
+                 phenoData = pd, 
+                 featureData = fd)
+
+keep_feature <- rowSums(counts(sce)) > 0
+sce <- sce[keep_feature, ]
+
+cell_controls <- grepl("(Ctrl|unmatched)", sce$cell)
+
+is_mito <- grep(mito_gene_pattern, fData(sce)$Gene)
+
+sce <- calculateQCMetrics(sce, feature_controls = list(MT = is_mito))
+
+```
+
+
+### Reads recovered per cell
+
+```{r cell_stats_unfiltered, fig.width = 12}
+n_cells <- length(sce$cell)
+fontsize <- theme(axis.text=element_text(size=8, angle = 90), 
+                  axis.title=element_text(size=12))
+
+a <- ggplot(pData(sce), aes(log10_total_counts)) + geom_histogram(bins = 100) + xlab("Reads per cell (log10)") + ylab("Cells") + geom_vline(xintercept = log10(read_cutoff), colour = "red")  +  
+  annotate(geom = "text", x = max(pData(sce)$log10_total_counts) * .95, 
+           y = max(hist(sce$log10_total_counts, plot = F, breaks = 100)$counts), label = paste0(n_cells, " Cells")) 
+
+b <- plotPhenoData(sce, aes(x = cell_type, y = log10_total_counts)) + 
+  fontsize + xlab("sample") + ylab("Reads per Cell (log10)") + geom_boxplot(size = .2, alpha = .05)
+plot_grid(a, b, align = "h")
+ggsave(paste0(params$Project, "/plots/reads_per_cell.pdf"), width =12)
+```
+
+``` {r}
+pData(sce) %>% group_by(cell_type) %>%
+  summarize(`Mean Read Count` = mean(total_counts),
+            `Median Read Count` = median(total_counts)
+            ) %>% knitr::kable(booktabs = TRUE)
+```
+
+Based on the observed distribution, a cutoff value of a minumum read count of `r read_cutoff` seems reasonable
+
+``` {r}
+#exclude cells with low reads counts
+count_filter <- (sce$total_counts > read_cutoff)
+
+knitr::kable(
+    as.data.frame(table(count_filter)),
+    booktabs = TRUE,
+    row.names = FALSE,
+  caption = paste0("The number of cells removed due to low read counts < ", read_cutoff, " reads (FALSE)")
+)
+```
+
+### Genes detected per cell
+```{r}
+ggplot(pData(sce), aes(log10_total_counts, log10_total_features)) + 
+  geom_point(aes(colour = cell_type)) + scale_color_brewer(palette = "Set1") + ylab("Genes detected per cell (>0 reads) (Log10)") +  
+  xlab("Reads per cell (Log10)")
+```
+``` {r read subsampling}
+bad_dat <- dat
+big_libs <- colSums(bad_dat) > 50000 & !grepl("PosCtrl|NegCtrl", colnames(bad_dat))
+
+big_libs <- bad_dat[, colnames(bad_dat)[big_libs]]
+
+set.seed(82316)
+
+read_counts <- 0.5^seq(0,10, 1) * 50000
+
+cell_lib <- rep(colnames(big_libs), each = length(read_counts))
+reads <- vector("list", length = ncol(big_libs))
+gene_count <-  vector("list", length = ncol(big_libs))
+
+for (i in 1:ncol(big_libs)) {
+  reads[[i]] <- vector("list", length(read_counts))
+  gene_count[[i]] <- vector("list", length(read_counts))
+}
+
+n = nrow(big_libs)
+for (i in 1:ncol(big_libs)){
+    for (j in seq_along(read_counts)){
+      proportion <- read_counts[j] / sum(big_libs[, i]) 
+      cnts <- rbinom(n, big_libs[, i], proportion)
+      genes <- sum(cnts > 0) 
+      cnts <- sum(cnts)
+      gene_count[[i]][j] <- genes
+      reads[[i]][j] <- cnts
+}
+}
+gene_read_dat <- data_frame(cells = cell_lib, reads = unlist(reads), genes = unlist(gene_count))
+
+b <- ggplot(gene_read_dat, aes(reads, genes)) +
+  geom_line(aes(colour = cell_lib)) +
+  theme(legend.position = "none") +
+  ggtitle(paste0(params$Project)) + xlab("Reads") + ylab("Genes Detected (>0 counts)") +
+  xlim(0,51000) + ylim(0,4000)
+
+
+
+ggsave(paste0(params$Project, "/plots/reads_subsampling_per_cell.pdf"), b, width = 6, height = 4)
+
+
+```
+
+
+```{r}
+count_dat <- counts(sce[, !grepl("unmatched|Ctrl", pData(sce)$cell_type)])
+n <- ncol(count_dat)
+cell_count = numeric(n) 
+cumlative_gene_count = numeric(n)
+ cell_count[1] <- 1 
+ cumlative_gene_count[1] <- sum(rowSums(count_dat[, 1, drop = F] ) > 0) 
+ 
+for (i in 2:n){
+ cell_count[i] <- i 
+ cumlative_gene_count[i] <- sum(rowSums(count_dat[, 1:i]) > 0) 
+}
+cumlative_gene_count <- data.frame(cell_count = cell_count,  cumlative_gene_count = cumlative_gene_count, stringsAsFactors = FALSE)
+ggplot(cumlative_gene_count, aes(cell_count, cumlative_gene_count)) + geom_point() + ylab("Unique Genes Detected")
+```
+  
+
+  
+```{r}
+a <- ggplot(pData(sce), aes(total_features)) + geom_histogram(bins = 100) + xlab("Genes detected per cell (>0 reads)") + ylab("Cells") + geom_vline(xintercept = gene_cutoff, colour = "red") +  
+  annotate(geom = "text", x = max(pData(sce)$total_features) * .95, 
+           y = max(hist(sce$total_features, breaks = 100, plot = F)$counts), label = paste0(n_cells, " Cells")) 
+
+b <- plotPhenoData(sce, aes(x = cell_type, y = total_features)) +  
+  fontsize + xlab("") + ylab("Genes detected (>0 reads)") + geom_boxplot(size = .2, alpha = .05)
+
+plot_grid(a, b, align = "h")
+ggsave(paste0(params$Project, "/plots/genes_per_cell.pdf"))
+```
+    
+``` {r}
+pData(sce) %>% group_by(cell_type) %>%
+  summarize(`Mean Gene Count` = mean(total_features),
+            `Median Gene Count` = median(total_features)
+            ) %>% knitr::kable(booktabs = TRUE)
+```
+
+  Additionally cells with only a few genes detected are unlikely to be informative for downstream clustering and differential gene expression. Here a very liberal cut-off of `r  params$gene_cutoff` genes has been chosen. 
+  
+``` {r}
+gene_filter <- (sce$total_features > gene_cutoff)
+
+knitr::kable(
+    as.data.frame(table(gene_filter)),
+    booktabs = TRUE,
+    row.names = FALSE,
+    caption = paste0("The number of cells removed due to low gene counts < ", gene_cutoff, " genes (FALSE)")
+)
+```
+
+### Reads mapping to mitochondia
+```{r}
+a <- ggplot(pData(sce), aes(pct_counts_feature_controls)) + geom_histogram(bins = 100) + xlab("% of reads mapping to mitochondrial genes") + ylab("Cells") + geom_vline(xintercept = mito_cutoff, colour = "red") +  
+  annotate(geom = "text", x = max(pData(sce)$pct_counts_feature_controls) * .95, 
+           y = max(hist(sce$pct_counts_feature_controls, breaks = 100, plot = F)$counts), label = paste0(n_cells, " Cells")) 
+
+b <- plotPhenoData(sce, aes(x = cell_type, y = pct_counts_feature_controls)) + 
+  fontsize + xlab("") + ylab("% of reads mapping to mitochondrial genes") + geom_boxplot(size = .2, alpha = .05)
+
+plot_grid(a, b, align = "h")
+ggsave(paste0(params$Project, "/plots/mitogenes_per_cell.pdf"))
+```
+
+``` {r}
+#exclude cells with abnormally high mitochondira
+mito_filter <- (sce$pct_counts_feature_controls < mito_cutoff)
+
+knitr::kable(
+    as.data.frame(table(mito_filter)),
+    booktabs = TRUE,
+    row.names = FALSE,
+    caption = paste0("The number of cells removed due to high mitochondial content > ", mito_cutoff, " % (FALSE)")
+)
+```
+
+---
+
+  Filtering for > `r read_cutoff` reads, > `r gene_cutoff` genes, and < `r mito_cutoff` percent mitochondial reads results in the following cells remaining:   
+``` {r}
+sce$pass_filter <- (
+    # has enough reads
+    count_filter &
+    # has enough  genes
+    gene_filter &
+    # doesn't have abnormal mitochondrial content]
+    mito_filter
+)
+
+pass_filter <- sce$pass_filter
+
+knitr::kable(
+    as.data.frame(table(pass_filter)),
+    booktabs = TRUE,
+    row.names = FALSE,
+    caption = 'The number of cells that passed all filtering steps (True = Pass)'
+    )
+```
+
+### Gene level filtering
+
+In addition to filtering to remove low-quality cells from the data, gene's with very infrequent counts should be removed. For this analysis, a gene must be expressed in at least 2 cells with a minimum of a single UMI. 
+
+``` {r}
+low_abundance_gene_filter <-  apply(counts(sce[ , pData(sce)$pass_filter]), 1, 
+                      function(x) length(x[x > 1]) >= 2)
+fData(sce)$pass_filter <- low_abundance_gene_filter
+
+knitr::kable(
+    as.data.frame(table(low_abundance_gene_filter)),
+    booktabs = TRUE,
+    row.names = FALSE,
+    caption = 'The number of genes removed by gene filter (FALSE)'
+)
+```
+---
+
+### Filtering Summary
+
+``` {r}
+dim(sce[fData(sce)$pass_filter, pData(sce)$pass_filter])
+sce_qc <- sce[fData(sce)$pass_filter, pData(sce)$pass_filter]
+
+before <-  tibble::as_data_frame(table(sce$cell_type))
+before <- bind_rows(before, frame_data(~Var1, ~n, "Total", sum(before$n)))
+after <-  tibble::as_data_frame(table(sce_qc$cell_type))
+after <- bind_rows(after, frame_data(~Var1, ~n, "Total", sum(after$n)))
+
+dat_tbl <- inner_join(before, after, by = "Var1") 
+colnames(dat_tbl) <-  c("Cell Type", "Before Filtering", "After Filtering")
+dat_tbl <- dat_tbl %>% mutate(`Percent Lost` = round(100 * (1 - `After Filtering` / `Before Filtering`), 1) )
+
+knitr::kable(
+    dat_tbl,
+    booktabs = TRUE,
+    row.names = FALSE,
+    caption = 'The cell types remaining after filtering '
+)
+```
+  
+---
+  
+## Post-Filtering Analysis  
+
+``` {r}
+pData(sce_qc) %>% group_by(cell_type) %>%
+  summarize(
+            `Mean Read Count` = mean(total_counts),
+            `Median Read Count` = median(total_counts),
+            `Mean Gene Count` = mean(total_features),
+            `Median Gene Count` = median(total_features)
+            ) %>% knitr::kable(booktabs = TRUE, caption = "Read and gene Statistics After Filtering")
+```
+   
+``` {r, fig.cap="The Percentage of total reads consumed by each gene. Each hash mark indicate the number of features i.e. genes per cell. " }
+plotQC(sce, type = "highest-expression")
+```
+
+``` {r, fig.cap="Very few genes are present in every cell, a problem due to the poor recovery of all of the RNA from a cell. feature_contols are mitochondrial genes. High technical dropouts are genes that are abundantly expressed but failed to be picked up in a many cells, in part likely to due random sampling" }
+plotQC(sce, type = "exprs-freq-vs-mean")
+```
+
+```{r cell_stats, fig.width = 12}
+fontsize <- theme(axis.text=element_text(size=8, angle = 90), 
+                  axis.title=element_text(size=12))
+n_cells <- length(sce_qc$cell)
+
+a <- ggplot(pData(sce_qc), aes(log10_total_counts)) + geom_histogram(bins = 100) + xlab("Reads per cell (log10)") + ylab("Cells") +  
+  annotate(geom = "text", x = max(pData(sce_qc)$log10_total_counts) * .95, 
+           y = max(hist(sce_qc$log10_total_counts, breaks = 100, plot = F)$counts), label = paste0(n_cells, " Cells")) 
+
+b <- plotPhenoData(sce_qc, aes(x = cell_type, y = log10_total_counts)) + 
+  fontsize + xlab("sample") + ylab("Reads per Cell (log10)") + geom_boxplot(size = .2, alpha = .05)
+plot_grid(a, b, align = "h")
+```
+
+```{r, fig.width = 12}
+a <- ggplot(pData(sce_qc), aes(total_features)) + geom_histogram(bins = 100) + xlab("Genes detected per cell (>0 reads)") + ylab("Cells")  +  
+  annotate(geom = "text", x = max(pData(sce_qc)$total_features) * .95, 
+           y = max(hist(sce_qc$total_features, breaks = 100, plot = F)$counts), label = paste0(n_cells, " Cells")) 
+
+b <- plotPhenoData(sce_qc, aes(x = cell_type, y = total_features)) + 
+  fontsize + xlab("") + ylab("Genes detected (>0 reads)") + geom_boxplot(size = .2, alpha = .05)
+plot_grid(a, b, align = "h")
+
+```
+
+
+## Clustering
+  To investigate the heterogeneity of gene abundance profiles between cells,  Principle Component Analysis (PCA) and t-Distributed Stochastic Neighbor Embedding (tSNE) can be used. PCA is a commonly used approach, but suffers from problems with outlier data. tSNE is a non-linear method for clustering that handles outlier far better than PCA.  
+  
+``` {r, fig.cap="PCA plot of count data before filtering. Top 500 most variable genes are used for input"}
+sce_noctrls <- sce[, !grepl("unmatched|Ctrl", pData(sce)$cell_type)]
+sceqc_noctrls <- sce_qc[, !grepl("unmatched|Ctrl", pData(sce_qc)$cell_type)]
+plotPCA(sce_noctrls, colour_by = "cell_type", size_by = "total_features")
+```  
+  
+``` {r, fig.cap="PCA plot of count data after filtering. Top 500 most variable genes are used for input"}
+plotPCA(sceqc_noctrls, colour_by = "cell_type", size_by = "total_features", ntop = 500)
+#a <-  plotPCA(sceqc_noctrls, colour_by = "cell_type", size_by = "total_features", exprs_values = "counts", ntop = 500), return_SCESet=T, draw_plot = F)
+# <- as.data.frame(reducedDimension(a))
+#plotReducedDim(a, colour_by = "cell_type", size_by = "total_features") + geom_text(data = b, aes(label = rownames(b)))
+#View(counts(sceqc_noctrls)[,rownames(pData(sceqc_noctrls)) == "Cell_3044_53_33", drop = F] )
+```
+
+``` {r, fig.cap="tSNE plot of counts pdata before filtering. Top 500 most variable genes are used for input"}
+set.seed(80316)
+tryCatch({plotTSNE(sce_noctrls, colour_by = "cell_type", size_by = "total_features")}, error=function(cond) {
+            message(paste("tsne found duplicates"))})
+```
+
+``` {r, fig.cap="tSNE plot of counts data after filtering. Top 500 most variable genes are used for input"}
+set.seed(80316)
+rand_seed = 80316
+plotTSNE(sceqc_noctrls, colour_by = "cell_type", size_by = "total_features")
+```
+
+### Cofounding variables
+  The variability in single-cell RNA-seq is much higher than that observed for bulk RNA-Seq. The varibility is in part potentially interesting biology, however many technical variables can skew the results. 
+  
+``` {r, fig.cap="Marginal R-squared values from linear models fit against gene counts versus each variable indicated"}
+plotQC(sce_qc, 
+       type = "expl", 
+       exprs = "counts", 
+       variables = c("total_features",
+                     "total_counts",
+                     "cell_type",
+                     "pct_counts_feature_controls"))
+```
+
+
+### Normalization 
+  The raw count data needs to be normalized to remove variation due to sequencing depth. 
+``` {r}
+
+
+#qclust <- scran::quickCluster(sce_qc, min.size = 20)
+#sce_qc <- scran::computeSumFactors(sce_qc, 
+#                                   sizes = 5, 
+#                                   clusters = qclust, assay = "counts", positive = T)
+#sce_qc <- scater::normalize(sce_qc)
+
+#pass_normalization <- pData(sce_qc)$size_factor == 0
+
+#knitr::kable(
+ #   as.data.frame(table(pass_normalization)),
+#    booktabs = TRUE,
+#    row.names = FALSE,
+#    caption = 'The number of cells that passed normalization (True = Pass)'
+#    )
+
+
+#sce_qc$pass_normalization <- pass_normalization
+
+#sce_qc <- sce_qc[ , !pData(sce_qc)$pass_normalization]
+
+#sce_qc <- normaliseExprs(sce_qc, method = "RLE", exprs_values = "counts")u`
+
+keep_feature <- rowSums(counts(sceqc_noctrls)) > 0
+sceqc_noctrls <- sceqc_noctrls[keep_feature, ]
+sceqc_norm <- normaliseExprs(sceqc_noctrls, method = "RLE", exprs_values = "counts")
+```
+
+``` {r, fig.cap = "PCA after normalizing using size factors"}
+plotPCA(sceqc_norm,
+                colour_by = "cell_type",
+                size_by = "total_features")
+ggsave(paste0(params$Project, "/plots/pca_clustering_normalized_values.pdf"))
+```
+``` {r, fig.cap = "tSNE after normalizing using size factors"}
+plotTSNE(sceqc_norm,
+                colour_by = "cell_type",
+                size_by = "total_features", rand_seed = rand_seed)
+ggsave(paste0(params$Project, "/plots/tsne_clustering_normalized_values.pdf"))
+```
+
+``` {r, fig.caption="Variance now explan mostly by cell_type"}
+plotQC(sceqc_norm, 
+       type = "expl", 
+       exprs = "norm_counts",
+       variables = c("total_features",
+                     "total_counts",
+                     "cell_type",
+                     "pct_counts_feature_controls"))
+
+```
+
+PCA and Tsne colored by Sample type (Old, Old AAT, Young)
+```{r}
+if (refactor_degregori){
+  pData(sceqc_norm)$sample_type <- ifelse(grepl("Y1|Y2", pData(sceqc_norm)$cell_type), "Young",
+                                          ifelse(grepl("242|250", pData(sceqc_norm)$cell_type), "Old",
+                                                 ifelse(grepl("241|248", pData(sceqc_norm)$cell_type), "AAT_old", 
+                                                        NA)
+                                          )
+  )
+
+plotPCA(sceqc_norm,
+                colour_by = "sample_type",
+                size_by = "total_features")
+ggsave(paste0(params$Project, "/plots/sample_type_pca_clustering_normalized_values.pdf"))
+
+plotTSNE(sceqc_norm,
+                colour_by = "sample_type",
+                size_by = "total_features",
+                rand_seed = rand_seed)
+ggsave(paste0(params$Project, "/plots/sample_type_tsne_clustering_normalized_values.pdf"))
+} else if (refactor_torchia){
+   pData(sceqc_norm)$sample_type <-ifelse(pData(sceqc_norm)$total_features < 1000, "less_than_1000_genes",
+                                          "greater_than_1000_genes")
+
+plotPCA(sceqc_norm,
+                colour_by = "sample_type",
+                size_by = "total_features")
+ggsave(paste0(params$Project, "/plots/sample_type_pca_clustering_normalized_values.pdf"))
+
+plotTSNE(sceqc_norm,
+                colour_by = "sample_type",
+                size_by = "total_features",  rand_seed = rand_seed)
+ggsave(paste0(params$Project, "/plots/sample_type_tsne_clustering_normalized_values.pdf"))
+
+
+}
+```
+## Differential Expression
+  Using `DESeq2`, differential expression between groups can be calcuated. In this example differentially expressed genes are computed between `r paste0(str_split_fixed(DGE_samples, "\\|", n = 2)[1]," and ", str_split_fixed(DGE_samples, "\\|", n = 2)[2]) `
+   
+   
+``` {r deseq, message=FALSE, warning=FALSE }
+register(MulticoreParam(4))
+if (refactor_degregori){
+  sce_df <- sceqc_norm[, grepl(DGE_samples, sceqc_norm$sample_type)]
+  counts <- counts(sce_df)
+  group <- data.frame(rownames(pData(sce_df)), condition = sce_df$sample_type)
+  counts <- counts(sce_df)
+  rownames(group) <- group[, 1]
+  group[, 1] <- NULL
+  group$condition <- relevel(as.factor(group$condition), as.character(params$relevel_factor))
+} else {
+  sce_df <- sceqc_norm[, grepl(DGE_samples, sceqc_norm$cell)]
+  counts <- counts(sce_df)
+  group <- data.frame(rownames(pData(sce_df)), condition = sce_df$cell)
+  counts <- counts(sce_df)
+  rownames(group) <- group[, 1]
+  group[, 1] <- NULL
+  group$condition <- relevel(as.factor(group$condition), as.character(params$relevel_factor))
+}
+
+dds <- DESeqDataSetFromMatrix(countData = counts, colData = group, design = ~ condition)
+dds <- DESeq(dds, parallel = T)
+res <- results(dds, parallel = T)
+resOrdered <- res[order(res$padj),]
+
+res_Ordered <- as.data.frame(resOrdered)
+topgene1 <- rownames(res_Ordered[1, ])
+topgene2 <- rownames(res_Ordered[2, ])
+topgene3 <- rownames(res_Ordered[3, ])
+topgene4 <- rownames(res_Ordered[4, ])
+topgene5 <- rownames(res_Ordered[5, ])
+```
+
+
+``` {r}
+knitr::kable(
+    head(res_Ordered, 10),
+    booktabs = TRUE,
+    row.names = TRUE,
+    caption = paste0('Top 10 differentially expressed genes between ', str_split_fixed(DGE_samples, "\\|", n = 2)[1],
+                    ' and ', str_split_fixed(DGE_samples, "\\|", n = 2)[2]),
+    digits = 100
+)
+write.table(res_Ordered, paste0(params$Project, "/differential_expression.txt"), col.names = T, row.names = T, quote = F, sep ="\t" )
+```
+
+Overall there are `r sum(res_Ordered$padj <0.05, na.rm = T)` genes with `padj <0.05`. `r sum(res_Ordered$padj <0.05 & res_Ordered$log2FoldChange < 0, na.rm = T)` are downregulated and `r sum(res_Ordered$padj <0.05 & res_Ordered$log2FoldChange > 0, na.rm = T)` are upregulated. 
+  
+*****  
+Below are tSNE plots with the top 5 differentially expressed genes based on adjusted p-value  
+
+``` {r}
+rand_seed <- 80316
+plotTSNE(sce_df, colour_by = "cell_type", size = topgene1, rand_seed = rand_seed)
+plotTSNE(sce_df, colour_by = "cell_type", size = topgene2, rand_seed = rand_seed)
+plotTSNE(sce_df, colour_by = "cell_type", size = topgene3, rand_seed = rand_seed)
+plotTSNE(sce_df, colour_by = "cell_type", size = topgene4, rand_seed = rand_seed)
+plotTSNE(sce_df, colour_by = "cell_type", size = topgene5, rand_seed = rand_seed)
+```
+
+
+``` {r}
+write_rds(sce_df, paste0(params$Project,  '/', params$alignments, "_diff_gene_exp.rds"), compress = "gz")
+write_rds(sceqc_norm, paste0(params$Project,  '/', params$alignments, "_qc_filtered.rds"), compress = "gz")
+write_rds(sce, paste0(params$Project, '/', params$alignments, "_all.rds"), compress = "gz")
+
+
+write.table(counts(sce_df), paste0(params$Project, "/filtered_count_matrix.tsv"), sep ="\t", row.names = T, col.names = T, quote = F)
+write.table(norm_counts(sce_df), paste0(params$Project, "/filtered_normalized_matrix.tsv"), sep ="\t", row.names = T, col.names = T, quote = F)
+write.table(counts(sce), paste0(params$Project, "/raw_count_matrix.tsv"), sep ="\t", row.names = T, col.names = T, quote = F)
+write.table(pData(sce), paste0(params$Project, "/filtered_sample_info.tsv"), sep ="\t", row.names = T, col.names = T, quote = F)
+write.table(pData(sce), paste0(params$Project, "/unfiltered_sample_info.tsv"), sep ="\t", row.names = T, col.names = T, quote = F)
+```
+
+```{r plots from individual gene comparisions, fig.height = 20}
+genes_to_plot = params$genes_to_plot 
+plotExpression(sce_df, genes_to_plot, x = "cell_type", exprs_values = "norm_counts", show_median = TRUE, show_violin = TRUE, log2_values = T)
+ggsave(paste0(params$Project, "/plots/per_gene_expression_plots.pdf"))
+```
+
+```{r final tsne plots}
+genes_to_tsne = params$genes_to_tsne
+for (i in 1:length(genes_to_tsne)){
+a <- plotTSNE(sce_df, colour_by = genes_to_tsne[i], shape_by = "cell_type", 
+         exprs_values = "norm_counts", rand_seed = rand_seed)
+print(a)
+ggsave(paste0(params$Project, "/plots/tsne_", genes_to_tsne[i], ".pdf"))
+}
+
+if (refactor_torchia){
+  a <- plotTSNE(sceqc_norm,
+                colour_by = "Vim",
+                shape_by = "sample_type",
+                exprs_values = "norm_counts",  rand_seed = rand_seed)
+  print(a)
+  a <- plotTSNE(sceqc_norm,
+                colour_by = "Cd14",
+                shape_by = "sample_type",
+                exprs_values = "norm_counts",  rand_seed = rand_seed)
+  print(a)
+  a <- plotTSNE(sceqc_norm,
+                colour_by = "Ptprc",
+                shape_by = "sample_type",
+                exprs_values = "norm_counts",  rand_seed = rand_seed)
+  print(a)
+}
+```
+  
+## Output Files
+ 
+1) The differential expression analysis data is provided as a tab deliminated table (`differential_expression.txt`).
+2) The raw count, filtered count, and normalized and filtered count matrices are provided as (`raw_count_matrix.tsv`, `filtered_count_matrix.tsv` and `filtered_normalized_matrix.tsv`). These are tab deliminated files with genes as rows and cells and columns. 
+3) Summary statistics and information for each cell are provided in the `unfiltered_sample_info.tsv` and `filtered_sample_info.tsv` files. Each row represented a cell. 
+4) Lastly, the gene expression data are also provided in an `.rds` binary format which can be loaded directly into `R` as an `R` object of class `SCESet` which can be analyzed using the [scater](https://bioconductor.org/packages/release/bioc/html/scater.html) `R` package. 
+
+
+## References
+
+This analysis  was inspired by the single cell RNA-Seq course from the [Hemberg Lab](http://hemberg-lab.github.io/scRNA.seq.course/), a a `Bioconductor` single cell analysis [workflow](http://www.bioconductor.org/help/workflows/simpleSingleCell/) and relies heavily on the `scater` R Package for visualization, written by `Davis McCarthy` (Package download and usage information [here](https://bioconductor.org/packages/release/bioc/html/scater.html)).

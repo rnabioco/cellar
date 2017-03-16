@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+inst/doc
+*.swp
+README.html
+*_cache/
+index.md
+index.html
+.DS_Store
