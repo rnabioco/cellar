@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ## Goal
@@ -54,9 +55,10 @@ The cellrangerRKit is equipped with a function `load_molecule_info()` which will
 library(cellrangerRkit)
 library(dtplyr)
 library(dplyr)
-gbm <- load_cellranger_matrix("~/Projects/10x_scRNA/data/Jordan/Brett_1/")
-gbm <- load_molecule_info(gbm = gbm) #load from h5 file
-dat <- gbm@molecule_info #extracted as a data.table 
+#gbm <- load_cellranger_matrix("~/Projects/10x_scRNA/data/Jordan/Brett_1/")
+#analysis <- load_cellranger_analysis_results("~/Projects/10x_scRNA/data/Jordan/Brett_1/")
+#gbm <- load_molecule_info(gbm = gbm) #load from h5 file
+#dat <- gbm@molecule_info #extracted as a data.table 
 dat ## can work with using dplyr verbs thanks to dtplyr
 ```
 
@@ -164,21 +166,85 @@ all(seqs == out_seqs)
 
 ## Per cell sequencing saturation
 
-Here's a quick analysis of 
-```{r mod_10x_dat, eval = T}
+Next I'll look at the duplication rate across all of the datasets, and plot the saturation metrics per cell on a TSNE
 
-d <- dat %>% mutate(seqs = decompress_sequences(barcode, 16))
+```{r utils}
+library(purrr)
 
-d %>% group_by(barcode) %>%  summarize(total_umis = n(), total_reads = sum(reads)) -> dat_stats
+load_dat <- function(sample_id, genome){
+  gbm <- load_cellranger_matrix(paste0("~/Projects/10x_scRNA/data/", sample_id), genome = genome)
+  gbm <- load_molecule_info(gbm = gbm) #load from h5 file
+  dat <- gbm@molecule_info #extracted as a data.table 
+  dat
+}
 
-dat_stats %>% 
+get_stats <- function(data_object, analysis_object){
+  data_object  %>% 
+  group_by(seqs) %>% 
+  summarize(total_umis = n(), total_reads = as.integer(sum(reads))) %>% 
+  as_data_frame() %>% 
   mutate(dup_rate = 1 - (total_umis / total_reads)) %>%  
   arrange(desc(total_umis)) %>% 
-  ungroup() %>%  
-  slice(1:1091) -> dat_stats
+  ungroup() -> dat_stats 
+  
+  inner_join(dat_stats, analysis_object$tsne, by = c("seqs" = "Barcode")) %>% 
+  rename(cDNA_duplication_rate = dup_rate) %>% 
+  mutate(average_duplication_rate = (1 - (sum(total_umis) / sum(total_reads)))) -> res
+  res
+}
 
-ggplot(dat_stats, aes(dup_rate)) + geom_density()
+plot_tsne <- function(dat){
+  ggplot(dat, aes(TSNE.1, TSNE.2, colour = cDNA_duplication_rate)) + 
+  geom_point() +
+  facet_wrap(~expt + 
+               paste0("Saturation = ", signif(average_duplication_rate, 3))) +
+  coord_equal() +
+  theme_bw() +
+  theme(legend.position = "top")
+}
+```
 
-ggplot(dat_stats, aes(row.names(dat_stats), dup_rate)) + 
-  geom_point()
+```{r run_analysis_fxn}
+
+run_saturation_analysis <- function(samples, genomes){
+  # input list of samples and list of associated genomes
+  # load the data
+  dat <- map2(samples, genomes, ~load_dat(.x, .y))
+  names(dat) <- samples %>% unlist() %>% basename
+  analysis <- map(samples, ~load_cellranger_analysis_results(paste0("~/Projects/10x_scRNA/data/", .x)))
+  
+  # Decode the barcode slow!
+  dat <- map(dat, ~mutate(.x, seqs = decompress_sequences(barcode, 16)))
+  # append to gem Id to barcode seq to match matrix colnames
+  dat <- map(dat, ~mutate(.x, seqs = paste0(seqs, "-", gem_group)))
+  
+  # merge TSNE data 
+  stats <- map2(dat, analysis, ~get_stats(.x, .y))
+  # merge all experiments
+  stats <- bind_rows(stats, .id = "expt")
+  
+  plots <- plot_tsne(stats)
+  plots
+}
+```
+
+
+```{r Craig_Jordan_plots}
+samples <- list(
+  "Jordan/Brett_1", "Jordan/Brett_2", "Jordan/Brett_3"
+)
+genomes <- c(rep("GRCh38", 3))
+
+plot <- run_saturation_analysis(samples, genomes)
+plot
+```
+
+```{r John_Cambier_plots}
+samples <- list(
+  "Cambier_BND2", "Cambier_MN2"
+)
+genomes <- c(rep("GRCh38", 2))
+
+plot <- run_saturation_analysis(samples, genomes)
+plot
 ```
