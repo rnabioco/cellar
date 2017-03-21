@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(message = FALSE)
 ```
 
 ## Goal
@@ -59,7 +60,7 @@ library(dplyr)
 #analysis <- load_cellranger_analysis_results("~/Projects/10x_scRNA/data/Jordan/Brett_1/")
 #gbm <- load_molecule_info(gbm = gbm) #load from h5 file
 #dat <- gbm@molecule_info #extracted as a data.table 
-dat ## can work with using dplyr verbs thanks to dtplyr
+#dat ## can work with using dplyr verbs thanks to dtplyr
 ```
 
   The barcode and umi are encoded in a integer64 object. Here's the python code in cell ranger that encode/decodes the object. 
@@ -212,9 +213,16 @@ run_saturation_analysis <- function(samples, genomes){
   dat <- map2(samples, genomes, ~load_dat(.x, .y))
   names(dat) <- samples %>% unlist() %>% basename
   analysis <- map(samples, ~load_cellranger_analysis_results(paste0("~/Projects/10x_scRNA/data/", .x)))
-  
+ 
+  # get unique barcodes (~100k) 
+  seqs <- map(dat, ~select(.x, barcode) %>% unique())
+
   # Decode the barcode slow!
-  dat <- map(dat, ~mutate(.x, seqs = decompress_sequences(barcode, 16)))
+  seqs <- map(seqs, ~mutate(.x, seqs = decompress_sequences(barcode, 16)))
+
+  # join seqs with dat
+  dat <- map2(dat, seqs, ~inner_join(.x, .y, by = "barcode"))
+
   # append to gem Id to barcode seq to match matrix colnames
   dat <- map(dat, ~mutate(.x, seqs = paste0(seqs, "-", gem_group)))
   
@@ -228,6 +236,7 @@ run_saturation_analysis <- function(samples, genomes){
 }
 ```
 
+## Craig_Jordan_expt
 
 ```{r Craig_Jordan_plots}
 samples <- list(
@@ -239,6 +248,8 @@ plot <- run_saturation_analysis(samples, genomes)
 plot
 ```
 
+## John_Cambier_expt
+
 ```{r John_Cambier_plots}
 samples <- list(
   "Cambier_BND2", "Cambier_MN2"
@@ -248,3 +259,109 @@ genomes <- c(rep("GRCh38", 2))
 plot <- run_saturation_analysis(samples, genomes)
 plot
 ```
+
+# Control_expt
+
+```{r control_plots, cache.lazy= FALSE}
+samples <- list(
+  "control", "control"
+)
+genomes <- c("hg19", "mm10")
+
+dat <- map2(samples, genomes, ~load_dat(.x, .y))
+names(dat) <- genomes %>% unlist()
+analysis <- map(samples, ~load_cellranger_analysis_results(paste0("~/Projects/10x_scRNA/data/", .x)))
+ 
+# get unique barcodes (~100k) 
+seqs <- map(dat, ~select(.x, barcode) %>% unique())
+
+# Decode the barcode slow!
+seqs <- map(seqs, ~mutate(.x, seqs = decompress_sequences(barcode, 16)))
+
+# join seqs with dat
+dat <- map2(dat, seqs, ~inner_join(.x, .y, by = "barcode"))
+
+# append to gem Id to barcode seq to match matrix colnames
+dat <- map(dat, ~mutate(.x, seqs = paste0(seqs, "-", gem_group)) %>% tbl_df()) 
+
+# get matrix to run TSNE
+all_dat <- map2(samples, genomes, 
+                ~load_cellranger_matrix(paste0("~/Projects/10x_scRNA/data/", .x), genome = .y))
+
+# run tsne
+library(Rtsne)
+
+get_tsne <- function(x){
+  exprs_dat <- exprs(x)
+  exprs_dat <- as.matrix(exprs_dat)
+  
+  # find variable genes (top 1000?) and plot tsne (code modified from scater::plotTSNE)
+  row_variance <- matrixStats::rowVars(exprs_dat)
+  ngenes <- min(1000, length(row_variance))
+  var_genes <- order(row_variance, decreasing = TRUE)[seq_len(ngenes)]
+  exprs_to_plot  <- exprs_dat[var_genes, ]     
+  
+  #drop low variance genes
+  keep_feature <- (matrixStats::rowVars(exprs_to_plot ) > 0.001)
+  keep_feature[is.na(keep_feature)] <- FALSE
+  exprs_to_plot <- exprs_to_plot[keep_feature, ]
+  
+  #scale data and compute tsne
+  exprs_to_plot <- t(scale(t(exprs_to_plot), scale = T))
+  
+  tsne_out <- Rtsne::Rtsne(t(exprs_to_plot),
+                            initial_dims = 12,
+                            perplexity = 30)
+  
+  tsne_out_dat <- data_frame(seqs = colnames(exprs_dat), 
+                         TSNE.1 = tsne_out$Y[, 1], 
+                         TSNE.2 = tsne_out$Y[, 2])
+  tsne_out_dat
+}
+
+tsne_dat <- map(all_dat, ~get_tsne(.x))
+
+tsne_dat <- map2(dat, tsne_dat, ~inner_join(.x, .y, by = "seqs"))
+
+tsne_stats <- function(x) {
+  x  %>% 
+  group_by(seqs, TSNE.1, TSNE.2) %>% 
+  summarize(
+    total_umis = n(), 
+    total_reads = sum(as.numeric(reads))) %>% 
+  mutate(dup_rate = 1 - (total_umis / total_reads)) %>%  
+  arrange(desc(total_umis)) %>% 
+  ungroup() %>% 
+  rename(cDNA_duplication_rate = dup_rate) %>% 
+  mutate(average_duplication_rate = (1 - (sum(as.numeric(total_umis)) / sum(total_reads)))) %>% 
+  select(seqs, TSNE.1, TSNE.2, cDNA_duplication_rate, average_duplication_rate, total_umis)
+}
+
+tsne_dat <- map(tsne_dat, ~tsne_stats(.x))
+tsne_dat <- bind_rows(tsne_dat, .id = "expt")
+plot_tsne(tsne_dat)
+```
+
+```{r duplication_rate_doublets}
+dblets <- readr::read_csv("~/Projects/10x_scRNA/data/control/outs/analysis/gem_classification.csv")
+
+dblets <- inner_join(tsne_dat, dblets, by = c("seqs" = "barcode"))
+
+ggplot(dblets, aes(call, cDNA_duplication_rate)) +
+  geom_boxplot()
+
+ggplot(dblets, aes(hg19, mm10, colour = cDNA_duplication_rate, shape = call)) + geom_point()
+```
+
+
+
+## Pick cells
+
+
+5' P5-R1-Barcode: AATGATACGGCGACCACCGAGATCT-ACACTCTTTCCCTACACGACGCTCTTCCGATCT-NNNNNNNNNNNNNNNN 
+3' P7-SI-R2: CAAGCAGAAGACGGCATACGAGAT-NNNNNNNN-GTGACTGGAGTTCAGACGTGTGCTCTTCCGATC
+
+```{r oligo_picker}
+p5_seq <- "AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT"
+```
+
