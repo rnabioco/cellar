@@ -270,7 +270,7 @@ aml_markers = c(Blasts_and_Immature_Ery_1 = "CD34", early_erythroids = "GATA2", 
 
 knitr::kable(data_frame(populations = names(aml_markers), markers = aml_markers))
 
-FeaturePlot(pbmc, aml_markers)
+FeaturePlot(pbmc, aml_markers, pt.size = .25)
 ```
 
 ```{r, eval = F}
@@ -350,8 +350,8 @@ current.cluster.ids <- c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 pbmc@ident <- plyr::mapvalues(pbmc@ident, from = current.cluster.ids, to = new.cluster.ids)
 
 TSNEPlot(pbmc, 
-                   #do.label = T, 
-                   pt.size = 1, 
+                   do.label = T, 
+                   pt.size = 2, 
                    do.return = F, 
                    colors.use = brewer.pal(n = 11, "Paired"), 
                    label.size = 5)
