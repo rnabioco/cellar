@@ -13,49 +13,43 @@ SAMPLE_SHEET = config["SAMPLE_SHEET"]
 PROJECT = config["PROJECT"]
 LANES = config["LANES"]
 SAMPLES = config["SAMPLES"]
-#SAMPLES_OUT = [x[:-1] + x[-1] for x in SAMPLES]
 INDICIES = config["INDICIES"]
 
 rule all:
     input:
       expand("{data}/raw_data/Stats/DemultiplexingStats.xml",
       data=DATA),
-      expand("{sample}/outs/cloupe.cloupe",
-      sample = SAMPLES)
-
-#def _rename_input(wildcards):
-#    """ for some reason I need to rename the output 
-#    something more unique, otherwise cellranger count will fail...
-#    This function takes the renamed output and pulls out the sampleid """
-#    
-#    sample = wildcards.sample
-#    sample_number = sample[-1]
-#    sample_id = sample[:-1]
-#    return sample_id + sample_number
+      expand("{sample}_complete.txt", sample = SAMPLES)
 
 rule cellranger_count:
+    """ note that cellranger count will fail if the output directory
+    specified with ``--id`` exists prior to running. By default Snakemake 
+    will generate directories listed in the input and output params, so to
+    avoid this error this rule creates a dummy file "{sample}_complete.txt """
     input:
       "{data}/raw_data/Stats/DemultiplexingStats.xml".format(data=DATA)      
     output:
-      "{sample}/outs/cloupe.cloupe"
+      "{sample}_complete.txt"
     params:
-      indir = "{data}/raw_data/{project}/".format(data = DATA, project = PROJECT),
-      #sampleid  = _rename_input,
+      indir = "{data}/raw_data/{project}".format(data=DATA, project = PROJECT),
       lanes = LANES,
       job_name = "count",
       memory = "select[mem>4] rusage[mem=4]",
-    log: "{data}/results/logs/count.out".format(data = DATA)
+    log: "logs/{sample}_count.out"
     threads: 2
     shell:
       """
+      set -x
       cellranger count \
           --id={wildcards.sample} \
           --fastqs={params.indir} \
           --sample={wildcards.sample} \
           --lanes={params.lanes} \
           --jobmode=lsf \
+          --project={PROJECT} \
           --maxjobs=24 \
           --transcriptome={TRANSCRIPTOME}
+      echo "finished" > {output}
       """ 
 
 rule cellranger_mkfastq:
