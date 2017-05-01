@@ -14,12 +14,56 @@ PROJECT = config["PROJECT"]
 LANES = config["LANES"]
 SAMPLES = config["SAMPLES"]
 INDICIES = config["INDICIES"]
+EXPT_GROUPS = config["EXPT_GROUPS"]
 
 rule all:
     input:
       expand("{data}/raw_data/Stats/DemultiplexingStats.xml",
       data=DATA),
-      expand("{sample}_complete.txt", sample = SAMPLES)
+      expand("{sample}_complete.txt", sample = SAMPLES),
+      expand("{expt_groups}_aggr_complete.out.txt", expt_groups = EXPT_GROUPS)
+
+def _collect_groups(wildcards):
+    
+    groups = wildcards.expt_groups
+    groups = groups.split(",")
+    
+    out = open(groups[0] + "_groups_def.csv", 'w')
+    out.write("library_id,molecule_h5\n")
+    for group in groups: 
+        if group is "":
+            continue
+        library = group.strip(" ")
+        path = library + "/outs/molecule_info.h5"
+        out.write("{},{}\n".format(library, path))
+    
+    out.close()
+    # return list with group id and path to csv
+    return [groups[0][:-1], groups[0] + "_groups_def.csv"]
+
+rule cellranger_aggr:
+    input:
+      expand("{sample}_complete.txt", sample = SAMPLES),
+    output:
+      "{expt_groups}_aggr_complete.out.txt"
+    params:
+      groups = _collect_groups,
+      job_name = "aggr",
+      memory = "select[mem>4] rusage[mem=4]",
+    log: "logs/{expt_groups}_aggr.out"
+    threads: 2
+    shell:
+      """
+      set -x
+      cellranger aggr \
+          --csv={params.groups[1]} \
+          --id={params.groups[0]} \ 
+          --jobmode=lsf \
+          --maxjobs=24 
+
+      echo "finished" > {output}
+      """ 
+    
 
 rule cellranger_count:
     """ note that cellranger count will fail if the output directory
