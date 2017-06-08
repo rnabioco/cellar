@@ -1,0 +1,333 @@
+---
+title: "Schwartz lab scRNA-Seq"
+author: "Kent Riemondy RBI"
+date: "June 7, 2017"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    fig_caption: yes
+    fig_retina: 1 
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(cache.lazy = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+
+
+```{r libs, message=FALSE, warning=FALSE, echo=FALSE}
+library(Seurat)
+library(readr)
+library(tidyr)
+library(plyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(cowplot)
+library(RColorBrewer)
+library(Matrix)
+library(purrr)
+```
+
+
+## Experiment Summary
+ 
+  
+Sample | Treatment
+-------- | ----------  
+Sample 1 | A549 control
+Sample 2 | A549 MUC5B crispr knockdown
+Sample 3 | A549 MEK inhibitor treated
+
+
+```{r Jordan_data, eval = T}
+a549 <- Seurat::Read10X("~/Projects/10x_data/runs/AW/outs/filtered_gene_bc_matrices_mex/GRCh38/")
+```
+
+```{r, eval = T, message = F, results = 'hide', warning=F}
+a549 <- new("seurat", raw.data = a549)
+
+a549 <- Setup(a549, min.cells = 5, min.genes = 250, do.logNormalize = T, total.expr = 1e4, 
+              project = "Schwartz", names.field = 2, names.delim = "-")
+
+samples_lookup <- c("Control", "Crispr_KO", "MEK_Inhibitor")
+names(samples_lookup) <- c(1, 2, 3)
+
+og_vals <- a549@ident
+new_vals <- samples_lookup[og_vals]
+a549@ident <- plyr::mapvalues(a549@ident, from = og_vals, to = new_vals)
+```
+
+## QC
+  
+```{r examine_umi_and_ngenes, cache.lazy=FALSE, fig.width = 10, fig.height = 8, warning = F}
+summary_dat <- data_frame(cell = colnames(a549@raw.data), 
+                          nUMIs = colSums(a549@raw.data),
+                          nGenes = colSums(a549@raw.data > 0))
+
+summary_dat <- separate(summary_dat, cell, c("cellid", "sample"), sep = "-")
+
+
+summary_dat <- summary_dat %>% mutate(sample = samples_lookup[.$sample])
+summary_dat <- summary_dat %>% group_by(sample) %>% dplyr::arrange(desc(nUMIs))
+
+n_cells <- summary_dat %>%  group_by(sample) %>%  summarize(n_cells = n(),
+                                                            median_UMIs = median(nUMIs),
+                                                            median_Genes = median(nGenes))
+
+knitr::kable(n_cells,
+             caption = "Number of cells prior to filtering and summary statistics")
+
+a <- ggplot(summary_dat, aes(sample, log10(nUMIs))) +
+  geom_violin(aes(fill = sample)) +
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Number of UMIs (Log10)") +
+  ylim(c(0, 6)) +
+  theme(axis.text.x = element_blank())
+
+b <- ggplot(summary_dat, aes(sample, log10(nGenes))) +
+    geom_violin(aes(fill = sample)) +
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Number of Genes (at least 1 UMI) Log10") +
+  ylim(c(0, 4)) +
+  theme(axis.text.x = element_blank())
+plot_grid(a, b)
+```
+
+```{r write_matrix, eval =F}
+system("mkdir -p count_matrix/")
+write_tsv(dat, "count_matrix/all_samples_raw_counts_matrix.txt")
+system("gzip count_matrix/all_samples_raw_counts_matrix.txt")
+```
+
+```{r utility_fxn}
+cell_counts <- function(seurat_object){
+  #returns tbl_df with number of cells per sample type in seurat object
+  map_df(levels(seurat_object@ident), 
+         ~data_frame(sample = .x, 
+                     n_cells = length(WhichCells(seurat_object, ident = .x))))
+}
+```
+
+
+The percentage of reads aligning to mitochondria is often an indicator of cell quality. Cells that have lysed prior to capture preferentially retain mitochondial RNA, but lose cellular cytoplasmic mRNA. As shown below there is a strong negative correlation with the number of UMIs and the proportion of reads aligning to mitochondria. Cells with less than 20% mitochondrial reads will be retained for further analysis.
+
+```{r QC, cache.lazy=FALSE}
+mito.genes <- grep("^MT-", rownames(a549@data), value = T)
+proportion.mito <- colSums(expm1(a549@data[mito.genes, ]))/colSums(expm1(a549@data))
+
+a549 <- AddMetaData(a549, proportion.mito, "proportion.mito")
+#VlnPlot(a549, "nGene")
+#VlnPlot(a549, "nUMI")
+VlnPlot(a549, "proportion.mito")
+```
+
+```{r qc_mito_problems}
+GenePlot(a549, "nUMI", "proportion.mito")
+
+```
+
+```{r}
+a549 <- SubsetData(a549, subset.name = "proportion.mito", accept.high = 0.20)
+
+
+```
+
+```{r ngenes_filter}
+a549 <- SubsetData(a549, subset.name = "nGene", accept.low = 250)
+
+knitr::kable(cell_counts(a549),
+             caption = "Number of cells passing an additional filter requiring less than 15% mitochondrial reads and at least 500 genes detected")
+```
+
+After filtering the distribution of UMIs, Genes, and Proportion of mitochondrial reads is shown below:
+
+```{r ngenes_post_filter}
+VlnPlot(a549, "nGene")
+VlnPlot(a549, "nUMI")
+VlnPlot(a549, "proportion.mito")
+```
+
+```{r regress_out_umi_and_mito, results = 'hide'}
+a549 <- RegressOut(a549, latent.vars = c("nUMI", "proportion.mito"))
+```
+
+```{r get_variable_genes, results = 'hide'}
+a549 <- MeanVarPlot(a549, 
+                    fxn.x = expMean, 
+                    fxn.y = logVarDivMean, 
+                    x.low.cutoff = 0.0125, 
+                    x.high.cutoff = 4, y.cutoff = 0.5, do.contour = F, do.plot = F)
+
+length(a549@var.genes)
+
+```
+
+```{r PCA_tsne_calc, eval = T, results='hide'}
+a549 <- PCA(a549, pc.genes = a549@var.genes, do.print = TRUE, pcs.print = 5, genes.print = 5)
+
+a549 <- ProjectPCA(a549)
+a549 <- RunTSNE(a549, dims.use = 1:15, do.fast = T, k.seed = 1)
+```
+
+## PCA
+  To get an overview of the relationships between different cell types, PCA will be used first. Shown below is a plot of the first two prinicipal components computed using highly variable genes (`r length(a549@var.genes)` genes). The `Control` and `Crispr_KO` cells are closely clustered, whereas the MEK inhibitor treated cells are more segregated and have a larger spread. This is consitent with the MEK inhibtor treatment likely perturbing many more genes than the `Crispr KO`. 
+  
+```{r plot_pca, eval = T}
+PCAPlot(a549, 1, 2)
+```
+
+```{r plot_elbow, eval = F}
+PCElbowPlot(a549)
+```
+
+```{r, eval = F, message = F, warning = F}
+PCHeatmap(a549, pc.use = 1:15, cells.use = 2000, do.balanced = TRUE, label.columns = FALSE, use.full = FALSE, do.plot = F)
+```
+
+## TSNE projection
+  PCA analysis is useful for identifying the most variable dimensions in the dataset, both only 2 or 3 dimensions can be readily visualized. In single cell RNA-Seq datasets there are often many dimensions that are informative for clustering, sometimes up 20-40 dimensions depending on the complexity of the data. [TSNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) is a non-linear dimensionality reduction algorithm that is particularly well-suited for projecting multidimensional data in two dimensional space to ease visualization and classification.
+  
+  Shown below is a TSNE projection of the single cell data, with each cell colored by the sample type. Overall there is quite a large degree of structure in the data with each sample strongly segregating, and also some unique clustering within each sample.
+  
+```{r plot_TSNE, fig.width = 8, fig.height = 8}
+TSNEPlot(a549, colors.use = brewer.pal(n = 3, "Set1"))
+```
+
+## Potential Confounding Factors
+  A challenge with single-cell RNA-Seq is the high degree of technical noise. Variables such as the number of detected genes or UMIs can drive apparent differences in sample transcriptomes. Shown below is the same `TSNE` projection with each cell colored by the number of genes, UMIs, or percent mitochondria detected. 
+  
+```{r find_confounding_issues}
+FeaturePlot(a549, "nGene")
+FeaturePlot(a549, "nUMI")
+FeaturePlot(a549, "proportion.mito")
+```
+
+Overall the samples have very consistent UMI counts, numbers of genes detected, and number of mitochondria. 
+
+## MUC5B expression
+
+Shown below is the same TSNE projection, with each cell now colored by the gene expression level. Yellow is no expression and Red is high expression. Additionally shown is are summary plots of the gene expression grouped by sample for the following genes:
+
+1. MUC5B  
+2. MUC5AC  
+3. ACTB (Beta actin for comparison)  
+4. KRT8 (Keratin 8 for comparison)  
+
+```{r, muc5b_plot}
+FeaturePlot(a549, c("MUC5AC", "MUC5B", "ACTB", "KRT8"), pt.size = 0.5)
+VlnPlot(a549, c("MUC5AC", "MUC5B", "ACTB", "KRT8"))
+```
+
+MUC5B is undetected in most cells, with a handful more cells expressing MUC5B in the MEK treated cells. MUC5AC, the upstream gene in the genome, is however detectable in more cells and shows some enrichment in the control cells. ACTB and KRT8 are nearly universally detectable, as expected.  
+
+## Gene expression per sample
+Next, the gene expression differences per sample will be computed. The following two comparisons will be made:
+
+#. Compare Crispr KO cells to control
+#. Compare MEK inhibitor cells to control
+```{r reset_og_ident}
+a549 <- SetIdent(a549, ident.use = a549@data.info$orig.ident)
+```
+
+```{r}
+crispr_markers <-  FindMarkers(a549, 1, 2, min.pct = 0.20, thresh.use = 0.20)
+mek_markers <-  FindMarkers(a549, 1, 3, min.pct = 0.20, thresh.use = 0.20)
+
+crispr_markers[1:9, ] -> top_crisp
+mek_markers[1:9, ]  -> top_mek
+```
+
+```{r genes_enriched_per_sample, fig.width = 7.5, fig.height= 7.5, eval = T }
+top_genenames <- list(rownames(top_crisp), rownames(top_mek))
+```
+
+### Differentially expressed in Crispr versus Control
+```{r}
+FeaturePlot(a549, top_genenames[[1]], pt.size = 0.5)
+```
+
+### Differentially expressed in MEK inhibitor versus Control
+
+```{r}
+FeaturePlot(a549, top_genenames[[2]], pt.size = 0.5)
+```
+
+
+
+## Cluster identification
+
+  Unsupervised clustering was also performed to identify transcriptionally distinct cell populations, as there appears to be some clusters within each individual sample. A graph-based algorithm was used that builds a k-nearest neighbor (KNN) graph on the eucidean distances calculated from principal components, weights each edge based on the local neighboorhod using a jaccard statics, then prunes the graph to select clusters using an optimization function. The graph based algorithm is implemented in the Seurat R package.  Clusters are visualized using TSNE, but the cluster assignments are based on the first 15 principal components.
+  
+```{r find_markers, fig.width = 10, fig.height = 10, warning=FALSE}
+a549 <- FindClusters(a549, 
+                     pc.use = 1:15, 
+                     k.param = 25, 
+                     resolution = 0.5, 
+                     print.output = 0, 
+                     plot.SNN = F,
+                     save.SNN = T, random.seed = 0)
+
+TSNEPlot(a549, colors.use = brewer.pal(n = 12, "Paired"), do.label = T, label.size = 10)
+```
+
+Given that each sample was split into multiple clusters, it suggests that there is heterogeneity with the cell popuations. A common source of heterogeneity in cell lines is the cell-cycle, which can affect the transcriptional profile of a cell. 
+
+
+## Cell cycle classification
+To determine if cell cycle is a strong driven of the heterogeneity in these populations each cells transcriptome was compared against a set of markers for each stage of the cell cycle. A pre-built set of training data was used to classify each cell into G1 G2/M or S phases of the cell cycle. 
+
+Shown below is the original cluster classification followed by the classification of each cell into a stage of the cell cycle. 
+ 
+
+```{r cell cycle classification, results='hide', message=FALSE, warning=FALSE}
+# code modified from http://bioconductor.org/help/workflows/simpleSingleCell
+# training data from scran package, code here,  https://github.com/MarioniLab/scran/blob/master/inst/exdata/generate_markers.R
+# trained on fluidigm C1 data from FUCCI hESC cells
+
+hs.pairs <- readRDS(system.file("exdata", "human_cycle_markers.rds", package="scran"))
+library(org.Hs.eg.db, warn.conflicts = F)
+library(scater, warn.conflicts = F)
+library(scran, warn.conflicts = F)
+
+anno <- select(org.Hs.eg.db, keys=rownames(a549@data), keytype="SYMBOL", column="ENSEMBL")
+ensembl <- anno$ENSEMBL[match(rownames(a549@data), anno$SYMBOL)]
+```
+
+```{r}
+assignments <- cyclone( as.matrix(a549@data), hs.pairs, gene.names=ensembl)
+#plot(assignments$score$G1, assignments$score$G2M, xlab="G1 score", ylab="G2/M score", pch=16)
+
+classifications <- data.frame(phase = assignments$phases, row.names = a549@cell.names)
+
+a549 <-AddMetaData(a549, classifications)
+```
+
+```{r}
+TSNEPlot(a549, colors.use = brewer.pal(n = 12, "Paired"), do.label = T, label.size = 10)
+a549 <- SetIdent(a549, ident.use = a549@data.info$phase)
+TSNEPlot(a549, colors.use = brewer.pal(n = 12, "Paired"), do.label = T, label.size = 10)
+
+``` 
+
+
+It appears the primary difference between the clusters in each sample is the cell cycle, as cells classifified as G2/M are enriched in distinct clusters.
+
+## Conclusions
+
+Overall the single cell experiment was a success. There are very high number of genes detected per cell, and high UMI and consistent UMI counts across all of the samples. Very few cells needed to be excluded from the analysis due to high mitochondrial read mapping or for low UMI/gene counts. 
+
+Each cell sample segregates into distinct clusters, and with each sample there is obvious heterogeneity. Much of the heterogeneity is likely explained by cell-cycle, with distinct clusters being enriched for G2/M cells. 
+
+The low or undetectable MUC5B expression is not ideal, however the differentially expressed genes per sample can still be analyzed, and used to determine the effects of the CRISPR mutation and of the MEK inhibitor. A plausible next step with this data would be to examine enriched GO-terms in the differentially expressed genes and filter the differentially expressed genes to find those genes whose expression is unique to the Crispr mutation  or MEK-inhibitor treated cell lines. 
+
+```{r save_objs, eval = T}
+write.table(mek_markers, "gene_de_MEK_vs_control.txt", quote = F, sep = "\t")
+write.table(crispr_markers, "genes_de_crispr_vs_control.txt", quote = F, sep = "\t")
+saveRDS(a549, "analyzed_seurat_object.rds")
+```

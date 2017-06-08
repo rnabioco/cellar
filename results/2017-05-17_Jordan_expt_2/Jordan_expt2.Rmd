@@ -387,4 +387,6 @@ plot_grid(plotlist = p, nrow = 3, align = "hv")
 saveRDS(pbmc, "analyzed_seurat_object.rds")
 ```
 
-##
+## Interesting Observations
+  Amongst the most enriched genes in the largest AML cluster (1) are a handful of LincRNAs (SNHG7, ZFAS1, and RP11-620J15.3)
+  
