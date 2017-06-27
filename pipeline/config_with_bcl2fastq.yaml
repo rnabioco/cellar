@@ -1,0 +1,32 @@
+# config file for running 10x pipeline 
+
+RUN: 
+    "../runs/20170515_jordan_pbmc/170511_K00262_0097_AHJN5KBBXX/"
+
+DATA:
+    "../runs/20170515_jordan_pbmc"
+
+SPECIES: 
+    "human"
+
+SAMPLE_SHEET: 
+    "../runs/20170515_jordan_pbmc/docs/simple_sheet.csv"
+
+PROJECT: 
+    "Chromium_20170525"
+
+TRANSCRIPTOME:
+    "~/Projects/shared_dbases/cell_ranger/refdata-cellranger-GRCh38-1.2.0/"
+
+SAMPLES:
+    - Brett_51
+    - Brett_55
+
+INDICIES:
+    - SI-GA-E8
+    - SI-GA-D8
+
+LANES: "2"
+
+EXPT_GROUPS:
+    - Brett_51,Brett_55

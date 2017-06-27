@@ -9,5 +9,5 @@ set -o nounset -o pipefail -o errexit -x
 
 args=' -q rna -o {log}.out -e {log}.err -J {params.job_name} -R " {params.memory} span[hosts=1] " -n {threads}'
 
-snakemake --drmaa "$args" --snakefile Snakefile --jobs 2 \
-  --latency-wait 50 --rerun-incomplete  --configfile config.yaml 
+snakemake --drmaa "$args" --snakefile Snakefile --jobs 3 \
+  --latency-wait 50 --rerun-incomplete  --configfile new_config.yaml 

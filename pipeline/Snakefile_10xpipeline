@@ -4,22 +4,22 @@ shell.prefix("source ~/.bash_profile; ")
 """ Snakefile for running 10x pipeline """
 # cellranger directory added to .bashrc 
 
-configfile: "new_config.yaml"
+configfile: "config.yaml"
 
-PROJECT = config ["PROJECT"]
 DATA = config["DATA"]
-SAMPLE_SHEET = config["SAMPLE_SHEET"]
-SAMPLES = config["SAMPLES"]
+RUN = config["RUN"]
 TRANSCRIPTOME = config["TRANSCRIPTOME"]
+SAMPLE_SHEET = config["SAMPLE_SHEET"]
+PROJECT = config["PROJECT"]
+LANES = config["LANES"]
+SAMPLES = config["SAMPLES"]
+INDICIES = config["INDICIES"]
 EXPT_GROUPS = config["EXPT_GROUPS"]
-
-FQS, = glob_wildcards(DATA + 
-    "/raw_data/combined/{ids}_R1_001.fastq.gz")
 
 rule all:
     input:
-      expand("{data}/raw_data/combined/{fqs}_I1_001.fastq.gz",
-      data=DATA, fqs = FQS),
+      expand("{data}/raw_data/Stats/DemultiplexingStats.xml",
+      data=DATA),
       expand("{sample}_complete.txt", sample = SAMPLES),
       expand("{expt_groups}_aggr_complete.out.txt", expt_groups = EXPT_GROUPS)
 
@@ -71,12 +71,12 @@ rule cellranger_count:
     will generate directories listed in the input and output params, so to
     avoid this error this rule creates a dummy file "{sample}_complete.txt """
     input:
-      expand("{data}/raw_data/combined/{fqs}_I1_001.fastq.gz", data = DATA,
-      fqs = FQS)
+      "{data}/raw_data/Stats/DemultiplexingStats.xml".format(data=DATA)      
     output:
       "{sample}_complete.txt"
     params:
-      indir = "{data}/raw_data/combined".format(data=DATA, project = PROJECT),
+      indir = "{data}/raw_data/{project}".format(data=DATA, project = PROJECT),
+      lanes = LANES,
       job_name = "count",
       memory = "select[mem>4] rusage[mem=4]",
     log: "logs/{sample}_count.out"
@@ -88,6 +88,7 @@ rule cellranger_count:
           --id={wildcards.sample} \
           --fastqs={params.indir} \
           --sample={wildcards.sample} \
+          --lanes={params.lanes} \
           --jobmode=lsf \
           --project={PROJECT} \
           --maxjobs=30 \
@@ -95,33 +96,30 @@ rule cellranger_count:
       echo "finished" > {output}
       """ 
 
-rule make_index_fastqs:
-    """ the 10x pipeline requires a seperate fastq with the index sequence
-    for each sample. The index and index base qualities can added to the bam
-    output, but as far as i can tell the index qualities aren't used for anything 
-    in the pipeline. This script takes R1 fastqs and generates I1 fastqs, with
-    dummy sequence qualities added."""
-    input: 
-      fq = "{data}/raw_data/combined/{fqs}_R1_001.fastq.gz",
-      combine_fqs("{data}/raw_data/logs/combining_complete.txt")
-    output: 
-      "{data}/raw_data/combined/{fqs}_I1_001.fastq.gz",
+rule cellranger_mkfastq:
+    input:
+      SAMPLE_SHEET 
+    output:
+      "{data}/raw_data/Stats/DemultiplexingStats.xml"      
     params:
-      job_name = "add_idx",
+      outdir = "{data}/raw_data/",
+      job_name = "count",
       memory = "select[mem>4] rusage[mem=4]",
-    threads: 2 #gzip will take up another thread
-    log: "{data}/raw_data/combined/logs/{fqs}_idx.out"
+    log: "{data}/results/logs/count.out"
+    threads: 2
     shell:
       """
-      ../bin/makeIdxFastq {input} \
-      | gzip > {output}
+      module load bcl2fastq
+      cellranger mkfastq \
+          --run={RUN} \
+          --csv={SAMPLE_SHEET} \
+          --project={PROJECT} \
+          --jobmode=lsf \
+          --maxjobs=30 \
+          --output-dir {params.outdir} \
+          --lanes {LANES} \
+          --use-bases-mask Y26n125,I8n8,Y151 \
+          --barcode-mismatches 1 
+      module unload bcl2fastq
       """
 
-subworkflow combine_fqs:
-    """ The 10x pipeline used bc2lfastq to demultiplex the fastqs, and generate the
-        index fastqs. To avoid this, the original fastqs from the core are instead 
-        combined per lane, per sample. Specifying a subworkflow allows the use of the 
-        glob_wildcards() fxns to be used twice to avoid hardcoding all of the lane 
-    specifications"""
-    workdir: "./"
-    snakefile: "rules/combinefqs_subprocess.snake"

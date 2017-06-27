@@ -1,0 +1,23 @@
+# config file for running 10x pipeline 
+
+DATA:
+    "../runs/20170623_zeemans"
+
+PROJECT:
+    "zeemans_run1"
+
+TRANSCRIPTOME:
+    "~/Projects/shared_dbases/cell_ranger/refdata-cellranger-mm10-1.2.0/"    
+
+SAMPLE_SHEET: 
+    "../runs/20170623_zeemans/docs/samples.txt"
+
+SAMPLES:
+    - "3161-ATII-1"
+    - "3161-ATII-2"
+    - "3161-ATII-3"
+    - "3162-ATII-5"
+    - "3162-ATTII-4"
+
+EXPT_GROUPS:
+    - 3161-ATII-1,3161-ATII-2,3161-ATII-3,3162-ATII-5,3162-ATTII-4
