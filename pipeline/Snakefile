@@ -1,10 +1,11 @@
 shell.executable("/bin/bash")
 shell.prefix("source ~/.bash_profile; ")
+import os 
 
 """ Snakefile for running 10x pipeline """
 # cellranger directory added to .bashrc 
 
-configfile: "new_config.yaml"
+configfile: "new_config_test.yaml"
 
 PROJECT = config ["PROJECT"]
 DATA = config["DATA"]
@@ -12,116 +13,14 @@ SAMPLE_SHEET = config["SAMPLE_SHEET"]
 SAMPLES = config["SAMPLES"]
 TRANSCRIPTOME = config["TRANSCRIPTOME"]
 EXPT_GROUPS = config["EXPT_GROUPS"]
-
-FQS, = glob_wildcards(DATA + 
-    "/raw_data/combined/{ids}_R1_001.fastq.gz")
+BIN = "../bin"
 
 rule all:
     input:
-      expand("{data}/raw_data/combined/{fqs}_I1_001.fastq.gz",
-      data=DATA, fqs = FQS),
-      expand("{sample}_complete.txt", sample = SAMPLES),
-      expand("{expt_groups}_aggr_complete.out.txt", expt_groups = EXPT_GROUPS)
+      expand("{data}/results/logs/{sample}_complete.txt", data = DATA,
+      sample = SAMPLES),
+      expand("{data}/results/logs/{expt_groups}_aggr_complete.out.txt", 
+      data = DATA, expt_groups = EXPT_GROUPS),
 
-def _collect_groups(wildcards):
-    
-    groups = wildcards.expt_groups
-    groups = groups.split(",")
-    
-    out = open(groups[0] + "_groups_def.csv", 'w')
-    out.write("library_id,molecule_h5\n")
-    for group in groups: 
-        if group is "":
-            continue
-        library = group.strip(" ")
-        path = library + "/outs/molecule_info.h5"
-        out.write("{},{}\n".format(library, path))
-    
-    out.close()
-    # return list with group id and path to csv
-    return [groups[0][:-1], groups[0] + "_groups_def.csv"]
-
-rule cellranger_aggr:
-    input:
-      expand("{sample}_complete.txt", sample = SAMPLES),
-    output:
-      "{expt_groups}_aggr_complete.out.txt"
-    params:
-      groups = _collect_groups,
-      job_name = "aggr",
-      memory = "select[mem>4] rusage[mem=4]",
-    log: "logs/{expt_groups}_aggr.out"
-    threads: 2
-    shell:
-      """
-      set -x
-      cellranger aggr \
-          --csv={params.groups[1]} \
-          --id={params.groups[0]} \
-          --jobmode=lsf \
-          --maxjobs=30 
-
-      echo "finished" > {output}
-      """ 
-    
-
-rule cellranger_count:
-    """ note that cellranger count will fail if the output directory
-    specified with ``--id`` exists prior to running. By default Snakemake 
-    will generate directories listed in the input and output params, so to
-    avoid this error this rule creates a dummy file "{sample}_complete.txt """
-    input:
-      expand("{data}/raw_data/combined/{fqs}_I1_001.fastq.gz", data = DATA,
-      fqs = FQS)
-    output:
-      "{sample}_complete.txt"
-    params:
-      indir = "{data}/raw_data/combined".format(data=DATA, project = PROJECT),
-      job_name = "count",
-      memory = "select[mem>4] rusage[mem=4]",
-    log: "logs/{sample}_count.out"
-    threads: 2
-    shell:
-      """
-      set -x
-      cellranger count \
-          --id={wildcards.sample} \
-          --fastqs={params.indir} \
-          --sample={wildcards.sample} \
-          --jobmode=lsf \
-          --project={PROJECT} \
-          --maxjobs=30 \
-          --transcriptome={TRANSCRIPTOME}
-      echo "finished" > {output}
-      """ 
-
-rule make_index_fastqs:
-    """ the 10x pipeline requires a seperate fastq with the index sequence
-    for each sample. The index and index base qualities can added to the bam
-    output, but as far as i can tell the index qualities aren't used for anything 
-    in the pipeline. This script takes R1 fastqs and generates I1 fastqs, with
-    dummy sequence qualities added."""
-    input: 
-      fq = "{data}/raw_data/combined/{fqs}_R1_001.fastq.gz",
-      combine_fqs("{data}/raw_data/logs/combining_complete.txt")
-    output: 
-      "{data}/raw_data/combined/{fqs}_I1_001.fastq.gz",
-    params:
-      job_name = "add_idx",
-      memory = "select[mem>4] rusage[mem=4]",
-    threads: 2 #gzip will take up another thread
-    log: "{data}/raw_data/combined/logs/{fqs}_idx.out"
-    shell:
-      """
-      ../bin/makeIdxFastq {input} \
-      | gzip > {output}
-      """
-
-subworkflow combine_fqs:
-    """ The 10x pipeline used bc2lfastq to demultiplex the fastqs, and generate the
-        index fastqs. To avoid this, the original fastqs from the core are instead 
-        combined per lane, per sample. Specifying a subworkflow allows the use of the 
-        glob_wildcards() fxns to be used twice to avoid hardcoding all of the lane 
-    specifications"""
-    workdir: "./"
-    snakefile: "rules/combinefqs_subprocess.snake"
+include: "rules/combinefqs_subprocess.snake"    
+include: "rules/10x_count.snake"

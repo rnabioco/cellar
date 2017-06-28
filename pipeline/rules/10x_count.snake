@@ -1,0 +1,94 @@
+shell.executable("/bin/bash")
+shell.prefix("source ~/.bash_profile; ")
+import os 
+
+""" Snakefile for running 10x cellranger """
+
+def _collect_groups(wildcards):
+    """generate a csv file with path to molecule_info.h5 for each expt
+    group. Return group_id and path to csv as a list """
+     
+    groups = wildcards.expt_groups
+    data = wildcards.data
+
+    groups = groups.split(",")
+    outdir = os.path.join(data, "results")
+
+    out = open(groups[0] + "_groups_def.csv", 'w')
+    out.write("library_id,molecule_h5\n")
+    for group in groups: 
+        if group is "":
+            continue
+        library = group.strip(" ")
+        path = os.path.join(outdir, library, "outs", "molecule_info.h5")
+        out.write("{},{}\n".format(library, path))
+    
+    out.close()
+    # return list with group id and path to csv
+    return [groups[0][:-1], groups[0] + "_groups_def.csv"]
+
+
+
+rule cellranger_count:
+    """ note that cellranger count will fail if the output directory
+    specified with ``--id`` exists prior to running. By default Snakemake 
+    will generate directories listed in the input and output params, so to
+    avoid this error this rule creates a dummy file "{sample}_complete.txt """
+
+    input:
+      expand("{data}/raw_data/combined/{fqs}_I1_001.fastq.gz", data = DATA,
+      fqs = FQS),
+    output:
+      "{data}/results/logs/{sample}_complete.txt"
+    params:
+      outdir = "{data}/results/",
+      indir = "{data}/raw_data/combined".format(data=DATA, project = PROJECT),
+      job_name = "count",
+      memory = "select[mem>4] rusage[mem=4]",
+    log: "logs/{sample}_count.out"
+    threads: 2
+    shell:
+      """
+      set -x
+      cellranger count \
+          --id={wildcards.sample} \
+          --fastqs={params.indir} \
+          --sample={wildcards.sample} \
+          --jobmode=lsf \
+          --project={PROJECT} \
+          --maxjobs=30 \
+          --transcriptome={TRANSCRIPTOME}
+
+      mkdir -p {params.outdir}
+      mv -u {wildcards.sample} {params.outdir}
+      echo "finished" > {output}
+
+      """ 
+
+rule cellranger_aggr:
+    input:
+      expand("{data}/results/logs/{sample}_complete.txt", sample =
+      SAMPLES, data = DATA),
+    output:
+      "{data}/results/logs/{expt_groups}_aggr_complete.out.txt"
+    params:
+      groups = _collect_groups,
+      outdir = "{data}/results/",
+      job_name = "aggr",
+      memory = "select[mem>4] rusage[mem=4]",
+    log: "logs/{expt_groups}_aggr.out"
+    threads: 2
+    shell:
+      """
+      set -x
+      cellranger aggr \
+          --csv={params.groups[1]} \
+          --id={params.groups[0]} \
+          --jobmode=lsf \
+          --maxjobs=30 
+      
+      mkdir -p {params.outdir}
+      mv -u {params.groups[0]} {params.outdir}
+      mv -i {params.groups[1]} {params.outdir}      
+      echo "finished" > {output}
+      """ 
