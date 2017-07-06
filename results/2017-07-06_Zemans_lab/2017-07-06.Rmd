@@ -1,0 +1,569 @@
+---
+title: "Zeman's lab single cell RNA-Seq expt.1"
+author: "Kent Riemondy RBI"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: false
+    fig_caption: yes
+    fig_retina: 1 
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+
+
+```{r libs, message=FALSE, warning=FALSE, echo=FALSE}
+library(Seurat)
+library(readr)
+library(tidyr)
+library(plyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(cowplot)
+library(RColorBrewer)
+library(Matrix)
+library(purrr)
+```
+
+
+## Experiment Summary
+  In the lung alveolar walls there are three major types of cells. Type I cells are thin cells that allow gas exchange to capillaries. Type II cells are granular cells that release surfacant substances to promote a low surface tension environment. Lastly, macrophages are also present and phagocytose foreign materials. 
+  The Type I cells are terminally differentiated, and are unable to replicate in response to damaging insults. Type II cells proliferate and transdifferentiate into Type I cells to restore Type I cell populations following injury. However, the molecular mechanisms regulating the transdifferentiation process *in vivo* remain inadequately characterized. 
+  Single cell RNA-Seq was performed on ATI and ATII cell populations isolated from control or injured mice. The goal of this experiment is gain unique insight into transcriptomes of cells undergoing transdifferentiation, hopefully uncovering novel markers for further characterization, and potential regulatory factor to further investigate. 
+  
+  
+Sample | Description
+-------- | ----------  
+3161-ATII-1 | Control Mouse, Type I Alveolar cells, rep. 1
+3161-ATII-2 | Control Mouse, Type I Alveolar cells, rep. 2
+3161-ATII-3 | Control Mouse, Type II Alveolar cells
+3162-ATIII-5 | Injured Mouse (bleomycin?), Type II Alveolar cells, rep. 1
+3162-ATII-4 | Injured Mouse (bleomycin?), Type II Alveolar cells, rep 2
+
+
+```{r Zemans_data, eval = T}
+atcells <- Seurat::Read10X("~/Projects/10x_data/runs/20170623_zeemans/results/3161-ATII-/outs/filtered_gene_bc_matrices_mex/mm10/")
+
+```
+
+```{r, eval = T, message = F, results = 'hide', warning=F}
+atcells <- new("seurat", raw.data = atcells)
+
+atcells <- Setup(atcells, min.cells = 5, min.genes = 250, do.logNormalize = T, total.expr = 1e4, project = "Zemans", names.field = 2, names.delim = "-")
+
+# note that the ordering passed to cell ranger aggr was:
+# 3161-ATII-1
+# 3161-ATII-2
+# 3161-ATII-3
+#  3162-ATIII-5
+#  3162-ATII-4
+# typos in sample ids were introduced during the sequencing, and have been preserved here for clarity
+  
+samples_lookup <- c("Type1_control_1", 
+                    "Type1_control_2", 
+                    "Type2_control", 
+                    "Type2_injured_2", 
+                    "Type2_injured_1")
+names(samples_lookup) <- c(1, 2, 3, 4, 5)
+
+og_vals <- atcells@ident
+new_vals <- samples_lookup[og_vals]
+atcells <- AddMetaData(atcells, data.frame(row.names = atcells@cell.names, 
+                                     "sample_names" = unname(new_vals)))
+```
+
+## QC Metrics
+  
+```{r examine_umi_and_ngenes, fig.width = 10, fig.height = 8, warning = F}
+summary_dat <- data_frame(cell = colnames(atcells@raw.data), 
+                          nUMIs = colSums(as.matrix(atcells@raw.data)),
+                          nGenes = colSums(as.matrix(atcells@raw.data) > 0))
+
+summary_dat <- separate(summary_dat, cell, c("cellid", "sample"), sep = "-")
+
+
+summary_dat <- summary_dat %>% 
+  dplyr::mutate(sample = samples_lookup[.$sample])
+
+summary_dat <- summary_dat %>% 
+  group_by(sample) %>% 
+  dplyr::arrange(desc(nUMIs))
+
+n_cells <- summary_dat %>%  
+  group_by(sample) %>%  
+  summarize(n_cells = n(),
+            median_UMIs = median(nUMIs),
+            median_Genes = median(nGenes))
+
+knitr::kable(n_cells,
+             caption = "Number of cells prior to filtering and summary statistics")
+
+a <- ggplot(summary_dat, aes(sample, nUMIs)) +
+  geom_violin(aes(fill = sample)) +
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Number of UMIs (Log10)") +
+  theme(axis.text.x = element_blank())
+
+b <- ggplot(summary_dat, aes(sample, nGenes)) +
+    geom_violin(aes(fill = sample)) +
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Number of Genes (at least 1 UMI) Log10") +
+  theme(axis.text.x = element_blank())
+plot_grid(a, b)
+```
+
+```{r write_matrix, eval =F}
+system("mkdir -p count_matrix/")
+write.table(as.matrix(atcells@raw.data), "count_matrix/all_samples_raw_counts_matrix.txt",
+            quote = F, sep = "\t")
+
+system("gzip count_matrix/all_samples_raw_counts_matrix.txt")
+```
+
+```{r utility_fxn}
+cell_counts <- function(seurat_object){
+  #returns tbl_df with number of cells per sample type in seurat object
+  map_df(levels(seurat_object@ident), 
+         ~data_frame(sample = .x, 
+                     n_cells = length(WhichCells(seurat_object, ident = .x))))
+}
+
+```
+
+
+The percentage of reads aligning to mitochondria is often an indicator of cell quality. Cells that have lysed prior to capture preferentially retain mitochondial RNA, but lose cellular cytoplasmic mRNA. As shown below there is a strong negative correlation with the number of UMIs and the proportion of reads aligning to mitochondria. Cells with less than 20% mitochondrial reads will be retained for further analysis.
+
+```{r QC}
+mito.genes <- grep("^mt-", rownames(atcells@data), value = T)
+proportion.mito <- Matrix::colSums(expm1(atcells@data[mito.genes, ])) /
+  Matrix::colSums(expm1(atcells@data))
+
+atcells <- AddMetaData(atcells, proportion.mito, "proportion.mito")
+
+VlnPlot(atcells, "proportion.mito", 
+        cols.use = brewer.pal(5, "Set1"), 
+        group.by = "sample_names")
+
+ggplot(atcells@data.info, aes(nUMI, proportion.mito)) +
+  geom_point(aes(color = sample_names)) +
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r}
+atcells <- SubsetData(atcells, 
+                      subset.name = "proportion.mito", 
+                      accept.high = 0.2)
+```
+
+```{r ngenes_filter}
+atcells <- SubsetData(atcells, subset.name = "nGene", accept.low = 250)
+atcells <- SubsetData(atcells, subset.name = "nUMI", accept.high = 40000)
+
+knitr::kable(cell_counts(atcells),
+             caption = "Number of cells passing an additional filter requiring less than 20% mitochondrial reads and at least 250 genes detected, and UMI < 40000")
+```
+
+After filtering the distribution of UMIs, Genes, and Proportion of mitochondrial reads is shown below:
+
+```{r ngenes_post_filter}
+VlnPlot(atcells, "nGene", 
+        cols.use = brewer.pal(5, "Set1"), 
+        group.by = "sample_names")
+
+VlnPlot(atcells, "nUMI", 
+        cols.use = brewer.pal(5, "Set1"), 
+        group.by = "sample_names")
+
+VlnPlot(atcells, "proportion.mito", 
+        cols.use = brewer.pal(5, "Set1"), 
+        group.by = "sample_names")
+
+```
+
+### GFP counts
+
+The abundance of GFP was also estimated for each cell by aligning to the eGFP sequence. Only the Type 2 cells should be labeled. 
+
+```{r read_in_counts, message = F}
+
+files <- dir("~/Projects/10x_data/runs/20170623_zeemans/results/gfp/",
+    pattern = "*.txt", full.names = T, recursive = T)
+
+dat <- map(files, read_tsv, col_names = c("cells", "gfp_counts"))
+
+file_ids = c(1, 2, 3, 5, 4)
+dat <- map2(dat, file_ids, ~dplyr::mutate(.x, group = .y))
+
+dat <- bind_rows(dat) 
+
+dat <- dplyr::mutate(dat, 
+              cells = str_split(cells, "-", simplify = T)[, 1],
+              cells = paste(cells, group, sep = "-" )) %>% 
+  dplyr::select(-group)
+
+# only keep filtered cells
+dat <- dat %>% dplyr::filter(cells %in% atcells@cell.names)
+# add in not-detected cells
+dat <- left_join(data_frame(cells = atcells@cell.names), 
+                 dat, by = c("cells"))
+
+dat[is.na(dat)] <- 0
+dat <- as.data.frame(dat)
+
+rownames(dat) <- dat[, 1]
+dat[, 1] <- NULL
+
+# log Normalize
+dat <- as.data.frame(as.matrix(LogNormalize(dat) ))
+
+atcells <- AddMetaData(atcells, dat)
+
+#FeaturePlot(atcells, "gfp_counts")
+atcells <- SetAllIdent(atcells, id = "orig.ident")
+VlnPlot(atcells, 
+        "gfp_counts",
+        cols.use = brewer.pal(n = 5, "Set1"), 
+        group.by = "sample_names")
+
+```
+
+```{r regress_out_umi_and_mito, results = 'hide'}
+atcells <- RegressOut(atcells, 
+                      latent.vars = c("nUMI", "proportion.mito"))
+```
+
+```{r get_variable_genes, results = 'hide'}
+atcells <- MeanVarPlot(atcells, 
+                    fxn.x = expMean, 
+                    fxn.y = logVarDivMean, 
+                    x.low.cutoff = 0.0125, 
+                    x.high.cutoff = 4, y.cutoff = 0.5, do.contour = F, do.plot = F)
+
+length(atcells@var.genes)
+
+```
+
+```{r PCA_tsne_calc, eval = T, results='hide'}
+atcells <- PCA(atcells, 
+               pc.genes = atcells@var.genes, 
+               do.print = TRUE, 
+               pcs.print = 5, 
+               genes.print = 5)
+
+atcells <- ProjectPCA(atcells)
+atcells <- RunTSNE(atcells, dims.use = 1:15, do.fast = T, k.seed = 1)
+```
+
+## PCA Projection
+  To get an overview of the relationships between different cell types, PCA will be used first. Shown below is a plot of the first two principal components computed using highly variable genes (`r length(atcells@var.genes)` genes). The first two components of the PCA rarely capture all of the variation in the data, as can be seen in the second plot.  
+  
+```{r plot_pca, eval = T}
+PCAPlot(atcells, 1, 2, cols.use = brewer.pal(5, "Set1"), 
+        group.by = "sample_names")
+PCElbowPlot(atcells)
+```
+
+```{r, eval = F, message = F, warning = F}
+PCHeatmap(atcells, 
+          pc.use = 1:15, 
+          cells.use = 2000, 
+          do.balanced = TRUE, label.columns = FALSE, use.full = FALSE, do.plot = F)
+```
+
+## TSNE projection
+  PCA analysis is useful for identifying the most variable dimensions in the dataset. However in single cell datasets there are often many dimensions that are informative for clustering the cells. [TSNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) is a non-linear dimensionality reduction algorithm that is particularly well-suited for projecting multidimensional data in two dimensional space. 
+  
+  Shown below is a TSNE projection of the single cell data, with each cell colored by the sample type. Overall there is quite a large degree of structure in the data with some apparent clusters shared with the samples, and also unique to each sample.
+  
+```{r plot_TSNE, fig.width = 10, fig.height = 10}
+TSNEPlot(atcells, 
+         colors.use = brewer.pal(n = 5, "Set1"), 
+         group.by = "sample_names")
+```
+
+```{r, fig.width = 16, fig.height= 10 , eval = T}
+cell_ids <- map(c(1, 2, 3, 4, 5), ~atcells@cell.names[atcells@data.info$orig.ident == .x])
+names(cell_ids) <- unique(atcells@data.info$sample_names)
+.cols <- brewer.pal(n = 5, "Set1")
+cols_to_pick <- list(c(1:9),
+                     c(2:7, 10:11),
+                     -7)
+p <- map(cell_ids,
+         ~TSNEPlot(atcells, 
+                   do.label = T, 
+                   pt.size = 0.5, 
+                   cells.use = .x, 
+                   do.return = T, 
+                   label.size = 5))
+
+
+p[[6]] <- TSNEPlot(atcells, 
+         colors.use = brewer.pal(n = 5, "Set1"), 
+         group.by = "sample_names", do.return = T, label.size = 5, pt.size = 0.5)
+
+p <- map2(p, c(names(cell_ids), "all_samples"),
+            ~.x + 
+            coord_cartesian(c(-45, 45), c(-45, 55)) + 
+            labs(title = .y) +
+            theme(legend.position = "none"))
+
+plot_grid(plotlist = p, nrow = 2, align = "hv")
+```
+
+
+## Potential Confounding Factors
+  A challenge with single-cell RNA-Seq is the high degree of technical noise. Variables such as the number of detected genes or UMIs can drive apparent differences in sample transcriptomes. Shown below is the same `TSNE` projection with each cell colored by the number of genes, umis, or percent mitochondria detected. 
+  
+```{r find_confounding_issues, fig.width = 7, fig.height = 7}
+FeaturePlot(atcells, "nGene", no.legend = F)
+FeaturePlot(atcells, "nUMI", no.legend = F)
+FeaturePlot(atcells, "proportion.mito", no.legend = F)
+```
+
+## Cluster identification
+
+  Unsupervised clustering was performed to identify transcriptionally distinct cell populations. A graph-based algorithm was used that builds a k-nearest neighbor (KNN) graph on the euclidean distances calculated from principal components, weights each edge based on the local neighborhood using jaccard statistics, then prunes the graph to select clusters using an optimization function. The graph based algorithm is implemented in the Seurat R package.  Clusters are visualized using TSNE, but the cluster assignments are based on the first 15 principal components.
+  
+```{r find_markers, fig.width = 10, fig.height = 10, warning=FALSE}
+atcells <- FindClusters(atcells, 
+                     pc.use = 1:15, 
+                     k.param = 25, 
+                     resolution = 0.5, 
+                     print.output = 0, 
+                     plot.SNN = F,
+                     save.SNN = T, 
+                     random.seed = 0)
+
+TSNEPlot(atcells, 
+         colors.use = brewer.pal(n = 12, "Paired"), 
+         do.label = T, label.size = 10)
+```
+
+
+
+## Gene expression per cluster
+
+Next we will determine genes enriched in each sample by comparing gene expression in each sample to all other samples. Plotted below are the top 10 enriched genes detected in each sample for all cell transcriptomes (Yellow is high, purple is low).
+
+```{r}
+atcells_markers <- FindAllMarkers(atcells, 
+                                  only.pos = TRUE,  
+                                  min.pct = 0.25, 
+                                  thresh.use = 0.25)
+
+atcells_markers %>% group_by(cluster) %>% top_n(10, avg_diff) -> top10
+```
+
+```{r, fig.width = 20, fig.height= 20 }
+DoHeatmap(atcells, 
+          genes.use = top10$gene, 
+          order.by.ident = TRUE, 
+          slim.col.label = TRUE, cexRow = 0.75, remove.key = TRUE,  margins = c(8, 8))
+```
+
+  Plotted below are the abundances of the top marker genes detected per sample (red is high, yellow is low) projected onto the TSNE map. 
+  
+```{r genes_enriched_per_cluster, fig.width = 7.5, fig.height= 7.5, eval = F }
+top6_genenames <- split(top10, top10$cluster) %>% map(., ~.x[1:4, ]$gene)
+
+plot_tsnes <- function(x, y) {
+  print(y)
+  FeaturePlot(atcells, x, pt.size = 0.5)
+} 
+
+walk2(top6_genenames, names(top6_genenames), ~plot_tsnes(.x, .y))
+```
+
+## Classifying the cell type for each cluster
+
+  Plotted below are a set of known marker genes that help to identify each cell population. Classifications taken from
+http://www.nature.com/nature/journal/v507/n7491/fig_tab/nature12930_ST1.html
+http://www.atsjournals.org/doi/pdf/10.1165/rcmb.2017-0037MA
+http://www.jci.org/articles/view/68782
+
+
+```{r,  fig.width = 10, fig.height= 10}
+
+control_markers <- c(
+  "Ager", # mouse homologue of RAGE
+  "Aqp5",
+  "Pdpn", # T1-Alpha
+  "Scgb1a1",
+  "Scgb3a1",
+  "Trp63")
+
+ae2 <- c(
+  "Sftpa1", #SPA
+  "Sftpc",
+  "Abca3",
+  "Muc1",
+  "Lyz2",
+  "Lamp3"
+  )
+
+g2_macro <- c(
+  "Col3a1",
+  "Col1a2",
+  "Col1a1",
+  "Fcer1g",
+  "Cd68",
+  "Cd53",
+  "Top2a",
+  "Cdk1",
+  "Mki67"
+)
+
+transdiff <- c(
+  "Cav1",
+  "Cav2",
+  "Pdpn",
+  "Hopx",
+  "Sfn",
+  "Epcam"
+)
+```
+
+### ATI markers
+```{r, fig.width= 7, fig.height=7}
+FeaturePlot(atcells, control_markers, pt.size = .25)
+```
+
+### ATII markers
+```{r, fig.width= 7, fig.height=7}
+FeaturePlot(atcells, ae2, pt.size = .25)
+```
+
+### Other population markers
+```{r, fig.width= 7, fig.height=7}
+FeaturePlot(atcells, g2_macro, pt.size = .25)
+```
+
+### Transdifferentiation
+```{r, fig.width= 7, fig.height=7}
+FeaturePlot(atcells, transdiff, pt.size = .25)
+```
+
+
+Based on these data I proposed the following classification
+
+Cluster |  Classification  | Notes
+-------- |  ------------  | ----------------
+0,1,3 | Injured ATII cells | high levels of SPC
+2,4 | Uninjured ATII cells | high levels of SPC
+5 | ATI cells | high levels of Pdpn, Aqp5, and P63
+6 | ATI / Goblet cells? | Express high levels of Secretoglobin (scgb1a1), also contains Scgb1a1+/SPC+ population
+7 | Transdifferentiating ATII | Low ATII markers, some ATI marker expression (Pdpn, Aqp5, Ager), Hopx expression 
+8 | Transdifferentiating ATII  | Low ATII markers,  
+9 | ATII cells in G2/M | Mki67
+10 | Macrophages | Cd53
+11 | Endothelial/Fibroblast | Col1a1
+
+
+### Distribution of cells per cluster
+```{r cluster_distribution}
+cluster_ids <- atcells@ident
+cell_ids <- atcells@data.info$orig.ident
+levels(cell_ids) <- samples_lookup
+
+cluster_summary <- data_frame(id = cell_ids, cluster = cluster_ids)
+cluster_summary <- group_by(cluster_summary, id, cluster) %>% summarize(cells = n())
+
+ggplot(cluster_summary, aes(cluster, cells, fill = cluster)) +
+  facet_wrap(~id, scales = "free_y") +
+  ylab("Number of Cells") +
+  scale_fill_brewer(palette = "Paired") +
+  geom_bar(stat = "identity")
+```
+
+
+
+
+```{r save_objs, eval = T}
+saveRDS(atcells, "analyzed_seurat_object.rds")
+```
+
+
+
+### Cell cycle
+
+The cell cycle state of the cells can be inferred using the cyclone function in scater. A pretrained dataset from mouse embryonic stem cells was used for classification. 
+
+```{r cell cycle classification, results='hide', message=FALSE, warning=FALSE}
+# code modified from http://bioconductor.org/help/workflows/simpleSingleCell
+# training data from scran package, code here,  https://github.com/MarioniLab/scran/blob/master/inst/exdata/generate_markers.R
+# trained on fluidigm C1 data from FUCCI hESC cells
+
+ms.pairs <- readRDS(system.file("exdata", "mouse_cycle_markers.rds", package="scran"))
+library(org.Mm.eg.db, warn.conflicts = F)
+library(scater, warn.conflicts = F)
+library(scran, warn.conflicts = F)
+
+anno <- select(org.Mm.eg.db, keys=rownames(atcells@data), keytype="SYMBOL", column="ENSEMBL")
+ensembl <- anno$ENSEMBL[match(rownames(atcells@data), anno$SYMBOL)]
+```
+
+```{r}
+assignments <- cyclone( as.matrix(atcells@data), ms.pairs, gene.names=ensembl)
+#plot(assignments$score$G1, assignments$score$G2M, xlab="G1 score", ylab="G2/M score", pch=16)
+
+classifications <- data.frame(phase = assignments$phases, row.names = atcells@cell.names)
+
+atcells <-AddMetaData(atcells, classifications)
+```
+
+```{r}
+TSNEPlot(atcells, colors.use = brewer.pal(n = 12, "Paired"), do.label = F)
+atcells <- SetIdent(atcells, ident.use = atcells@data.info$phase)
+TSNEPlot(atcells, colors.use = brewer.pal(n = 12, "Paired"), do.label = F)
+
+``` 
+ 
+## Find Transcription Factors
+ 
+```{r, results = 'hide', message = F}
+# https://academic.oup.com/bioinformatics/article/29/19/2519/190534/TFcheckpoint-a-curated-compendium-of-specific-DNA
+tfs <- read_tsv("http://www.tfcheckpoint.org/data/TFCheckpoint_download_180515.txt")
+ 
+# map entrez id to symbol
+eid_to_symbol <- select(org.Mm.eg.db, keys = keys(org.Mm.eg.db), columns = c("ENTREZID", "SYMBOL"))
+ 
+eid_to_symbol[["ENTREZID"]] <- as.integer(eid_to_symbol[["ENTREZID"]])
+
+# filter non-mouse tfs, and add in symbol
+left_join(tfs, tbl_df(eid_to_symbol), by = c("entrez_mouse" = "ENTREZID")) %>% 
+  dplyr::filter(entrez_mouse != 0) -> annotated_tfs #0 is na 
+
+# select out interesting cluster
+atcells_markers %>% 
+  dplyr::filter(cluster == "8") -> interesting_cluster
+
+# find clusters associated with transcription factors
+left_join(interesting_cluster, annotated_tfs, by = c("gene" = "SYMBOL")) -> tf_annotated
+
+# find RNA binding proteins, 
+# supplemental table3 
+# http://www.nature.com/nrg/journal/v15/n12/full/nrg3813.html
+
+download.file("http://www.nature.com/nrg/journal/v15/n12/extref/nrg3813-s3.xls", "nrg3813-s3.xls")
+
+rbps <- readxl::read_excel("nrg3813-s3.xls", sheet = 2)
+
+annotated <- left_join(tf_annotated, rbps, by = c("gene_symbol" = "gene name"))
+```
+```{r}
+annotated %>% dplyr::filter(entrez_mouse != 0) %>% 
+  dplyr::select(p_val:gene, gene_name) -> tf_info
+
+knitr::kable(tf_info[1:10, ], caption = c("TFs found enriched in cluster 8"))
+```
+
+
+
