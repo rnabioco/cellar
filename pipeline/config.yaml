@@ -1,50 +1,23 @@
 # config file for running 10x pipeline 
 
-RUN: 
-    "../runs/10xpilot2/170418_K00262_0090_BHJJG5BBXX/"
-
 DATA:
-    "../runs/10xpilot2"
+    "../runs/20170728_zeeman_expt2"
 
-SPECIES: 
-    "human"
-
-SAMPLE_SHEET: 
-    "../runs/10xpilot2/docs/10x_samplesheet_illuminastyle.csv"
-
-PROJECT: 
-    "10xPilot2"
+PROJECT:
+    "zeemans_run2"
 
 TRANSCRIPTOME:
-    "~/Projects/shared_dbases/cell_ranger/refdata-cellranger-GRCh38-1.2.0/"
+    "~/Projects/shared_dbases/cell_ranger/refdata-cellranger-mm10-1.2.0/"    
+
+SAMPLE_SHEET: 
+    "../runs/20170728_zeeman_expt2/docs/samples.txt"
 
 SAMPLES:
-    - AML1
-    - AML2
-    - AML3 
-    - AW1
-    - AW2
-    - AW3
-    - PK65BRAIN2
-    - PT46LIVER4
-    - PT46TUMOR3
-    - PK65TUMOR1
-
-INDICIES:
-    - SI-GA-H5
-    - SI-GA-G5
-    - SI-GA-F5
-    - SI-GA-A5
-    - SI-GA-H6
-    - SI-GA-G6
-    - SI-GA-D5
-    - SI-GA-B5
-    - SI-GA-C5
-    - SI-GA-E5
-
-LANES: "5,6,7,8"
+    - "3242ATI1"
+    - "3242ATI2"
+    - "3242ATII3"
+    - "3241ATII4"
+    - "3241ATII5"
 
 EXPT_GROUPS:
-    - AML1,AML2,AML3
-    - AW1,AW2,AW3
-    - PK65TUMOR1,PK65BRAIN2,PT46LIVER4,PT46TUMOR3 
+    - 3241ATII4,3241ATII5,3242ATI1,3242ATI2,3242ATII3 

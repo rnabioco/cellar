@@ -56,7 +56,7 @@ rule cellranger_count:
           --sample={wildcards.sample} \
           --jobmode=lsf \
           --project={PROJECT} \
-          --maxjobs=30 \
+          --maxjobs=18 \
           --transcriptome={TRANSCRIPTOME}
 
       mkdir -p {params.outdir}
@@ -85,7 +85,7 @@ rule cellranger_aggr:
           --csv={params.groups[1]} \
           --id={params.groups[0]} \
           --jobmode=lsf \
-          --maxjobs=30 
+          --maxjobs=18 
       
       mkdir -p {params.outdir}
       mv -u {params.groups[0]} {params.outdir}
