@@ -1,5 +1,5 @@
 ---
-title: "Zeman's lab single cell RNA-Seq expt.1"
+title: "Zeman's lab single cell RNA-Seq analysis (combined expt 1 and 2)"
 author: "Kent Riemondy RBI"
 output:
   html_document:
@@ -13,8 +13,9 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(cache.lazy = FALSE)
 ```
 
 
@@ -50,15 +51,45 @@ Sample | Description
 
 
 ```{r Zemans_data, eval = T}
-atcells <- Seurat::Read10X("~/Projects/10x_data/runs/20170623_zeemans/results/3161-ATII-/outs/filtered_gene_bc_matrices_mex/mm10/")
+
+samples <- c(
+  "3161-ATII-1",
+  "3161-ATII-2",
+  "3161-ATII-3",
+  "3162-ATII-5",
+  "3162-ATTII-4")
+
+sample_paths_exp1 <- file.path("~/Projects/10x_data/runs/20170623_zeemans/results", 
+                          samples, "outs/filtered_gene_bc_matrices/mm10")
+      
+names(sample_paths_exp1) <- c("ATI1expt1", "ATI2expt1", "ATII1expt1", "ATIIinjured2expt1", "ATIIinjured1expt1")
+
+samples <- c(
+  "3241ATII4",
+  "3241ATII5",
+  "3242ATI1",
+  "3242ATI2",
+  "3242ATII3")
+
+sample_paths_exp2 <- file.path("~/Projects/10x_data/runs/20170728_zeeman_expt2/results", 
+                          samples, "outs/filtered_gene_bc_matrices/mm10")
+      
+names(sample_paths_exp2) <- c("ATIIinjured1expt2", "ATIIinjured2expt2", "ATI1expt2", "ATI2expt2", "ATII1expt2")
+
+sample_paths <- c(sample_paths_exp1, sample_paths_exp2)
+names(sample_paths) <- c(names(sample_paths_exp1), names(sample_paths_exp2))
+atcells <- Seurat::Read10X(sample_paths)
+
 
 ```
 
 ```{r, eval = T, message = F, results = 'hide', warning=F}
 atcells <- new("seurat", raw.data = atcells)
 
-atcells <- Setup(atcells, min.cells = 5, min.genes = 250, do.logNormalize = T, total.expr = 1e4, project = "Zemans", names.field = 2, names.delim = "-")
+atcells <- Setup(atcells, min.cells = 5, min.genes = 250, do.logNormalize = T, total.expr = 1e4, project = "Zemans", names.field = 1, names.delim = "_")
+```
 
+```{r, eval = T}
 # note that the ordering passed to cell ranger aggr was:
 # 3161-ATII-1
 # 3161-ATII-2
@@ -67,17 +98,23 @@ atcells <- Setup(atcells, min.cells = 5, min.genes = 250, do.logNormalize = T, t
 #  3162-ATII-4
 # typos in sample ids were introduced during the sequencing, and have been preserved here for clarity
   
-samples_lookup <- c("Type1_control_1", 
-                    "Type1_control_2", 
-                    "Type2_control", 
-                    "Type2_injured_2", 
-                    "Type2_injured_1")
-names(samples_lookup) <- c(1, 2, 3, 4, 5)
-
-og_vals <- atcells@ident
-new_vals <- samples_lookup[og_vals]
+#samples_lookup <- c("Type1_control_1", 
+#                    "Type1_control_2", 
+#                    "Type2_control", 
+#                    "Type2_injured_2", 
+#                    "Type2_injured_1")
+#names(samples_lookup) <- c(1, 2, 3, 4, 5)
+#
+#og_vals <- atcells@ident
+#new_vals <- samples_lookup[og_vals]
 atcells <- AddMetaData(atcells, data.frame(row.names = atcells@cell.names, 
-                                     "sample_names" = unname(new_vals)))
+                                     "sample_names" = atcells@ident))
+
+ids <- atcells@data.info$orig.ident
+ids <- str_extract(ids, "expt[12]")
+ids <- data.frame(row.names = atcells@cell.names,
+                  expt = ids)
+atcells <- AddMetaData(atcells, ids)
 ```
 
 ## QC Metrics
@@ -87,11 +124,13 @@ summary_dat <- data_frame(cell = colnames(atcells@raw.data),
                           nUMIs = colSums(as.matrix(atcells@raw.data)),
                           nGenes = colSums(as.matrix(atcells@raw.data) > 0))
 
-summary_dat <- separate(summary_dat, cell, c("cellid", "sample"), sep = "-")
+summary_dat <- separate(summary_dat, cell, 
+                        c("sample", "cellid"), 
+                        sep = "_", remove = F)
 
 
 summary_dat <- summary_dat %>% 
-  dplyr::mutate(sample = samples_lookup[.$sample])
+  dplyr::mutate(sample = sample)
 
 summary_dat <- summary_dat %>% 
   group_by(sample) %>% 
@@ -108,16 +147,16 @@ knitr::kable(n_cells,
 
 a <- ggplot(summary_dat, aes(sample, nUMIs)) +
   geom_violin(aes(fill = sample)) +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Paired") +
   ylab("Number of UMIs (Log10)") +
   theme(axis.text.x = element_blank())
 
 b <- ggplot(summary_dat, aes(sample, nGenes)) +
     geom_violin(aes(fill = sample)) +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Paired") +
   ylab("Number of Genes (at least 1 UMI) Log10") +
   theme(axis.text.x = element_blank())
-plot_grid(a, b)
+plot_grid(a, b, ncol = 1)
 ```
 
 ```{r write_matrix, eval =F}
@@ -138,23 +177,48 @@ cell_counts <- function(seurat_object){
 
 ```
 
-
+## Mitochondrial Reads {.tabset}
 The percentage of reads aligning to mitochondria is often an indicator of cell quality. Cells that have lysed prior to capture preferentially retain mitochondial RNA, but lose cellular cytoplasmic mRNA. As shown below there is a strong negative correlation with the number of UMIs and the proportion of reads aligning to mitochondria. Cells with less than 20% mitochondrial reads will be retained for further analysis.
 
 ```{r QC}
-mito.genes <- grep("^mt-", rownames(atcells@data), value = T)
+mito.genes <- grep("^mt-", rownames(atcells@raw.data), value = T)
 proportion.mito <- Matrix::colSums(expm1(atcells@data[mito.genes, ])) /
   Matrix::colSums(expm1(atcells@data))
 
 atcells <- AddMetaData(atcells, proportion.mito, "proportion.mito")
 
-VlnPlot(atcells, "proportion.mito", 
-        cols.use = brewer.pal(5, "Set1"), 
-        group.by = "sample_names")
+unfiltered <- atcells@data.info %>% 
+  tibble::rownames_to_column("cell") %>% 
+  left_join(summary_dat, by = c("cell")) %>% 
+  as_data_frame()
 
-ggplot(atcells@data.info, aes(nUMI, proportion.mito)) +
-  geom_point(aes(color = sample_names)) +
-  scale_color_brewer(palette = "Set1")
+ggplot(unfiltered, aes(sample_names,
+                       proportion.mito)) +
+  geom_violin(aes(fill = sample_names)) +
+  geom_jitter(size = 0.25) +
+  scale_fill_brewer(palette = "Paired")
+```
+
+### Per Sample
+
+```{r, results ='asis'}
+
+sample_names <- unique(atcells@data.info$orig.ident)
+per_sample <- map(sample_names, ~filter(unfiltered, 
+                                        sample_names == .x))
+
+# generate tab with individual plot programmatically 
+# see https://stackoverflow.com/questions/43752095/programmatically-insert-header-and-plot-in-same-code-chunk-with-r-markdown-using?noredirect=1&lq=1
+
+for(i in seq_along(per_sample)){
+  .col <- brewer.pal(10, "Paired")[i]
+  cat('\n### ', sample_names[i], '\n')
+  p <- ggplot(per_sample[[i]], aes(nUMI, proportion.mito)) +
+        geom_point(aes(color = sample_names)) +
+        scale_color_manual(values = .col)
+  print(p)
+  cat('\n')
+}
 ```
 
 ```{r}
@@ -172,42 +236,56 @@ knitr::kable(cell_counts(atcells),
 ```
 
 After filtering the distribution of UMIs, Genes, and Proportion of mitochondrial reads is shown below:
+## Post filtering Stats
 
+### Number of Genes
 ```{r ngenes_post_filter}
 VlnPlot(atcells, "nGene", 
-        cols.use = brewer.pal(5, "Set1"), 
+        cols.use = brewer.pal(10, "Paired"),
         group.by = "sample_names")
+```
 
+### Number of UMIs
+```{r}
 VlnPlot(atcells, "nUMI", 
-        cols.use = brewer.pal(5, "Set1"), 
+        cols.use = brewer.pal(10, "Paired"),
         group.by = "sample_names")
+```
 
+### Proportion of Mitochondria
+```{r}
 VlnPlot(atcells, "proportion.mito", 
-        cols.use = brewer.pal(5, "Set1"), 
+        cols.use = brewer.pal(10, "Paired"),
         group.by = "sample_names")
 
 ```
 
 ### GFP counts
 
-The abundance of GFP was also estimated for each cell by aligning to the eGFP sequence. Only the Type 2 cells should be labeled. 
+```{r read_in_counts, message = F, eval = F}
 
-```{r read_in_counts, message = F}
-
-files <- dir("~/Projects/10x_data/runs/20170623_zeemans/results/gfp/",
+expt1_files <- dir("~/Projects/10x_data/runs/20170623_zeemans/results/gfp/",
     pattern = "*.txt", full.names = T, recursive = T)
+expt2_files <- dir("~/Projects/10x_data/runs/20170728_zeeman_expt2/results/gfp/",
+    pattern = "*.txt", full.names = T, recursive = T)
+files <- c(expt1_files, expt2_files)
 
 dat <- map(files, read_tsv, col_names = c("cells", "gfp_counts"))
 
-file_ids = c(1, 2, 3, 5, 4)
-dat <- map2(dat, file_ids, ~dplyr::mutate(.x, group = .y))
+dat <- map2(dat, names(sample_paths), ~dplyr::mutate(.x, group = .y))
 
 dat <- bind_rows(dat) 
 
 dat <- dplyr::mutate(dat, 
               cells = str_split(cells, "-", simplify = T)[, 1],
-              cells = paste(cells, group, sep = "-" )) %>% 
+              cells = paste( group, cells, sep = "_" )) %>% 
   dplyr::select(-group)
+
+#write out metadata 
+out_dat <- left_join(unfiltered,
+                        dat,
+                        by = c("cell" = "cells"))
+write_tsv(out_dat, "per_cell_stats.txt")
 
 # only keep filtered cells
 dat <- dat %>% dplyr::filter(cells %in% atcells@cell.names)
@@ -230,7 +308,7 @@ atcells <- AddMetaData(atcells, dat)
 atcells <- SetAllIdent(atcells, id = "orig.ident")
 VlnPlot(atcells, 
         "gfp_counts",
-        cols.use = brewer.pal(n = 5, "Set1"), 
+        cols.use = brewer.pal(n = 10, "Paired"), 
         group.by = "sample_names")
 
 ```
@@ -245,7 +323,7 @@ atcells <- MeanVarPlot(atcells,
                     fxn.x = expMean, 
                     fxn.y = logVarDivMean, 
                     x.low.cutoff = 0.0125, 
-                    x.high.cutoff = 4, y.cutoff = 0.5, do.contour = F, do.plot = F)
+                    x.high.cutoff = 4, y.cutoff = 0.5, do.contour = F, do.plot = T)
 
 length(atcells@var.genes)
 
@@ -266,7 +344,7 @@ atcells <- RunTSNE(atcells, dims.use = 1:15, do.fast = T, k.seed = 1)
   To get an overview of the relationships between different cell types, PCA will be used first. Shown below is a plot of the first two principal components computed using highly variable genes (`r length(atcells@var.genes)` genes). The first two components of the PCA rarely capture all of the variation in the data, as can be seen in the second plot.  
   
 ```{r plot_pca, eval = T}
-PCAPlot(atcells, 1, 2, cols.use = brewer.pal(5, "Set1"), 
+PCAPlot(atcells, 1, 2, cols.use = brewer.pal(10, "Paired"), 
         group.by = "sample_names")
 PCElbowPlot(atcells)
 ```
@@ -278,15 +356,44 @@ PCHeatmap(atcells,
           do.balanced = TRUE, label.columns = FALSE, use.full = FALSE, do.plot = F)
 ```
 
-## TSNE projection
+## TSNE projection {.tabset}
   PCA analysis is useful for identifying the most variable dimensions in the dataset. However in single cell datasets there are often many dimensions that are informative for clustering the cells. [TSNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) is a non-linear dimensionality reduction algorithm that is particularly well-suited for projecting multidimensional data in two dimensional space. 
   
   Shown below is a TSNE projection of the single cell data, with each cell colored by the sample type. Overall there is quite a large degree of structure in the data with some apparent clusters shared with the samples, and also unique to each sample.
   
+### Sample Names
 ```{r plot_TSNE, fig.width = 10, fig.height = 10}
 TSNEPlot(atcells, 
-         colors.use = brewer.pal(n = 5, "Set1"), 
+         colors.use = brewer.pal(n = 10, "Paired"), 
          group.by = "sample_names")
+
+```
+
+### Experiment
+```{r, fig.width = 10, fig.height = 10 }
+TSNEPlot(atcells, 
+         colors.use = brewer.pal(n = 10, "Paired"), 
+         group.by = "expt")
+```
+
+### GFP
+```{r, fig.width = 10, fig.height = 10 }
+FeaturePlot(atcells, "gfp_counts")
+```
+
+### Genes Detected
+```{r, fig.width = 10, fig.height = 10 }
+FeaturePlot(atcells, "nGene", no.legend = F)
+```
+
+### UMIs Detected
+```{r, fig.width = 10, fig.height = 10 }
+FeaturePlot(atcells, "nUMI", no.legend = F)
+```
+
+### Proportion Mito
+```{r, fig.width = 10, fig.height = 10 }
+FeaturePlot(atcells, "proportion.mito", no.legend = F)
 ```
 
 ```{r, fig.width = 16, fig.height= 10 , eval = T}
@@ -311,7 +418,7 @@ p[[6]] <- TSNEPlot(atcells,
 
 p <- map2(p, c(names(cell_ids), "all_samples"),
             ~.x + 
-            coord_cartesian(c(-45, 45), c(-45, 55)) + 
+            coord_cartesian(c(-50, 50), c(-45, 55)) + 
             labs(title = .y) +
             theme(legend.position = "none"))
 
@@ -319,20 +426,14 @@ plot_grid(plotlist = p, nrow = 2, align = "hv")
 ```
 
 
-## Potential Confounding Factors
-  A challenge with single-cell RNA-Seq is the high degree of technical noise. Variables such as the number of detected genes or UMIs can drive apparent differences in sample transcriptomes. Shown below is the same `TSNE` projection with each cell colored by the number of genes, umis, or percent mitochondria detected. 
-  
-```{r find_confounding_issues, fig.width = 7, fig.height = 7}
-FeaturePlot(atcells, "nGene", no.legend = F)
-FeaturePlot(atcells, "nUMI", no.legend = F)
-FeaturePlot(atcells, "proportion.mito", no.legend = F)
-```
 
-## Cluster identification
+
+## Cluster identification {.tabset}
 
   Unsupervised clustering was performed to identify transcriptionally distinct cell populations. A graph-based algorithm was used that builds a k-nearest neighbor (KNN) graph on the euclidean distances calculated from principal components, weights each edge based on the local neighborhood using jaccard statistics, then prunes the graph to select clusters using an optimization function. The graph based algorithm is implemented in the Seurat R package.  Clusters are visualized using TSNE, but the cluster assignments are based on the first 15 principal components.
-  
-```{r find_markers, fig.width = 10, fig.height = 10, warning=FALSE}
+
+### res 0.5  
+```{r find_markers0.5, fig.width = 10, fig.height = 10, warning=FALSE}
 atcells <- FindClusters(atcells, 
                      pc.use = 1:15, 
                      k.param = 25, 
@@ -343,7 +444,40 @@ atcells <- FindClusters(atcells,
                      random.seed = 0)
 
 TSNEPlot(atcells, 
-         colors.use = brewer.pal(n = 12, "Paired"), 
+   #      colors.use = brewer.pal(n = 12, "Paired"), 
+         do.label = T, label.size = 10)
+```
+
+### res 0.8
+```{r find_markers0.8, fig.width = 10, fig.height = 10, warning=FALSE}
+atcells <- FindClusters(atcells, 
+                     pc.use = 1:15, 
+                     k.param  = 25, 
+                     resolution = 0.8, 
+                     print.output = 0, 
+                     plot.SNN = F,
+                     save.SNN = T, 
+                     random.seed = 0)
+
+TSNEPlot(atcells, 
+   #      colors.use = brewer.pal(n = 12, "Paired"), 
+         do.label = T, label.size = 10)
+```
+
+
+### res 1.2
+```{r find_markers1.2, fig.width = 10, fig.height = 10, warning=FALSE}
+atcells <- FindClusters(atcells, 
+                     pc.use = 1:15, 
+                     k.param = 25, 
+                     resolution = 1.2, 
+                     print.output = 0, 
+                     plot.SNN = F,
+                     save.SNN = T, 
+                     random.seed = 0)
+
+TSNEPlot(atcells, 
+   #      colors.use = brewer.pal(n = 12, "Paired"), 
          do.label = T, label.size = 10)
 ```
 
@@ -354,12 +488,97 @@ TSNEPlot(atcells,
 Next we will determine genes enriched in each sample by comparing gene expression in each sample to all other samples. Plotted below are the top 10 enriched genes detected in each sample for all cell transcriptomes (Yellow is high, purple is low).
 
 ```{r}
+atcells <- SetAllIdent(atcells, "res.0.8")
 atcells_markers <- FindAllMarkers(atcells, 
                                   only.pos = TRUE,  
                                   min.pct = 0.25, 
                                   thresh.use = 0.25)
 
-atcells_markers %>% group_by(cluster) %>% top_n(10, avg_diff) -> top10
+atcells_markers %>% 
+  group_by(cluster) %>% 
+  top_n(10, avg_diff) -> top10
+
+write_tsv(atcells_markers, "res0.8_markers.txt")
+```
+
+```{r, fig.width = 10, fig.height = 10}
+replace_id <- function(vec, x, y) {
+  for(i in seq_along(x)){
+    vec[vec == x[i]] <- y
+  }
+  vec
+}
+
+# merge injured type II cells
+clusters_to_merge <- c("1", "11", "3", "0", "4", "2")
+cluster_ids <- atcells@data.info$res.0.8
+a <- replace_id(cluster_ids, clusters_to_merge, "20")
+new_ids <- data.frame(row.names = atcells@cell.names, 
+                new_ids = as.character(a))
+atcells <- AddMetaData(atcells, new_ids)
+
+#merge uninjured type II cells
+clusters_to_merge <- c("7", "6")
+cluster_ids <- atcells@data.info$new_ids
+cluster_ids <- as.character(cluster_ids)
+a <- replace_id(cluster_ids, clusters_to_merge, "22")
+a <- match(a, unique(a))
+new_ids <- data.frame(row.names = atcells@cell.names, 
+                new_ids = as.character(a))
+atcells <- AddMetaData(atcells, new_ids)
+
+atcells <- SetAllIdent(atcells, "new_ids")
+
+TSNEPlot(atcells, 
+        colors.use = brewer.pal(n = 11, "Paired"), 
+         do.label = T, label.size = 16,
+        pt.size = 3)
+
+
+renames <- c(
+  "Endothelial",
+  "Basal",
+  "Club",
+  "Ciliary",
+  "Type I",
+  "Type II",
+  "Macrophages",
+  "TD 1",
+  "TD 2",
+  "Injured\nType II",
+  "TD 3")
+
+names(renames) <- c(as.character(1:11))
+ids <- atcells@data.info$new_ids
+ids <- as.character(ids)
+labeled_ids <- renames[ids] %>% unname()
+
+
+labeled_ids <- data.frame(
+  row.names = atcells@cell.names,
+  labeled_clusters = labeled_ids)
+
+atcells <- AddMetaData(atcells, labeled_ids)
+
+atcells <- SetAllIdent(atcells, "labeled_clusters")
+TSNEPlot(atcells, 
+        colors.use = brewer.pal(n = 11, "Paired"), 
+         do.label = T, label.size = 16,
+        pt.size = 3)
+
+```
+
+```{r}
+atcells_markers <- FindAllMarkers(atcells, 
+                                  only.pos = TRUE,  
+                                  min.pct = 0.25, 
+                                  thresh.use = 0.25)
+
+atcells_markers %>% 
+  group_by(cluster) %>% 
+  top_n(10, avg_diff) -> top10
+
+write_tsv(atcells_markers, "res0.8_merged_markers.txt")
 ```
 
 ```{r, fig.width = 20, fig.height= 20 }
@@ -471,7 +690,7 @@ Cluster |  Classification  | Notes
 ```{r cluster_distribution}
 cluster_ids <- atcells@ident
 cell_ids <- atcells@data.info$orig.ident
-levels(cell_ids) <- samples_lookup
+#levels(cell_ids) <- samples_lookup
 
 cluster_summary <- data_frame(id = cell_ids, cluster = cluster_ids)
 cluster_summary <- group_by(cluster_summary, id, cluster) %>% summarize(cells = n())
@@ -482,6 +701,7 @@ ggplot(cluster_summary, aes(cluster, cells, fill = cluster)) +
   scale_fill_brewer(palette = "Paired") +
   geom_bar(stat = "identity")
 ```
+
 
 
 
@@ -540,7 +760,7 @@ left_join(tfs, tbl_df(eid_to_symbol), by = c("entrez_mouse" = "ENTREZID")) %>%
 
 # select out interesting cluster
 atcells_markers %>% 
-  dplyr::filter(cluster == "9") -> interesting_cluster
+  dplyr::filter(cluster == "7") -> interesting_cluster
 
 # find clusters associated with transcription factors
 left_join(interesting_cluster, annotated_tfs, by = c("gene" = "SYMBOL")) -> tf_annotated
@@ -559,13 +779,20 @@ annotated <- left_join(tf_annotated, rbps, by = c("gene_symbol" = "gene name"))
 annotated %>% dplyr::filter(entrez_mouse != 0) %>% 
   dplyr::select(p_val:gene, gene_name) -> tf_info
 
-knitr::kable(tf_info[1:10, ], caption = c("TFs found enriched in cluster 8"))
+knitr::kable(tf_info[1:10, ], caption = c("TFs found enriched in cluster 7"))
 ```
 
-```{r gfptsne}
-FeaturePlot(atcells, "gfp_counts")
-```
 
 ```{r save_objs, eval = T}
-saveRDS(atcells, "analyzed_seurat_object.rds")
+saveRDS(atcells, "analyzed_seurat_object_all.rds")
+write_tsv(atcells_markers, "markers.txt")
+#write_tsv(atcells_roc_markers, "auc_markers.txt")
+```
+
+```{r}
+TSNEPlot(atcells, 
+         colors.use = brewer.pal(n = 12, "Paired"), 
+         group.by = "res.0.5")
+
+BuildClusterTree(atcells, pcs.use = 1:15)
 ```
