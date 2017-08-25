@@ -780,10 +780,20 @@ dplyr::filter(tf_info, cluster == clusters[11]) %>%
 
 ## Find Cell Surface Markers {.tabset .tabset-fade}
 
-  To identify FACS sortable markers of each cell type cell surface proteins will be identified that are enriched in each cell type. A database of known cell surface proteins derived from mass spec data was queried (taken from this [paper](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0121314) in Plos One) to select cell surface markers. Shown below are the TFs found in each cluster rank by enrichment in the cluster. 
+  To identify FACS sortable markers of each cell type cell surface proteins will be identified that are enriched in each cell type. A database of known cell surface proteins derived from mass spec data was queried (taken from this [paper](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0121314) in Plos One) to select cell surface markers. Additionally, the  [UniProt](http://www.uniprot.org/uniprot/?query=locations%3A(location%3A%22cell%20membrane%22)%20AND%20organism%3A%22Mus%20musculus%20(Mouse)%20%5B10090%5D%22%20AND%20annotation%3A(type%3Atransmem)&sort=score&columns=id%2Centry%20name%2Creviewed%2Cprotein%20names%2Corganism%2Clength%2Cgenes(PREFERRED))  database was queried to extract putative cell surface proteins. Shown below are the cell surface proteins found in each cluster ranked by enrichment in the cluster. 
   
-  The `CSPA category` is a category that is either `high confidence`, `putative` or `unspecific`. 
-  
+  The `CSPA category` is a category that is either `high confidence`, `putative` or `unspecific`. If the cell surface marker was not found in the CSPA database, but present in the Uniprot database, then it will not have a CSPA category entry.
+ 
+```{r, eval = F}
+# url to download uniprot catagories
+"http://www.uniprot.org/uniprot/?query=locations%3A(location%3A%22cell%20membrane%22)%20AND%20organism%3A%22Mus%20musculus%20(Mouse)%20%5B10090%5D%22%20AND%20annotation%3A(type%3Atransmem)&sort=score&columns=id%2Centry%20name%2Creviewed%2Cprotein%20names%2Corganism%2Clength%2Cgenes(PREFERRED)"
+
+# search terms
+#locations:(location:"cell membrane") annotation:(type:transmem) AND organism:"Mus musculus (Mouse) [10090]"
+
+# dl date = 08/24/17
+```
+
 ```{r}
 
 if(!file.exists("S2_File.xlsx")){
@@ -793,18 +803,53 @@ if(!file.exists("S2_File.xlsx")){
 
 cell_surface_markers <- readxl::read_excel("S2_File.xlsx", 
                                            sheet = 2)
+uni <- suppressMessages(read_tsv("uniprot.tab.gz"))
+filter_cell_surface <- function(df, cell_surface_markers, uniprot) {
+  # annotate with CSPA database and uniprot databse
+  
+  left_join(df, 
+            uniprot,
+            by = c("gene" = "Gene names  (primary )")) %>% 
+    dplyr::select(-(Entry:Status), -(Organism:Length)) %>% 
+    dplyr::mutate(Uniprot_tm = ifelse(is.na(`Protein names`), 
+                                      NA,
+                                      "yes")) -> uni_annotated
+  
+  left_join(uni_annotated, 
+            cell_surface_markers, 
+            by = c("gene" = "ENTREZ gene symbol")) -> cf_annotated
+  
+  dplyr::mutate(cf_annotated,
+                `UniProt cell surface` = ifelse(!is.na(Uniprot_tm),
+                                                "yes",
+                                                `UniProt cell surface`),
+                `UP_Protein_name` = ifelse(!is.na(`Protein names`),
+                                                `Protein names`,
+                                                `UP_Protein_name`)) -> cf_annotated
+  
+  cf_annotated <- dplyr::select(cf_annotated, 
+                                -(`Protein names`:Uniprot_tm))
+  dplyr::filter(cf_annotated,
+                !is.na(`CSPA category`) | !is.na(`UniProt cell surface`)) %>% 
+    dplyr::select(-organism, 
+                  -ID_link,
+                  -UP_entry_name,
+                  -(ENTREZ_gene_ID:`Phobius TM predicted yes/no`)) -> res
+  
+  #remove redundant annotatiosn due to multiple gene descriptions
+  grp_cols <- colnames(res)
+  grp_cols <- grp_cols[grp_cols != "UP_Protein_name"]
+  group_by_at(res, grp_cols) %>% 
+    summarize(UP_Protein_name = dplyr::first(UP_Protein_name)) %>% 
+    arrange(p_val) %>% 
+    ungroup()
+}
 
-left_join(atcells_merged_markers, 
+
+filter_cell_surface(atcells_merged_markers, 
           cell_surface_markers, 
-          by = c("gene" = "ENTREZ gene symbol")) -> cf_annotated
+          uni) -> cf_annotated
 
-dplyr::filter(cf_annotated,
-              !is.na(`CSPA category`)) %>% 
-  dplyr::select(p_val:gene,
-         CD,
-         `CSPA category`,
-         UP_Protein_name,
-         `# predicted TM domains`:`UniProt cell surface`) -> cf_annotated
 ```
 
 ### Surface Proteins enriched in TD 1
@@ -874,51 +919,40 @@ dplyr::filter(cf_annotated, cluster == clusters[11]) %>%
 ```
 
 
-## Find Surface markers marking TD populations, not in non-TD Type II {.tabset .tabset-fade }
+##  Find Surface markers marking TD populations, not in non-TD Type II {.tabset .tabset-fade }
 
 Ideally a surface marker for sorting would be able to isolate the TD populations. The Type II cells are marked with GFP, so we only need to find a marker that distinguishes the TD type II cells from the non-TD type II cells. Shown below are cell surface proteins that are enriched compared to non-TD cell populations in TD 1, TD 2, TD 3, or in all TD cells.
 
 ```{r, eval = F}
 td1 <- FindMarkers(atcells, c("TD 1"), 
                                   c("Injured\nType II", 
-                                    "Type II"), only.pos = T)
+                                    "Type II"), only.pos = F)
 
 td2 <- FindMarkers(atcells, c("TD 2"), 
                                   c("Injured\nType II", 
-                                    "Type II"), only.pos = T)
+                                    "Type II"), only.pos = F)
                    
 td3 <- FindMarkers(atcells, c("TD 3"), 
                                   c("Injured\nType II", 
-                                    "Type II"), only.pos = T)
+                                    "Type II"), only.pos = F)
 
                                       
 td <- FindMarkers(atcells, c("TD 1", "TD 2", "TD 3"), 
                                   c("Injured\nType II", 
-                                    "Type II"), only.pos = T)
+                                    "Type II"), only.pos = F)
                   
 tds <- list(td1,
             td2,
             td3,
             td)
 
-filter_cell_surface <- function(df, cell_surface_markers) {
-  df <- df %>% 
-    tibble::rownames_to_column("gene") %>% 
-    as_data_frame()
-  
-  left_join(df, 
-            cell_surface_markers, 
-            by = c("gene" = "ENTREZ gene symbol")) -> cf_annotated
-  
-  dplyr::filter(cf_annotated,
-                !is.na(`CSPA category`)) %>% 
-    dplyr::select(gene:pct.2,
-           CD,
-           `CSPA category`,
-           UP_Protein_name,
-           `# predicted TM domains`:`UniProt cell surface`)
-}
-map(tds, ~filter_cell_surface(.x, cell_surface_markers)) -> tds_annotated
+tds <- map(tds, ~tibble::rownames_to_column(.x, "gene") %>% 
+             as_data_frame())
+
+
+map(tds, ~filter_cell_surface(.x, 
+                              cell_surface_markers,
+                              uni)) -> tds_annotated
 
 map2(tds_annotated, 
      c("csm_td1.txt", 
@@ -926,6 +960,14 @@ map2(tds_annotated,
        "csm_td3.txt",
        "csm_tds.txt"),
      ~write_tsv(.x, .y))
+
+map2(tds, 
+     c("td1_markers.txt", 
+       "td2_markers.txt",
+       "td3_markers.txt",
+       "td123_markers.txt"),
+     ~write_tsv(.x, .y))
+
 ```
 
 ```{r, message=F}
@@ -950,23 +992,25 @@ tds[[2]]
 tds[[3]]
 ```
 
-### Enriched in TD3
+### Enriched in All TDs
 ```{r, eval = T}
 tds[[4]]
 ```
 
 ## Surface Markers Enriched in TD populations {.tabset .tabset-fade}
 
-There is much more data to analyze to figure out what would be the best set of candidates, but here is a quick look at a few markers:
+Here is a quick look at a few markers that are strongly enriched in the TD1 popultation. 
 ```{r}
 cool_genes <- c(
-  "Anxa2",
-  "Emp2",
-  "Tmpo",
-  "Bcam",
-  "Clu",
-  "Crlf1",
-  "Mfge8")
+  "Cldn4",
+  "Plb1",
+  "Ifitm3",
+  "Eno1",
+  "Fn1",
+  "Ntm",
+  "Ifngr1",
+  "Mfge8",
+  "Emp2")
 ```
 
 ```{r, fig.width = 10, fig.height = 10, results='asis'}
@@ -977,5 +1021,107 @@ for(i in seq_along(cool_genes)){
   cat("\n")
 }
 ```
+
+
+
+
+## Find TFs marking TD populations, not in non-TD Type II or Type I {.tabset .tabset-fade }
+
+Determining if there are TFs that distinguish the TD1 or TD3 population from type I or type II cells  
+
+```{r, eval = F}
+td1_tf <- FindMarkers(atcells, c("TD 1"), 
+                                  c("Type I", "Injured\nType II", 
+                                     "Type II"), only.pos = F)
+
+td3_tf <- FindMarkers(atcells, c("TD 3"), 
+                                  c("Type I", "Injured\nType II", 
+                                     "Type II"), only.pos = F)
+
+                                      
+td13_tf <- FindMarkers(atcells, c("TD 1", "TD 3"), 
+                                  c("Type I", "Injured\nType II", 
+                                    "Type II"), only.pos = F)
+             
+
+tfs <- list(td1_tf,
+            td3_tf, 
+            td13_tf)
+
+tfs <- map(tfs, ~tibble::rownames_to_column(.x, "gene") %>% 
+             as_data_frame())
+
+tfs_annotated <- map(tfs, ~left_join(.x, 
+          annotated_tfs, by = c("gene" = "SYMBOL")))
+
+tfs_annotated <- map(tfs_annotated, 
+                     ~.x %>% 
+             dplyr::filter(entrez_mouse != 0) %>% 
+  dplyr::select(gene:pct.2, gene_name))
+
+
+map2(tfs_annotated, 
+     c("tfs_td1.txt", 
+       "tfs_td3.txt",
+       "tfs_td13.txt"),
+     ~write_tsv(.x, .y))
+
+map2(tfs, 
+     c("td1_notype1_markers.txt", 
+       "td3_notype1_markers.txt", 
+       "td13_notype1_markers.txt"),
+     ~write_tsv(.x, .y))
+
+```
+
+```{r, message=F}
+tfs <- map(c("tfs_td1.txt", 
+       "tfs_td3.txt",
+       "tfs_td13.txt"), ~read_tsv(.x))
+
+```
+### Enriched in TD1
+```{r, eval = T}
+tfs[[1]]
+```
+
+### Enriched in TD3
+```{r, eval = T}
+tfs[[2]]
+```
+
+### Enriched in TD1 + TD3
+```{r, eval = T}
+tfs[[3]]
+```
+
+
+## TFs Enriched in TD populations {.tabset .tabset-fade}
+
+Interesting Tfs based on expression. Strangly `Eno1` is annotated as a cell
+surface marker and a transcription factor.
+
+```{r}
+cool_genes <- c(
+  "Sox4",
+  "Trim47",
+  "Nfkbia",
+  "Nfkbie",
+  "Nfkb2",
+  "Relb",
+  "Ran",
+  "Tead2",
+  "Crip2")
+```
+
+```{r, fig.width = 10, fig.height = 10, results='asis'}
+for(i in seq_along(cool_genes)){
+  cat('\n### ', cool_genes[i], '\n', sep = "")
+  FeaturePlot(atcells, cool_genes[i])
+  VlnPlot(atcells, cool_genes[i])
+  cat("\n")
+}
+```
+
 
 
