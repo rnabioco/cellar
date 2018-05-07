@@ -51,7 +51,10 @@ To run on new data edit `config.yaml` to specify the following important paramet
    sample_2_3_S3_L001_R1_001.fastq.gz
    sample_2_4_S4_L001_R1_001.fastq.gz
    ```
-   
+    
+   The cellranger count log that contains the list of fastqs is here:
+   `DATA/sample_1/SC_RNA_COUNTER_CS/SC_RNA_COUNTER/SETUP_CHUNKS/fork0/_outs`
+
 5. `EXPT_GROUPS`: Specify which samples to group together for aggregation
    as a csv separated string.The sample names should match those provided in the SAMPLES list. If
    you have multiple aggregations, then supply them as additional list
