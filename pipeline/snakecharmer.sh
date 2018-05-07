@@ -13,4 +13,4 @@ args=' -q rna -o {log}.out -e {log}.err -J {params.job_name} -R "
     compute16 " '
 
 snakemake --drmaa "$args" --snakefile Snakefile --jobs 3 \
-  --latency-wait 50 --rerun-incomplete  --configfile config_jordan.yaml 
+  --latency-wait 50 --rerun-incomplete  --configfile config.yaml 

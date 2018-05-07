@@ -9,20 +9,16 @@ configfile: "config.yaml"
 
 PROJECT = config ["PROJECT"]
 DATA = config["DATA"]
-SAMPLE_SHEET = config["SAMPLE_SHEET"]
 SAMPLES = config["SAMPLES"]
 TRANSCRIPTOME = config["TRANSCRIPTOME"]
 EXPT_GROUPS = config["EXPT_GROUPS"]
 MAX_10X_JOBS = config["MAX_10X_JOBS"]
 
-BIN = "../bin"
-
 rule all:
     input:
       expand("{data}/results/logs/{sample}_complete.txt", data = DATA,
-      sample = SAMPLES),
+        sample = SAMPLES),
       expand("{data}/results/logs/{expt_groups}_aggr_complete.out.txt", 
-      data = DATA, expt_groups = EXPT_GROUPS),
+        data = DATA, expt_groups = EXPT_GROUPS),
 
-include: "rules/combinefqs_subprocess.snake"    
 include: "rules/10x_count.snake"

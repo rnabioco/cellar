@@ -1,8 +1,8 @@
-shell.executable("/bin/bash")
-shell.prefix("source ~/.bash_profile; ")
 import os 
+import re
+import glob
 
-""" Snakefile for running 10x cellranger """
+""" Snakerules for running 10x cellranger """
 
 def _collect_groups(wildcards):
     """generate a csv file with path to molecule_info.h5 for each expt
@@ -25,9 +25,67 @@ def _collect_groups(wildcards):
     
     out.close()
     # return list with group id and path to csv
-    return [groups[0][:-1], groups[0] + "_groups_def.csv"]
+    return [groups[0][:-1] + "_aggr", groups[0] + "_groups_def.csv"]
 
 
+def _get_sample_ids(wildcards):
+    """ extract out sample prefixes from fastqs to pass to cellranger
+    i.e. given the following fastqs
+    sample_name_1_S1_L001_R1_001.fastq.gz"
+    sample_name_2_S2_L001_R1_001.fastq.gz"
+    sample_name_3_S3_L001_R1_001.fastq.gz"
+
+    return:
+    sample_name_1,sample_name_2,sample_name_3
+    """
+
+    no_lane = "_S[0-9]+_[RI][12]_001\.fastq\.gz$"
+    lane = "_S[0-9]+_L[0-9]{3}_[RI][12]_001\.fastq\.gz$"
+
+    fq_dir = os.path.join(wildcards.data, "raw_data")          
+    fqs = glob.glob(os.path.join(fq_dir, wildcards.sample + "*"))
+    R1_fqs = [x for x in fqs if "R1" in x]
+    R1_fqs = [os.path.basename(x) for x in R1_fqs]
+
+    sample_ids = set()
+    for fq in R1_fqs:
+      if re.search(lane, fq) is not None:
+        sample_id = re.sub(lane, "", fq)
+        sample_ids.add(sample_id)
+
+      elif re.search(no_lane, fq) is not None:
+        # Novaseq style S1 flowcell
+        sample_id = re.sub(no_lane, "", fq)
+        sample_ids.add(sample_id)
+      else:
+        sys.exit("unable to parse out sample id from {}".format(fq))
+
+    return ",".join(sample_ids)
+
+def _get_sample_fq_paths(wildcards):
+    """ generate list of fastqs that contain sample prefix 
+    """
+    
+    sample_ids = _get_sample_ids(wildcards)
+    sample_ids = sample_ids.split(",")
+
+    fq_dir = os.path.join(wildcards.data, "raw_data")          
+    input_fqs = set()
+    for sample in sample_ids:
+      
+      r1_pattern = sample + "*" + "R1_001.fastq.gz"
+      
+      r1s = glob.glob(os.path.join(fq_dir, r1_pattern))
+      r2s = [re.sub("_R1_001.fastq.gz$", "_R2_001.fastq.gz", x) for x in r1s] 
+      reads = r1s + r2s
+      for read in reads:
+        input_fqs.add(read)
+    
+    print("running cellranger on the following fqs\nfastq\tsample", file = sys.stderr) 
+    for fq in input_fqs:
+      print("{}\t{}".format(fq, wildcards.sample), file = sys.stderr)
+
+    return input_fqs
 
 rule cellranger_count:
     """ note that cellranger count will fail if the output directory
@@ -36,13 +94,13 @@ rule cellranger_count:
     avoid this error this rule creates a dummy file "{sample}_complete.txt """
 
     input:
-      expand("{data}/raw_data/combined/{fqs}_R1_001.fastq.gz", data = DATA,
-      fqs = FQS),
+      _get_sample_fq_paths
     output:
       "{data}/results/logs/{sample}_complete.txt"
     params:
+      fqs = _get_sample_ids,
       outdir = "{data}/results/",
-      indir = "{data}/raw_data/combined".format(data=DATA, project = PROJECT),
+      indir = os.path.join("{data}","raw_data"),
       job_name = "count",
       memory = "select[mem>4] rusage[mem=4]",
     log: "logs/{sample}_count.out"
@@ -50,10 +108,11 @@ rule cellranger_count:
     shell:
       """
       set -x
+      echo {params.fqs}
       cellranger count \
           --id={wildcards.sample} \
           --fastqs={params.indir} \
-          --sample={wildcards.sample} \
+          --sample={params.fqs} \
           --jobmode=lsf \
           --project={PROJECT} \
           --maxjobs={MAX_10X_JOBS} \
@@ -61,14 +120,21 @@ rule cellranger_count:
 
       mkdir -p {params.outdir}
       mv -u {wildcards.sample} {params.outdir}
-      echo "finished" > {output}
+      
+      # test if output bam file produced by count
+      bam="{params.outdir}{wildcards.sample}/outs/possorted_genome_bam.bam" 
 
+      if [ -s $bam ] 
+        then 
+        echo "finished" > {output}
+      fi
       """ 
 
 rule cellranger_aggr:
     input:
-      expand("{data}/results/logs/{sample}_complete.txt", sample =
-      SAMPLES, data = DATA),
+      expand("{data}/results/logs/{sample}_complete.txt",
+        sample = SAMPLES, 
+        data = DATA),
     output:
       "{data}/results/logs/{expt_groups}_aggr_complete.out.txt"
     params:
@@ -90,5 +156,10 @@ rule cellranger_aggr:
       mkdir -p {params.outdir}
       mv -u {params.groups[0]} {params.outdir}
       mv -i {params.groups[1]} {params.outdir}      
-      echo "finished" > {output}
+      
+      summary_html="{params.outdir}{params.groups[0]}/outs/web_summary.html"
+      if [ -s $summary_html ]
+      then
+        echo "finished" > {output}
+      fi
       """ 

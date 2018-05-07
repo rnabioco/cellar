@@ -1,2 +1,2 @@
-Repository for storing analysis and pipelines for 10x single cell data
-analyses
+Repository for analyses and pipelines for 10x genomics single cell data
+
