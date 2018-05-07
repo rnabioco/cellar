@@ -36,7 +36,7 @@ rule cellranger_count:
     avoid this error this rule creates a dummy file "{sample}_complete.txt """
 
     input:
-      expand("{data}/raw_data/combined/{fqs}_I1_001.fastq.gz", data = DATA,
+      expand("{data}/raw_data/combined/{fqs}_R1_001.fastq.gz", data = DATA,
       fqs = FQS),
     output:
       "{data}/results/logs/{sample}_complete.txt"
@@ -56,7 +56,7 @@ rule cellranger_count:
           --sample={wildcards.sample} \
           --jobmode=lsf \
           --project={PROJECT} \
-          --maxjobs=18 \
+          --maxjobs={MAX_10X_JOBS} \
           --transcriptome={TRANSCRIPTOME}
 
       mkdir -p {params.outdir}
@@ -85,7 +85,7 @@ rule cellranger_aggr:
           --csv={params.groups[1]} \
           --id={params.groups[0]} \
           --jobmode=lsf \
-          --maxjobs=18 
+          --maxjobs={MAX_10X_JOBS} 
       
       mkdir -p {params.outdir}
       mv -u {params.groups[0]} {params.outdir}

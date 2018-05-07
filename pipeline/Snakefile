@@ -13,6 +13,8 @@ SAMPLE_SHEET = config["SAMPLE_SHEET"]
 SAMPLES = config["SAMPLES"]
 TRANSCRIPTOME = config["TRANSCRIPTOME"]
 EXPT_GROUPS = config["EXPT_GROUPS"]
+MAX_10X_JOBS = config["MAX_10X_JOBS"]
+
 BIN = "../bin"
 
 rule all:

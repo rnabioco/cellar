@@ -16,14 +16,16 @@ def fastq_names(sample_file, in_directory, out_directory):
     fqs = glob.glob(in_directory + "/*.fastq.gz")
 
     sample_names = [x.strip() for x in open(sample_file)]
+
     outnames = []
-    
+    novaseq = False 
     for sample in sample_names:
         
         fqs_with_name = [x for x in fqs if sample in x]
 
         # determine the set of lanes, and pick a sample id (take first)
         fqregex = re.compile(".*_(S[0-9]+)_(L00[1-8])_[IR][12]_001[.]fastq[.]gz")
+        fqregex_novaseq = re.compile(".*_(S[0-9]+)_[IR][12]_001[.]fastq[.]gz")
 
         lanes = set()
         sample_id = ""
@@ -32,19 +34,31 @@ def fastq_names(sample_file, in_directory, out_directory):
 
             try:
                 sid, lane = fqregex.match(fq).groups()
-            except ValueError:
-                sys.exit("Unable to extract sample, lane from fastq name")
+            except AttributeError:
+                try:
+                    sid = fqregex_novaseq.match(fq).groups()[0]
+                    novaseq = True
+                except:
+                    sys.exit("Unable to extract sample, lane from fastq name") 
 
             if sample_id == "":
                 sample_id = sid
 
-            lanes.add(lane)
+            if not novaseq:
+                lanes.add(lane)
+
+        if novaseq:
+            R1_fqs = [x for x in fqs_with_name if "_R1_" in x]
+            if R1_fqs:
+                outname =  sample + "_" + sample_id + "_L001" 
+                outnames.append(outname)
+            continue
 
         for lane_id in lanes:
 
             per_lane_fqs = [x for x in fqs_with_name if lane_id in x]
 
-            R1_fqs = [x for x in per_lane_fqs if "R1" in x]
+            R1_fqs = [x for x in per_lane_fqs if "_R1_" in x]
             
             if R1_fqs:
                 outname =  sample + "_" + sample_id + "_" + lane

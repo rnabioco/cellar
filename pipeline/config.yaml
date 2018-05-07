@@ -1,23 +1,22 @@
 # config file for running 10x pipeline 
 
 DATA:
-    "../runs/20170728_zeeman_expt2"
-
+    "../runs/tmp"
 PROJECT:
-    "zeemans_run2"
+    "zemans"
 
 TRANSCRIPTOME:
-    "~/Projects/shared_dbases/cell_ranger/refdata-cellranger-mm10-1.2.0/"    
+    "/vol3/home/riemondy/Projects/shared_dbases/cell_ranger/refdata-cellranger-mm10-1.2.0"
 
 SAMPLE_SHEET: 
-    "../runs/20170728_zeeman_expt2/docs/samples.txt"
+    "../runs/tmp/docs/samples.txt"
 
 SAMPLES:
-    - "3242ATI1"
-    - "3242ATI2"
-    - "3242ATII3"
-    - "3241ATII4"
-    - "3241ATII5"
+    - Collins_TNF_deltaARE
+    - Collins_WT 
 
 EXPT_GROUPS:
-    - 3241ATII4,3241ATII5,3242ATI1,3242ATI2,3242ATII3 
+    - Collins_TNF_deltaARE,Collins_WT 
+
+MAX_10X_JOBS:
+    30
