@@ -40,44 +40,76 @@ def combine_fastqs(ids, in_directory, out_directory):
 
         fqregex = re.compile(".*_(S[0-9]+)_(L00[1-8])_[IR][12]_001[.]fastq[.]gz")
         
+        fqregex_novaseq = re.compile(".*_(S[0-9]+)_[IR][12]_001[.]fastq[.]gz")
+
         lanes = set()
         sample_id = ""
-        
+        novaseq = False
+
         for fq in fqs_with_name:
-        
             try:
                 sid, lane = fqregex.match(fq).groups()
-            except ValueError:
-                sys.exit("Unable to extract sample, lane from fastq name")
+            except AttributeError:
+                try:
+                    sid = fqregex_novaseq.match(fq).groups()[0]
+                    novaseq = True
+                except:
+                    sys.exit("Unable to extract sample, lane from fastq name")
             
             if sample_id == "":
                 sample_id = sid
+            
+            if not novaseq:
+                lanes.add(lane)
         
-            lanes.add(lane)
+        R1_fqs = []
+        R2_fqs = []
+        
+        if novaseq:
+            
+            R1_fqs = [x for x in fqs_with_name if "_R1_" in x]
+            R2_fqs = [x for x in fqs_with_name if "_R2_" in x]
+            
+            # make output directory
+            if not os.path.exists(out_directory):
+                os.makedirs(out_directory)
+            
+            # add dummmy lane info for 10x cell ranger
+            # i.e. [Sample Name]_S1_L00[Lane Number]_[ReadType]_001.fastq.gz
+            lane = "L001"
+            
+            if R1_fqs and R2_fqs:
+                outname_r1 = sample + "_" + sample_id + "_" + lane + "_R1_001.fastq.gz"
+                concatenate_fq(outname_r1, R1_fqs, out_directory)
+                
+                outname_r2 = sample + "_" + sample_id + "_" + lane + "_R2_001.fastq.gz"
+                r2_fqs = [x.replace("_R1_001.fastq.gz", "_R2_001.fastq.gz") for x in R1_fqs]
+                concatenate_fq(outname_r2, r2_fqs, out_directory)
+            
+            continue
         
         for lane_id in lanes:
             
             per_lane_fqs = [x for x in fqs_with_name if lane_id in x]
             
-            R1_fqs = [x for x in per_lane_fqs if "R1" in x]
-            R2_fqs = [x for x in per_lane_fqs if "R2" in x]
-            I1_fqs = [x for x in per_lane_fqs if "I1" in x]
+            R1s = [x for x in per_lane_fqs if "_R1_" in x]
+            R2s = [x for x in per_lane_fqs if "_R2_" in x]
+            R1_fqs += R1s          
+            R2_fqs += R2s          
             
-            # make output directory
-            if not os.path.exists(out_directory):
-                os.makedirs(out_directory)
-
-            if R1_fqs:
-                outname = sample + "_" + sample_id + "_" + lane + "_R1_001.fastq.gz"
-                concatenate_fq(outname, R1_fqs, out_directory)
-            
-            if R2_fqs:
-                outname = sample + "_" + sample_id + "_" + lane + "_R2_001.fastq.gz"
-                concatenate_fq(outname, R2_fqs, out_directory)
-            
-            if I1_fqs:
-                outname = sample + "_" + sample_id + "_" + lane + "_I1_001.fastq.gz"
-                concatenate_fq(outname, I1_fqs, out_directory)
+        # make output directory
+        if not os.path.exists(out_directory):
+            os.makedirs(out_directory)
+        
+        if R1_fqs and R2_fqs:
+            ## keep same order for R1 and R2 
+            outname_r1 = sample + "_" + sample_id + "_" + lane + "_R1_001.fastq.gz"
+            concatenate_fq(outname_r1, R1_fqs, out_directory)
+       
+            outname_r2 = sample + "_" + sample_id + "_" + lane + "_R2_001.fastq.gz"
+            r2_fqs = [x.replace("_R1_001.fastq.gz", "_R2_001.fastq.gz") for x in R1_fqs]
+            concatenate_fq(outname_r2, r2_fqs, out_directory)
+        
 def main():
 
     parser = argparse.ArgumentParser(description="""
