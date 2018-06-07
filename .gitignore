@@ -1,7 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
-inst/doc
 *.swp
 README.html
 *_cache/
@@ -14,3 +13,7 @@ index.html
 *.gz
 *.pdf
 *.html
+tcr/*
+runs/*
+results/*
+

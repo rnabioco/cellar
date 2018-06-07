@@ -1,2 +1,3 @@
-Repository for analyses and pipelines for 10x genomics single cell data
+# cellar 
+Repository for analyses and pipelines for single cell data
 
