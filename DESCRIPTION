@@ -8,9 +8,8 @@ Depends: R (>= 3.4.2)
 Imports:
     Seurat,
     RColorBrewer,
-    ggplot2,
-    tidyr,
-    dplyr,
+    tidyverse,
+    Matrix,
     viridis
 License: MIT
 VignetteBuilder: knitr

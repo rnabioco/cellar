@@ -1,0 +1,38 @@
+dist: trusty
+sudo: required
+language: r
+warnings_are_errors: false
+cache: packages
+r_build_args: '--no-build-vignettes'
+r_check_args: '--as-cran --ignore-vignettes'
+bioc_required: true
+bioc_use_devel: true
+r_packages:
+  - devtools
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - os: osx
+  include:
+    - os: linux
+      r: release
+      compiler: gcc-6
+      addons:
+        apt:
+          sources:
+           - 'ubuntu-toolchain-r-test'
+          packages:
+           - 'g++-6'
+    - os: linux
+      r: devel
+      compiler: gcc-6
+      addons:
+        apt:
+          sources:
+           - 'ubuntu-toolchain-r-test'
+          packages:
+           - 'g++-6'
+    - os: osx
+      r: release
+      compiler: clang

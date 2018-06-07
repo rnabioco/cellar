@@ -1,0 +1,381 @@
+---
+title: "Seurat Vignette"
+author: "RBI fellows (Austin Gillen, Rui Fu, Kent Riemondy)"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Class-7}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "img/seurat",
+  fig.align = "center"
+)
+
+library(cellar)
+library(RColorBrewer)
+library(Seurat)
+library(tidyverse)
+library(Matrix)
+```
+
+# Single cell RNA-seq analysis in R with Seurat
+(Adapted from the [Seurat PBMC 3k Tutorial](http://satijalab.org/seurat/pbmc3k_tutorial.html))
+
+- Introduce sparse matrices
+- QC considerations for scRNA-seq data sets
+- Build a seurat object, cluster cells and and calculate differential gene expression
+
+## Load libraries
+
+``` r
+library(Seurat)
+library(tidyverse)
+library(Matrix)
+```
+
+## Single cell RNA-seq analysis in R starts with the same data as bulk RNA-seq: a count matrix
+
+For this tutorial we will process a single cell RNA-Seq library produced by 10x genomics. There are numerous datasets available for download from the 10x website (see [datasets](https://support.10xgenomics.com/single-cell-gene-expression/datasets)). We will analyze Peripheral Blood Mononuclear Cells (PBMCs) isolated from a healthy person. This dataset contains ~2,700 cells.
+
+First let's download and uncompress the data (may require a login for 10x website). There should be a `filtered_gene_bc_matrices` directory generated. 
+
+```{r}
+pbmc_matrix <- file.path("filtered_gene_bc_matrices", "hg19", "matrix.mtx")
+
+if (!file.exists(pbmc_matrix)){
+  dl_link <- "http://cf.10xgenomics.com/samples/cell-exp/1.1.0/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz"
+  tar_ball <- basename(dl_link) 
+  download.file(dl_link, tar_ball) # download file from url
+  untar(tar_ball) # uncompress directory
+  unlink(tar_ball) # remove compressed tarball
+}
+```
+
+The data is stored in a [`.mtx`](https://math.nist.gov/MatrixMarket/formats.html#MMformat) file, which is a special on disk representation of a [sparseMatrix](https://en.wikipedia.org/wiki/Sparse_matrix).
+
+The [`Seurat`](https://github.com/satijalab/seurat) package provides a input function to load this data into R as a `sparseMatrix`. 
+
+```{r, sparse_matrix, eval = T}
+# load the path to the example data
+pbmc_10x <- file.path("filtered_gene_bc_matrices", "hg19")
+
+# read the example data
+pbmc.data <- Read10X(pbmc_10x)
+
+# take a peek at the data
+pbmc.data[1:4, 1:4]
+```
+
+The sparseMatrix format saves memory usage when working with data with many zeros such as single cell RNA-Seq data.
+
+```{r}
+## percent of matrix with non-zero elements
+100 * (nnzero(pbmc.data) / length(pbmc.data))
+```
+
+## Seurat uses a custom object to store counts and data (similar to the SummarizedExperiment & DESeqDataSet)
+
+First, we'll generate a Seurat object with the raw count data, keeping all genes that are expressed in at least 3 cells and all cells with at least 200 detectable genes.
+
+```{r, seurat_object, eval = T}
+pbmc <- CreateSeuratObject(raw.data = pbmc.data, 
+                           min.cells = 3, 
+                           min.genes = 200,
+                           project = "10x_PBMC")
+```
+
+The seurat object will store many different R objects related to the dataset in specific slots of the object. For example the  PCA and tSNE projections are stored in `pbmc@dr`, normalized data in `pbmc@data`, and metadata in `pbmc@meta.data`. Information about each slot can be found in the help page for the seurat class (`?seurat`).
+
+## Filtering and QC for scRNA-seq
+
+scRNA-seq data sets are further filtered to remove cells with too few detectable genes, cells with clear outlier numbers of detectable genes (likely doublets) and cells with high proportions of mitochondrial RNAs (likely dead cells). We will calculate the proportion of UMIs assigned to mitochondria, then store these values in the meta.data slot. 
+
+```{r, filtering}
+# Calculate percent of reads that are mitochondrial
+mito.genes <- grep(pattern = "^MT-",
+                   x = rownames(x = pbmc@data),
+                   value = TRUE)
+
+proportion.mito <- Matrix::colSums(pbmc@raw.data[mito.genes, ]) / 
+  Matrix::colSums(pbmc@data)
+
+# Add proportion.mito as metadata to Seurat object
+pbmc <- AddMetaData(object = pbmc,
+                    metadata = proportion.mito,
+                    col.name = "proportion.mito")
+
+head(pbmc@meta.data)
+```
+
+Seurat provides a series of plotting functions to explore the data (VlnPlot, TSNEPlot, FeaturePlot, etc.). 
+
+```{r plot_mitos, fig.height=5, fig.width=7}
+# Plot number of genes, number of UMIs and proportion.mito
+VlnPlot(object = pbmc,
+        features.plot = c("nGene", "nUMI", "proportion.mito"),
+        nCol = 3)
+
+```
+
+Outliers can be identified visually using the `GenePlot` function:
+
+```{r, outlier_plot, eval = T, message = F, fig.height=5, fig.width=6}
+GenePlot(object = pbmc, gene1 = "nUMI", gene2 = "proportion.mito")
+GenePlot(object = pbmc, gene1 = "nUMI", gene2 = "nGene")
+```
+
+Finally, we can filter the pbmc object with `FilterCells`:
+
+```{r, filter_cells, eval = T, message = F}
+pbmc <- FilterCells(object = pbmc,
+                    subset.names = c("nGene", "proportion.mito"), 
+                    low.thresholds = c(200, -Inf),
+                    high.thresholds = c(2500, 0.05))
+```
+
+After filtering, we need to normalize gene expression across cells with the `NormalizeData` function. This function normalizes gene expression measurements by per-cell total expression, multiplies the result by an arbitrary value (10,000 here) and log transforms the result (natural log + pseudocount of 1).
+
+```{r, normalize, message = F}
+pbmc <- NormalizeData(object = pbmc,
+                      normalization.method = "LogNormalize", 
+                      scale.factor = 10000)
+```
+
+## Preparing data for clustering
+
+Now that we have QC'd and normalized the data we will next select important features to use for dimensionality reduction, clustering and tSNE/uMAP projection. Feature selection can have a strong impact on the clustering and tSNEs. The next few processing steps often are run multiple times with different parameters to try to optimize the clustering results for the biological question at hand.
+
+We can in theory use all ~20K genes in the dataset for these steps, however this is often computationally expensive and unneccesary. Most genes in a dataset are going to be expressed at relatively similar values across different cells. For determining the relationships between cells in gene-expression space, we want to focus on genes that are different between cells. The gene expression values for these genes are often highly variable across cells. 
+
+Seurat provides a function to help identity these genes, `FindVariableGenes`. The approach is rather simple in which the ratio of the variance and the mean is computed for each gene. Genes are then binned based on mean expression, and z-scores are calculated within each bin. This approach helps to control for the relationship between higher expression and higher variance. There are other methods implemented in other packages (`MD3Drop`, `scran`, `scater`). 
+
+Shown in the plot below is the mean to variance relationship for genes across the dataset.
+Gene names are shown for genes that exceed the cutoffs defined by the function. 
+
+```{r, pkg_data, message = F, fig.height=5, fig.width=6}
+pbmc <- FindVariableGenes(object = pbmc,
+                          mean.function = ExpMean,
+                          dispersion.function = LogVMR, 
+                          x.low.cutoff = 0.0125,
+                          x.high.cutoff = 3,
+                          y.cutoff = 0.5)
+
+length(x = pbmc@var.genes)
+```
+
+
+Next, we will scale the normalized expression values. The scaled values will only be used for dimensionality reduction and clustering, and not differential expression. The purpose of scaling is to scale the expression values for each gene onto a similar numeric scale. This avoid issues of have a gene that is highly expressed being given more weight in clustering simply because it has larger numbers. Scaling converts the normalized data into z-scores by default and the values are stored in the `pbmc@scale.data` slot.
+
+Single cell data sets often contain various types of 'uninteresting' variation. These can include technical noise, batch effects and confounding biological variation (such as cell cycle stage). We can use modeling to regress these signals out of the analysis using ` ScaleData`. By default a linear model is fit between the the supplied variables (i.e `nUMI`, `proportion.mito`, etc.) and each gene expression value. The residuals from this model are then scaled instead of the normalized gene expression. For this example we will simply scale the data. 
+
+```{r regress}
+pbmc <- ScaleData(object = pbmc, 
+                  genes.use = pbmc@var.genes)
+```
+
+## Performing dimensionality reduction and clustering: PCA
+
+We need a way to project the highly multidimensional data onto a 2D plane for visualization and interpretation. PCA alone is insufficient to capture the variation in these data due to the complexity, so we'll introduce a new method: t-distributed stochastic neighbor embedding (tSNE). A useful interactive tool to help you understand tSNE can be found [here](https://distill.pub/2016/misread-tsne/). First, we'll calculate the principle components (used by the clustering and tSNE algorithms):
+
+The `RunPCA` function will also print the genes most highly assocaited with each principal component. Often these genes will be recognizable as markers of different cell populations. 
+
+```{r, pca, message = F}
+pbmc <- RunPCA(object = pbmc,
+               pc.genes = pbmc@var.genes,
+               do.print = TRUE,
+               pcs.print = 1:5,
+               genes.print = 5)
+```
+Next, we'll generate a series of PCA plots.
+
+### PCA Plots {.tabset .tabsetfade}
+  Shown in the tabs are 2 dimensional plots showing different principal components. Overall the data looks good as there is quite alot of structure to the data and many consisent populations that match the sample types are observed.
+  
+```{r pc_plots, results ='asis'}
+pcs <- list(
+  c(1, 2),
+  c(1, 3),
+  c(1, 4),
+  c(2, 3),
+  c(2, 4),
+  c(3, 4)
+)
+
+
+for(i in seq_along(pcs)){
+  cat('\n#### ', 'PC', pcs[[i]][1], ' vs PC', pcs[[i]][2], '\n', sep = "")
+  PCAPlot(pbmc, 
+               pcs[[i]][1], 
+               pcs[[i]][2], 
+               cols.use = brewer.pal(10, "Paired"))
+  cat('\n')
+}
+```
+
+
+Multiple subpopulations are clearly visible in these plots, but as we'll see later, there is even more interesting variation present in these data. However, in order to use the clustering and tSNE algorithms, we'll need to determine how many PCs comprise the 'true dimensionality' of the data set. One approach is to view a heatmap of the 500 most extreme cells for each principle component.
+
+```{r, pca_heatmap, message = F, fig.height=7, fig.width=6}
+PCHeatmap(object = pbmc,
+          pc.use = 1:12,
+          cells.use = 500,
+          do.balanced = TRUE, 
+          label.columns = FALSE,
+          use.full = FALSE)
+```
+
+Another approach is the jackstraw plot, which compares the distribution of p-values for each principle component with a uniform distribution. 'Significant' PCs show an enrichment of genes with low p-values.
+
+```r
+pbmc <- JackStraw(object = pbmc,
+                  num.replicate = 100,
+                  do.print = FALSE)
+
+JackStrawPlot(object = pbmc, PCs = 1:12)
+```
+
+Finally, we can generate an 'elbow plot' of the standard deviation of the principle components. The 'elbow' indicated the last significant principle component.
+
+```{r, elbow_plot, message = F, fig.height=5, fig.width=6}
+PCElbowPlot(object = pbmc)
+```
+
+Based on these plots, we conclude that the first 7-10 PCs contain sufficient variation for use downstream.
+
+## Performing dimensionality reduction and clustering: Clustering and tSNE
+
+Now that we've identified the 'true dimensionality' of the data, we can cluster the cells and project them on a tSNE plot.
+
+```{r, find_clusters, message = F, fig.height=5, fig.width=6}
+pbmc <- FindClusters(object = pbmc,
+                     reduction.type = "pca",
+                     dims.use = 1:10, 
+                     resolution = 0.6,
+                     print.output = 0,
+                     save.SNN = TRUE)
+
+pbmc <- RunTSNE(object = pbmc,
+                dims.use = 1:10,
+                do.fast = TRUE)
+
+TSNEPlot(object = pbmc)
+```
+
+Clustering reveals seven distinct populations that are accurately separated in the tSNE projection - substantially more complexity than was captured in the PCA plot!
+
+## Identifying marker genes (differential expression)
+
+Seurat provides the `FindAllMarkers` and `FindMarkers` functions for identifying differentially expressed genes in all clusters vs. all other clusters and in specific pairs of clusters, respectively.
+
+```{r, find_markers, message = F, fig.height=5, fig.width=6}
+pbmc.markers <- FindAllMarkers(object = pbmc,
+                               only.pos = TRUE,
+                               min.pct = 0.25, 
+                               thresh.use = 0.25)
+
+pbmc.markers %>%
+  group_by(cluster) %>%
+  top_n(2, avg_logFC)
+
+```
+
+Differentially expressed genes can be visualized as violin plots:
+
+```{r, plot_genes_violin, message = F, fig.height=5, fig.width=6}
+VlnPlot(object = pbmc,
+        features.plot = c("LDHB", "CD79A"))
+```
+
+Or as 'feature plots' on the tSNE projection:
+
+```{r, plot_genes_feature, message = F, fig.height=5, fig.width=6}
+FeaturePlot(object = pbmc,
+            features.plot = c("MS4A1",
+                              "GNLY",
+                              "CD3E",
+                              "CD14", 
+                              "FCER1A",
+                              "FCGR3A",
+                              "LYZ",
+                              "PPBP",
+                              "CD8A"),
+            cols.use = c("grey", "blue"), 
+            reduction.use = "tsne")
+
+```
+
+## Manipulating Seurat objects: renaming clusters
+
+The marker genes identified above can be used to reclassify clusters as known cell types. This provides a useful example of how metadata is handled in Seurat.
+
+```{r, rename_clusters, message = F, fig.height=5, fig.width=6}
+# Create a vector of current cluster IDs
+current.cluster.ids <- c(0, 1, 2, 3, 4, 5, 6, 7)
+
+# Create a vector of new cluster IDs (cell types)
+new.cluster.ids <- c("CD4 T cells",
+                     "CD14+ Monocytes",
+                     "B cells",
+                     "CD8 T cells", 
+                     "FCGR3A+ Monocytes",
+                     "NK cells",
+                     "Dendritic cells",
+                     "Megakaryocytes")
+
+# Save the cluster numbers as "cluster.id"
+pbmc <- StashIdent(object = pbmc, save.name = "cluster.id")
+
+# Use plyr to remap the idents from the current IDs to the new IDs
+pbmc@ident <- plyr::mapvalues(x = pbmc@ident,
+                              from = current.cluster.ids,
+                              to = new.cluster.ids)
+
+# Plot the tSNE with new cluster IDs
+TSNEPlot(object = pbmc,
+         do.label = TRUE,
+         pt.size = 0.5)
+
+# Plot the tSNE with old cluster IDs
+TSNEPlot(object = pbmc,
+         do.label = TRUE,
+         pt.size = 0.5,
+         group.by = "cluster.id")
+```
+
+## Dealing with proliferating cells
+
+PBMCs are poor examples for this analysis, but the commands are shown here to demonstrate how other, more complex variables are regressed out of these analyses.
+
+```{r, cell_cycle, message = F, eval = F}
+# Inspect the classifying genes
+cc.genes
+
+# Classify the cells
+pbmc <- CellCycleScoring(pbmc,
+                         s.genes = cc.genes$s.genes,
+                         g2m.genes = cc.genes$g2m.genes, 
+                         set.ident = TRUE)
+
+# view cell cycle scores and phase assignments
+head(x = pbmc@meta.data)
+```
+
+``` r
+# Cell cycle stage can then be regressed out using `Scale Data`
+pbmc <- ScaleData(pbmc,
+                  vars.to.regress = c("S.Score", "G2M.Score"),
+                  display.progress = FALSE)
+
+# Alternatively, retain cycling vs. stationary information, but regress out differences in phase
+pbmc@meta.data$CC.Difference <- pbmc@meta.data$S.Score - pbmc@meta.data$G2M.Score
+
+pbmc <- ScaleData(pbmc,
+                  vars.to.regress = "CC.Difference",
+                  display.progress = FALSE)
+```

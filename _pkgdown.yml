@@ -1,0 +1,23 @@
+template:
+  params:
+    bootswatch: cosmo
+    ganalytics: UA-54095998-4
+
+authors:
+  Kent Riemondy
+  
+reference:
+  - title: Utilities
+    contents:
+    - plot_feature
+
+navbar:
+  left:
+  - text: "Home"
+    href: index.html
+  - text: "Reference"
+    href: reference/index.html
+  - text: "Vignettes"
+    menu:
+      - text: "Seurat Tutorial"
+        href: articles/preprocessing.html
