@@ -11,8 +11,8 @@ args=' -o {log}.out -e {log}.err -J {params.job_name} -R "
 
 snakemake \
   --drmaa "$args" \
-  --snakefile Snakefile \
+  --snakefile 10x_3p.snake \
   --jobs 3 \
   --latency-wait 50 \
   --rerun-incomplete  \
-  --configfile config.yaml 
+  --configfile 10x_3p_config.yaml 
