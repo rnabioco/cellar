@@ -4,7 +4,7 @@
 This directory contains a snakemake pipeine to execute the 10x genomics
 cellranger count and aggregate pipelines on multiple samples. 
 
-To run on new data edit `config.yaml` to specify the following important parameters:
+To run on new data edit `10x_3p_config.yaml` to specify the following important parameters:
 
 1. `DATA`: This is the directory that the output results will be placed
    into. Also there should be a directory called `raw_data` in this
@@ -70,6 +70,6 @@ To run on new data edit `config.yaml` to specify the following important paramet
    `count` and `aggr`. Note that this is the maximum number of jobs
    submitted not maximum number of cores used. 
 
-Lastly, the `snakecharmer.sh` script is a BSUB submission script that initiates the
+Lastly, the `run_10x_3p_pipeline.sh` script is a BSUB submission script that initiates the
 snakemake executable.
 

@@ -1,7 +1,10 @@
 Package: cellar
 Title: Single Cell RNA-Seq Pipelines and Analysis Vignettes
 Version: 0.0.0.9000
-Authors@R: person("Kent", "Riemondy", email = "kent.riemondy@gmail.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Kent", "Riemondy", role = c("aut", "cre"),
+      email = "kent.riemondy@gmail.com")
+    )
 Description: cellar provides a collection of snakemake pipelines and analysis vignettes
              for single cell RNA-Seq data. 
 Depends: R (>= 3.4.2)

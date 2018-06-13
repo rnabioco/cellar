@@ -1,0 +1,218 @@
+from os import path
+
+""" 
+Snakemake pipeline to process custom scRNA-Seq data using umi-tools
+see https://github.com/CGATOxford/UMI-tools/blob/master/doc/Single_cell_tutorial.md
+"""
+
+configfile: "config.yaml"
+
+DATA = config["DATA"]
+IDS = config["IDS"]
+STAR_IDX = config['STAR_IDX']
+GENOME_FA = config['GENOME_FA']
+STAR_IDX_OUT = STAR_IDX + "Genome"
+TRANSCRIPTS = config["TRANSCRIPTS"]
+BARCODE_STRUCTURE = config["BARCODE_STRUCTURE"]
+EXPECTED_CELL_COUNT = config["EXPECTED_CELL_COUNT"]
+
+rule all:
+  input: 
+    {STAR_IDX_OUT},
+    expand(path.join(DATA, 'fastq', 'fastqc', '{ids}_{read}_001_fastqc.zip'),
+      ids = IDS, read = ['R1', 'R2']),
+    expand(path.join(DATA, "matrix", "{ids}_umimatrix.txt"),
+      ids = IDS)
+
+rule count_umis:
+  """
+  use umi_tools to count each umi per 
+  gene per cell
+  """
+  input:
+    bam = path.join(DATA, "alignments", "{ids}_aligned_exons.bam"),
+    bai = path.join(DATA, "alignments", "{ids}_aligned_exons.bai"),
+  output:
+    matrix = path.join(DATA, "matrix", "{ids}_umimatrix.txt"),
+  params:
+    job_name = "{ids}.count_umis",
+    memory = "select[mem>16] rusage[mem=16]",
+  resources: max_cpus = 1
+  log:
+    path.join("logs", "count_umis", "{ids}")
+  shell:
+    """
+    umi_tools count \
+      --per-gene \
+      --gene-tag=XT \
+      --per-cell \
+      --wide-format-cell-counts \
+      -I {input.bam} \
+      -S {output.matrix}
+    """  
+
+rule featurecount_bam:
+  """ use feature counts to associate each
+  read with an exon 
+  subread 1.6.0
+  """
+  input:
+    bam = path.join(DATA, "alignments", "{ids}_Aligned.sortedByCoord.out.bam"),
+    bai = path.join(DATA, "alignments", "{ids}_Aligned.sortedByCoord.out.bam.bai"),
+  output:
+    bam = path.join(DATA, "alignments", "{ids}_aligned_exons.bam"),
+    bai = path.join(DATA, "alignments", "{ids}_aligned_exons.bai"),
+    fc_summary = path.join(DATA, "alignments", "{ids}_assigned_genes.txt")
+  params:
+    prefix = path.join(DATA, "alignments", "{ids}_assigned_genes.txt"),
+    bam = path.join(DATA, "alignments", "{ids}_Aligned.sortedByCoord.out.bam.featureCounts.bam"),
+    job_name = "{ids}.tagexons",
+    memory = "select[mem>16] rusage[mem=16]",
+  threads: 12
+  resources: max_cpus = 12
+  log:
+    path.join("logs", "featurecounts", "{ids}")
+  shell:
+    """
+    featureCounts \
+      -a {TRANSCRIPTS} \
+      -R BAM  \
+      -T {threads} \
+      -o {params.prefix} \
+      -s 1 \
+      -g "gene_name" \
+      {input.bam}
+
+    samtools sort -@ {threads} {params.bam} -o {output.bam}
+    samtools index -@ {threads} {output.bam}
+    rm -f {params.bam}
+    """  
+
+rule star_align:
+  input:
+    path.join(DATA, 'modified_fq', '{ids}_named_R2.fastq.gz')
+  output:
+    bam = temp(path.join(DATA, "alignments",
+      "{ids}_Aligned.sortedByCoord.out.bam")),
+    bai = temp(path.join(DATA, "alignments",
+      "{ids}_Aligned.sortedByCoord.out.bam.bai")),
+  params:
+    output_pre = path.join(DATA, 'alignments', '{ids}_'),
+    job_name = '{ids.star}',
+    memory = "select[mem>80] rusage[mem=80]",
+  log:
+    path.join("logs", "star", "{ids}")
+  threads: 12
+  resources: max_cpus = 12
+  shell:
+    """
+    STAR \
+      --runThreadN {threads} \
+      --genomeDir {STAR_IDX} \
+      --readFilesIn {input} \
+      --readFilesCommand gunzip -c \
+      --outSAMtype BAM SortedByCoordinate \
+      --runMode alignReads \
+      --outFileNamePrefix {params.output_pre} \
+      --outSAMmultNmax 1 \
+      --outStd Log \
+      --outSAMunmapped Within
+
+    samtools index -@ {threads} {output.bam}
+    """
+
+rule extract:
+  """ append cell barcodes to R2 """
+  input:
+    R1 = path.join(DATA, 'fastq', '{ids}_R1_001.fastq.gz'),
+    R2 = path.join(DATA, 'fastq', '{ids}_R2_001.fastq.gz'),
+    barcodes = path.join(DATA, 'barcodes', '{ids}_barcodes.txt')
+  output:
+    R2 = path.join(DATA, 'modified_fq', '{ids}_named_R2.fastq.gz')
+  params:
+    job_name = "{ids}.extract",
+    memory = "select[mem>8] rusage[mem=8] span[hosts=1]"
+  log:
+    path.join("logs", "umi_tools_extract", "{ids}")
+  resources: max_cpus = 2
+  threads: 2 # for gzip
+  shell:
+    """
+    umi_tools extract \
+      --bc-pattern={BARCODE_STRUCTURE} \
+      --stdin {input.R1} \
+      --stdout {output.R2}  \
+      --read2-in {input.R2} \
+      --read2-stdout \
+      --filter-cell-barcode \
+      --whitelist={input.barcodes} 
+    """
+
+rule whitelist: 
+  """ determine good cell barcodes"""
+  input:
+    path.join(DATA, 'fastq', '{ids}_R1_001.fastq.gz'),
+  output:
+    path.join(DATA, 'barcodes', '{ids}_barcodes.txt')
+  params:
+    prefix = path.join("logs","umi_tools_whitelist", "qc_plots", "{ids}"),
+    job_name = "{ids}.whitelist",
+    memory = "select[mem>8] rusage[mem=8] span[hosts=1]"
+  log:
+    path.join("logs", "umi_tools_whitelist", "{ids}")
+  resources: max_cpus = 1
+  shell:
+    """
+    umi_tools whitelist \
+      --stdin {input} \
+      --bc-pattern={BARCODE_STRUCTURE} \
+      --plot-prefix={params.prefix} \
+      --expect-cells={EXPECTED_CELL_COUNT} \
+      --log2stderr \
+      > {output} 
+    """
+
+rule fastqc:
+  input:
+    R1 = path.join(DATA, "fastq", "{ids}_R1_001.fastq.gz"),
+    R2 = path.join(DATA, "fastq", "{ids}_R2_001.fastq.gz"),
+  output:
+    path.join(DATA, "fastq", "fastqc", "{ids}_R1_001_fastqc.zip"),
+    path.join(DATA, "fastq", "fastqc", "{ids}_R2_001_fastqc.zip")
+  params:
+    out_dir = path.join(DATA, "fastq", "fastqc"),
+    job_name = '{ids}.fastqc',
+    memory =  "select[mem=40] rusage[mem=40] span[hosts=1]"
+  log:
+    path.join("logs", "fastqc", "{ids}_fastqc")
+  threads: 6
+  resources: max_cpus = 6
+  shell:
+    """ 
+    mkdir -p {params.out_dir}
+    fastqc -t {threads} -f fastq -o {params.out_dir} {input.R1} {input.R2} 
+    """
+
+rule star_idx:
+  input:
+    {GENOME_FA}
+  output:
+    {STAR_IDX_OUT}
+  params:
+    job_name = 'idx_star',
+    memory =  "select[mem>80] rusage[mem=80] span[hosts=1]"
+  threads: 16
+  resources: max_cpus = 16
+  log:
+    STAR_IDX + "log.txt"
+  shell:
+    """
+    mkdir -p {STAR_IDX}
+
+    STAR --runThreadN {threads} \
+     --genomeDir {STAR_IDX} \
+     --genomeFastaFiles {input} \
+     --sjdbGTFfile {TRANSCRIPTS} \
+     --runMode genomeGenerate \
+     --outStd Log 
+    """ 

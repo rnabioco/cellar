@@ -1,4 +1,4 @@
-#' 
+#' Plot tSNE with continuous variable overlaid
 #' @export
 plot_feature <- function(seurat_obj,
                          ident = NULL,
