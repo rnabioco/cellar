@@ -143,12 +143,13 @@ rule extract:
     """
     module load python3/3.6.5
     umi_tools extract \
-      --bc-pattern={BARCODE_STRUCTURE} \
+      {BARCODE_STRUCTURE} \
       --stdin {input.R1} \
       --stdout {output.R2}  \
       --read2-in {input.R2} \
       --read2-stdout \
       --filter-cell-barcode \
+      --error-correct-cell \
       --whitelist={input.barcodes} 
     """
 
@@ -174,6 +175,7 @@ rule whitelist:
       {BARCODE_STRUCTURE} \
       --plot-prefix={params.prefix} \
       --expect-cells={EXPECTED_CELL_COUNT} \
+      --error-correct-threshold 1 \
       --log2stderr \
       > {output.bcs} 
     """
