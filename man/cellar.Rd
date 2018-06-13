@@ -10,7 +10,7 @@
 cellar: functions and pipelines for processing single cell data
 }
 \seealso{
-Report bugs at \url{https://github.com/rnabioco/10x_data}
+Report bugs at \url{https://github.com/rnabioco/cellar}
 }
 \author{
 Kent Riemondy \href{mailto:kent.riemondy@gmail.com}{kent.riemondy@gmail.com}
