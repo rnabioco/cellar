@@ -1,3 +1,5 @@
+shell.executable("/bin/bash")
+shell.prefix("source ~/.bash_profile; ")
 from os import path
 
 """ 
@@ -5,7 +7,7 @@ Snakemake pipeline to process custom scRNA-Seq data using umi-tools
 see https://github.com/CGATOxford/UMI-tools/blob/master/doc/Single_cell_tutorial.md
 """
 
-configfile: "config.yaml"
+configfile: "umitools_config.yaml"
 
 DATA = config["DATA"]
 IDS = config["IDS"]
@@ -19,7 +21,7 @@ EXPECTED_CELL_COUNT = config["EXPECTED_CELL_COUNT"]
 rule all:
   input: 
     {STAR_IDX_OUT},
-    expand(path.join(DATA, 'fastq', 'fastqc', '{ids}_{read}_001_fastqc.zip'),
+    expand(path.join(DATA, 'fastq', '{ids}_{read}_001_fastqc.zip'),
       ids = IDS, read = ['R1', 'R2']),
     expand(path.join(DATA, "matrix", "{ids}_umimatrix.txt"),
       ids = IDS)
@@ -31,7 +33,7 @@ rule count_umis:
   """
   input:
     bam = path.join(DATA, "alignments", "{ids}_aligned_exons.bam"),
-    bai = path.join(DATA, "alignments", "{ids}_aligned_exons.bai"),
+    bai = path.join(DATA, "alignments", "{ids}_aligned_exons.bam.bai"),
   output:
     matrix = path.join(DATA, "matrix", "{ids}_umimatrix.txt"),
   params:
@@ -42,6 +44,7 @@ rule count_umis:
     path.join("logs", "count_umis", "{ids}")
   shell:
     """
+    module load python3/3.6.5
     umi_tools count \
       --per-gene \
       --gene-tag=XT \
@@ -61,7 +64,7 @@ rule featurecount_bam:
     bai = path.join(DATA, "alignments", "{ids}_Aligned.sortedByCoord.out.bam.bai"),
   output:
     bam = path.join(DATA, "alignments", "{ids}_aligned_exons.bam"),
-    bai = path.join(DATA, "alignments", "{ids}_aligned_exons.bai"),
+    bai = path.join(DATA, "alignments", "{ids}_aligned_exons.bam.bai"),
     fc_summary = path.join(DATA, "alignments", "{ids}_assigned_genes.txt")
   params:
     prefix = path.join(DATA, "alignments", "{ids}_assigned_genes.txt"),
@@ -138,6 +141,7 @@ rule extract:
   threads: 2 # for gzip
   shell:
     """
+    module load python3/3.6.5
     umi_tools extract \
       --bc-pattern={BARCODE_STRUCTURE} \
       --stdin {input.R1} \
@@ -153,7 +157,8 @@ rule whitelist:
   input:
     path.join(DATA, 'fastq', '{ids}_R1_001.fastq.gz'),
   output:
-    path.join(DATA, 'barcodes', '{ids}_barcodes.txt')
+    bcs = path.join(DATA, 'barcodes', '{ids}_barcodes.txt'),
+    plot = path.join("logs","umi_tools_whitelist", "qc_plots", "{ids}_cell_barcode_count_density.png"),
   params:
     prefix = path.join("logs","umi_tools_whitelist", "qc_plots", "{ids}"),
     job_name = "{ids}.whitelist",
@@ -163,13 +168,14 @@ rule whitelist:
   resources: max_cpus = 1
   shell:
     """
+    module load python3/3.6.5
     umi_tools whitelist \
       --stdin {input} \
-      --bc-pattern={BARCODE_STRUCTURE} \
+      {BARCODE_STRUCTURE} \
       --plot-prefix={params.prefix} \
       --expect-cells={EXPECTED_CELL_COUNT} \
       --log2stderr \
-      > {output} 
+      > {output.bcs} 
     """
 
 rule fastqc:
@@ -177,10 +183,9 @@ rule fastqc:
     R1 = path.join(DATA, "fastq", "{ids}_R1_001.fastq.gz"),
     R2 = path.join(DATA, "fastq", "{ids}_R2_001.fastq.gz"),
   output:
-    path.join(DATA, "fastq", "fastqc", "{ids}_R1_001_fastqc.zip"),
-    path.join(DATA, "fastq", "fastqc", "{ids}_R2_001_fastqc.zip")
+    path.join(DATA, "fastq", "{ids}_R1_001_fastqc.zip"),
+    path.join(DATA, "fastq", "{ids}_R2_001_fastqc.zip")
   params:
-    out_dir = path.join(DATA, "fastq", "fastqc"),
     job_name = '{ids}.fastqc',
     memory =  "select[mem=40] rusage[mem=40] span[hosts=1]"
   log:
@@ -189,8 +194,7 @@ rule fastqc:
   resources: max_cpus = 6
   shell:
     """ 
-    mkdir -p {params.out_dir}
-    fastqc -t {threads} -f fastq -o {params.out_dir} {input.R1} {input.R2} 
+    fastqc -t {threads} -f fastq {input.R1} {input.R2} 
     """
 
 rule star_idx:

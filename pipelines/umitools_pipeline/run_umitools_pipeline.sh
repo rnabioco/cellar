@@ -18,7 +18,7 @@ args=' -q rna -o {log}.out -e {log}.err -J {params.job_name} -R " {params.memory
 module load modules modules-init modules-python
 module load fastqc/0.10.1
 module load samtools
-module load python3/3.6.5
+module load star 
 
 # featureCounts >= 1.6.0
 # umi_tools >= 0.5.3

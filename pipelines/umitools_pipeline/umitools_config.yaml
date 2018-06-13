@@ -9,11 +9,13 @@ STAR_IDX:
   "/vol3/home/riemondy/Projects/shared_dbases/star/gencode_GRCm38/"
 
 TRANSCRIPTS:
-  "/vol3/home/riemondy/Projects/shared_dbases/annotation/gencode.m15.primary_assembly.annotation.gtf"
+  "/vol3/home/riemondy/Projects/shared_dbases/annotation/gencode.vM15.primary_assembly.annotation.gtf"
 
 IDS:
   - "10xneurons/neurons_900_S1_L001"
   - "10xneurons/glia_900_S1_L001"
         
-EXPECTED_CELL_COUNT: 1000
-BARCODE_STRUCTURE: "CCCCCCCCCCCCCCCCNNNNNNNNNN"
+EXPECTED_CELL_COUNT: 
+  3000
+BARCODE_STRUCTURE: 
+  " --bc-pattern=CCCCCCCCCCCCCCCCNNNNNNNNNN "
