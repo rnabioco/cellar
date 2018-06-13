@@ -101,7 +101,7 @@ rule star_align:
       "{ids}_Aligned.sortedByCoord.out.bam.bai")),
   params:
     output_pre = path.join(DATA, 'alignments', '{ids}_'),
-    job_name = '{ids.star}',
+    job_name = '{ids}.star',
     memory = "select[mem>80] rusage[mem=80]",
   log:
     path.join("logs", "star", "{ids}")
