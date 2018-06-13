@@ -69,12 +69,10 @@ plot_feature <- function(seurat_obj,
     max_y <- c(NA, NA)
   } 
   
-  
   # loupe-like colors
   cols <- rev(brewer.pal(11, "RdGy")[c(1:5, 7)])
   
   ## handle zero expression
-  
   if (all(max_y == c(0, 0))){
     p <- p + scale_color_gradient(low = cols[1], high = cols[1])
     return(p)

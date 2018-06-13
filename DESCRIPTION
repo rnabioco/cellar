@@ -11,8 +11,13 @@ Depends: R (>= 3.4.2)
 Imports:
     Seurat,
     RColorBrewer,
-    tidyverse,
+    stringr,
+    ggplot2,
+    dplyr,
+    readr,
+    tibble,
     Matrix,
+    rlang,
     viridis
 License: MIT
 VignetteBuilder: knitr
