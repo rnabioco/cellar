@@ -18,6 +18,9 @@ matrix:
     - os: linux
       r: release
       compiler: gcc-6
+      before_install:
+        - sudo apt-get update
+        - sudo apt-get install libhdf5-dev
       addons:
         apt:
           sources:
@@ -27,6 +30,9 @@ matrix:
     - os: linux
       r: devel
       compiler: gcc-6
+      before_install:
+        - sudo apt-get update
+        - sudo apt-get install libhdf5-dev
       addons:
         apt:
           sources:
