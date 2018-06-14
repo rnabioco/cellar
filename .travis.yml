@@ -10,6 +10,11 @@ bioc_use_devel: true
 r_packages:
   - devtools
 
+env:
+  global:
+    - HDF5_VERSION=1.8.17
+    - HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/releases"
+    
 matrix:
   fast_finish: true
   allow_failures:
