@@ -16,6 +16,7 @@ To run on new data edit `10x_3p_config.yaml` to specify the following important 
    ```
    
    Then fastq data should be in `2018-02-08/raw_data`
+   (/beevol/home/riemondy/tmp/example_10x_fastqs)
 
    The `count` and `aggr` 10x executables will generate output in
    a `results` directory located in DATA.
