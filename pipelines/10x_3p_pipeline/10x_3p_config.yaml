@@ -14,7 +14,7 @@ SAMPLES:
     - Collins_WT 
 
 EXPT_GROUPS:
-    - Collins_TNF_deltaARE 
+    - Collins_TNF_deltaARE,Collins_WT 
 
 MAX_10X_JOBS:
     30
