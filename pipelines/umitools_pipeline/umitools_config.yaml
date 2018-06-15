@@ -1,4 +1,4 @@
-# config for scRNA-SEQ snakemake pipeline #
+# config for umi-tools based scRNA-SEQ snakemake pipeline #
 
 DATA: "../data/"
 
