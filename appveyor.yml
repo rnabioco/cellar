@@ -27,8 +27,7 @@ branches:
     - master
 
 environment:
-  global:
-
+  
   matrix:
   - R_VERSION: release
     R_ARCH: x64
