@@ -11,10 +11,10 @@ add the cellranger executable in the following directory to your PATH in your `.
 i.e.
 ```bash
 #if on tesla add:
-export cellranger="/vol3/home/riemondy/src/cellranger-2.1.1"
+PATH=${PATH}:"/vol3/home/riemondy/src/cellranger-2.1.1"
 
 #if on bodhi
-export cellranger="/beevol/home/riemondy/src/cellranger-2.1.1"
+PATH=${PATH}:"/beevol/home/riemondy/src/cellranger-2.1.1"
 ```
 
 To run this pipeline on new data edit `10x_3p_config.yaml` to specify the following important parameters:
