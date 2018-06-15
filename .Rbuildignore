@@ -2,6 +2,3 @@
 ^\.Rproj\.user$
 ^_pkgdown\.yml$
 ^docs$
-^tcr$
-^runs$
-^results$

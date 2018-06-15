@@ -9,7 +9,6 @@ Description: cellar provides a collection of snakemake pipelines and analysis vi
              for single cell RNA-Seq data. 
 Depends: R (>= 3.4.2)
 Imports:
-    Seurat,
     RColorBrewer,
     stringr,
     ggplot2,
@@ -19,6 +18,8 @@ Imports:
     Matrix,
     rlang,
     viridis
+Suggests:
+    Seurat
 License: MIT
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1

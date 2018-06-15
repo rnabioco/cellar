@@ -32,7 +32,7 @@ plot_feature <- function(seurat_obj,
   }
   
   if (!is.null(gene) & is.null(meta_data_col)) {
-    gene_dat <- FetchData(seurat_obj, gene) %>% 
+    gene_dat <- seurat_obj@data[gene, , drop = F] %>% 
       as.data.frame() %>% 
       tibble::rownames_to_column("cell")
     tsne_dat <- left_join(tsne_dat, gene_dat, by = "cell")

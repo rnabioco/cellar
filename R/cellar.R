@@ -13,6 +13,5 @@
 #' @import stringr 
 #' @import ggplot2
 #' @import dplyr
-#' @import Seurat
 #' @import Matrix
 "_PACKAGE"

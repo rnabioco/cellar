@@ -2,7 +2,6 @@
 
 export(plot_feature)
 import(Matrix)
-import(Seurat)
 import(dplyr)
 import(ggplot2)
 import(readr)

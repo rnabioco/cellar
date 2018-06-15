@@ -7,7 +7,7 @@
 set -o nounset -o pipefail -o errexit -x
 
 args=' -o {log}.out -e {log}.err -J {params.job_name} -R "
-{params.memory} span[hosts=1] " -n {threads} " '
+{params.memory} span[hosts=1] " -n {threads}  '
 
 snakemake \
   --drmaa "$args" \

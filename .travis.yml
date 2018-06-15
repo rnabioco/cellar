@@ -10,11 +10,6 @@ bioc_use_devel: true
 r_packages:
   - devtools
 
-env:
-  global:
-    - HDF5_VERSION=1.8.17
-    - HDF5_RELEASE_URL="https://support.hdfgroup.org/ftp/HDF5/releases"
-    
 matrix:
   fast_finish: true
   allow_failures:
@@ -23,9 +18,6 @@ matrix:
     - os: linux
       r: release
       compiler: gcc-6
-      before_install:
-        - sudo apt-get update
-        - sudo apt-get install libhdf5-dev
       addons:
         apt:
           sources:
@@ -35,9 +27,6 @@ matrix:
     - os: linux
       r: devel
       compiler: gcc-6
-      before_install:
-        - sudo apt-get update
-        - sudo apt-get install libhdf5-dev
       addons:
         apt:
           sources:
