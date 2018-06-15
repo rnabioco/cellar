@@ -10,6 +10,9 @@ The 10x Ig/TCR data is not currently in a snakemake pipeline. cellranger has an 
 
 The bsub scripts assumes that you have the fastqs from 5' gene expression (Exp) or Ig/TCR (B/Tcell) named as follows:
 
+For example raw data see here on tesla:
+`/vol3/home/riemondy/Projects/10x_data/tcr/raw_data/2018-05-18_jurkat_raji`
+
 ```bash
 Bcell_S1_L001_R1_001.fastq.gz      
 Bcell_S1_L001_R2_001.fastq.gz     
