@@ -4,7 +4,20 @@
 This directory contains a snakemake pipeine to execute the 10x genomics
 cellranger count and aggregate pipelines on multiple samples. 
 
-To run on new data edit `10x_3p_config.yaml` to specify the following important parameters:
+The cellranger software is available on tesla/bodhi as a module, but we don't recommend using 
+the module as it won't take advantage of the pipelining functionality built into cellranger. Instead 
+add the cellranger executable in the following directory to your PATH in your `.bashrc`.
+
+i.e.
+```bash
+#if on tesla add:
+export cellranger="/vol3/home/riemondy/src/cellranger-2.1.1"
+
+#if on bodhi
+export cellranger="/beevol/home/riemondy/src/cellranger-2.1.1"
+```
+
+To run this pipeline on new data edit `10x_3p_config.yaml` to specify the following important parameters:
 
 1. `DATA`: This is the directory that the output results will be placed
    into. Also there should be a directory called `raw_data` in this
