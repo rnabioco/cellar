@@ -5,7 +5,7 @@ import os
 """ Snakefile for running 10x pipeline """
 # cellranger directory added to .bashrc 
 
-configfile: "10x_3p_config.yaml"
+configfile: "config.yaml"
 
 PROJECT = config ["PROJECT"]
 DATA = config["DATA"]

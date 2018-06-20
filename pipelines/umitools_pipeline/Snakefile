@@ -7,7 +7,7 @@ Snakemake pipeline to process custom scRNA-Seq data using umi-tools
 see https://github.com/CGATOxford/UMI-tools/blob/master/doc/Single_cell_tutorial.md
 """
 
-configfile: "umitools_config.yaml"
+configfile: "config.yaml"
 
 DATA = config["DATA"]
 IDS = config["IDS"]

@@ -8,6 +8,9 @@ set -o nounset -o pipefail -o errexit -x
 
 args=' -q normal -o {log}.out -e {log}.err -J {params.job_name} -R " {params.memory} span[hosts=1] " -n {threads} '
 
+
+mkdir -p logs
+
 #### load necessary programs ####
 
 # If programs are not all in the path then modify code to load
@@ -24,9 +27,9 @@ module load star
 # umi_tools >= 0.5.1
 
 snakemake --drmaa "$args" \
-  --snakefile umitools.snake \
+  --snakefile Snakefile \
   --jobs 12 \
   --resources max_cpus=36 \
   --latency-wait 50 \
   --rerun-incomplete  \
-  --configfile umitools_config.yaml 
+  --configfile config.yaml 
