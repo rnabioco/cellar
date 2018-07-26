@@ -74,10 +74,10 @@ To run this pipeline on new data edit `10x_3p_config.yaml` to specify the follow
    you have multiple aggregations, then supply them as additional list
    entries. 
 
-   i.e. to aggregate `sample1` and `sample2`:
+   i.e. to aggregate `sample_1` and `sample_2`:
    ```
    EXPT_GROUPS:
-     - sample_1,sample2
+     - sample_1,sample_2
    ```
 
 6. `MAX_10X_JOBS`: This argument is passed to ` --maxjobs` argument for
