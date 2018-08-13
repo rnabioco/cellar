@@ -11,13 +11,13 @@ add the cellranger executable in the following directory to your PATH in your `.
 i.e.
 ```bash
 #if on tesla add:
-PATH=${PATH}:"/vol3/home/riemondy/src/cellranger-2.1.1"
+PATH=${PATH}:"/vol3/home/riemondy/src/cellranger-2.2.0"
 
 #if on bodhi
-PATH=${PATH}:"/beevol/home/riemondy/src/cellranger-2.1.1"
+PATH=${PATH}:"/beevol/home/riemondy/src/cellranger-2.2.0"
 ```
 
-To run this pipeline on new data edit `10x_3p_config.yaml` to specify the following important parameters:
+To run this pipeline on new data edit `config.yaml` to specify the following important parameters:
 
 1. `DATA`: This is the directory that the output results will be placed
    into. Also there should be a directory called `raw_data` in this
@@ -84,6 +84,6 @@ To run this pipeline on new data edit `10x_3p_config.yaml` to specify the follow
    `count` and `aggr`. Note that this is the maximum number of jobs
    submitted not maximum number of cores used. 
 
-Lastly, the `run_10x_3p_pipeline.sh` script is a BSUB submission script that initiates the
+Lastly, the `snakecharmer.sh` script is a BSUB submission script that initiates the
 snakemake executable.
 
