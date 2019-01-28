@@ -17,8 +17,12 @@ Imports:
     tibble,
     Matrix,
     rlang,
-    viridis
+    viridis,
+    cowplot,
+    RANN,
+    ggnetwork
 License: MIT
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
+Encoding: UTF-8

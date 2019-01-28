@@ -4,10 +4,10 @@
 \name{cellar}
 \alias{cellar}
 \alias{cellar-package}
-\alias{cellar-package}
 \title{cellar: functions and pipelines for processing single cell data}
 \description{
-cellar: functions and pipelines for processing single cell data
+cellar provides a collection of snakemake pipelines and analysis vignettes
+             for single cell RNA-Seq data.
 }
 \seealso{
 Report bugs at \url{https://github.com/rnabioco/cellar}

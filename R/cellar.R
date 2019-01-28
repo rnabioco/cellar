@@ -14,4 +14,6 @@
 #' @import ggplot2
 #' @import dplyr
 #' @import Matrix
+#' @import cowplot
+#' @importFrom RColorBrewer brewer.pal
 "_PACKAGE"
