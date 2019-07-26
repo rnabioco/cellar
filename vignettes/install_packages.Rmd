@@ -1,0 +1,53 @@
+---
+title: "install"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Knit this R Markdown
+Before class, make sure this RMD file knits, which installs and double checks for the required packages covered in class. [Just press the Knit button on top!] Installation of some packages will require 
+```{r}
+if (!(as.numeric(R.Version()$major) >= 3 & as.numeric(R.Version()$minor >= 5))) {
+  error("please install latest version of R")
+}
+```
+
+
+```{r packages}
+installed_packages <- rownames(installed.packages())
+cran_req_packages <- c("Seurat", "BiocManager", "tidyverse", "devtools")
+bioc_req_packages <- c("M3Drop")
+git_req_packages <- c("clustifyr") #path?
+
+# here are the packages not yet installed
+cran_download <- setdiff(cran_req_packages, installed_packages)
+bioc_download <- setdiff(cran_req_packages, installed_packages)
+git_download <- setdiff(cran_req_packages, installed_packages)
+
+# cran packages are installed with command `install.packages`
+for (pack in cran_download) {
+  install.packages(pack)
+}
+
+# bioconductor packages are installed with command `BiocManager::install`
+for (pack in bioc_download) {
+  BiocManager::install(pack)
+}
+
+# github packages are installed with command `devtools::install_github`
+for (pack in git_download) {
+  BiocManager::install(pack)
+}
+```
+
+# check that everything loads correctly
+```{r load}
+lapply(c(cran_req_packages, bioc_req_packages, git_req_packages), library, character.only = TRUE)
+sessionInfo()
+```
+
+
