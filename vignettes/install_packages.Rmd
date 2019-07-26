@@ -20,8 +20,14 @@ if (!(as.numeric(R.Version()$major) >= 3 & as.numeric(R.Version()$minor >= 5))) 
 ```{r packages}
 installed_packages <- rownames(installed.packages())
 cran_req_packages <- c("Seurat", "BiocManager", "tidyverse", "devtools")
-bioc_req_packages <- c("M3Drop")
-git_req_packages <- c("clustifyr") #path?
+bioc_req_packages <- c("M3Drop",
+                       "scRecover"
+                      )
+git_req_packages <- c("rnabioco/clustifyr",
+                      "immunogenomics/harmony",
+                      "quon-titative-biology/scAlign",
+                      "Zhangxf-ccnu/EnImpute",
+                     )
 
 # here are the packages not yet installed
 cran_download <- setdiff(cran_req_packages, installed_packages)
@@ -40,7 +46,7 @@ for (pack in bioc_download) {
 
 # github packages are installed with command `devtools::install_github`
 for (pack in git_download) {
-  BiocManager::install(pack)
+  devtools::install_github(pack)
 }
 ```
 
