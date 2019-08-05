@@ -16,7 +16,7 @@ Before class, make sure this RMD file knits, which installs and double checks fo
 
 ## Check R version
 ```{r}
-if (!(as.numeric(R.Version()$major) >= 3 & as.numeric(R.Version()$minor >= 5))) {
+if (!(as.numeric(R.Version()$major) >= 3 & as.numeric(R.Version()$minor >= 6))) {
   error("please install latest version of R")
 }
 
@@ -43,7 +43,6 @@ bioc_req_packages <- c("M3Drop",
 git_req_packages <- c("rnabioco/clustifyr",
                       "immunogenomics/harmony",
                       "quon-titative-biology/scAlign",
-                      #"Zhangxf-ccnu/EnImpute", <- might be a pain to install
                       "cole-trapnell-lab/monocle3"
                      )
 
