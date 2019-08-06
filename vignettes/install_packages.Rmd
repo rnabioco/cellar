@@ -152,7 +152,7 @@ if(is(res, "error")){
 
 ## Required linux packages:
 
-Linux users may need to install libssl-dev, libcurl4-openssl-dev, libgsl-dev, and libxml2-dev (using apt, pacman, etc.) to successfully install these packages in R. Package names may differ by linux distribution.
+Linux users may need to install libssl-dev, libcurl4-openssl-dev, libgsl-dev, libgdal-dev, libudunits2-dev, and libxml2-dev (using apt, pacman, etc.) to successfully install these packages in R. Package names may differ by linux distribution.
 
 
 ## Missing xcode (or compilers):
