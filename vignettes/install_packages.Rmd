@@ -14,10 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Before class, make sure this RMarkdown file knits cleanly, which installs and  checks for the required packages covered in class. Installation of some packages will require answering prompted questions, so run the document interactively prior to trying to knit.  
 
 
-## Required packages
-
-Here is a list of the packages that will be installed. 
-
+## Required R packages
 ```{r}
 cran_req_packages <- c("Seurat", 
                        "BiocManager", 
@@ -31,7 +28,8 @@ bioc_req_packages <- c("M3Drop",
                        "destiny",
                        "slingshot",
                        "fgsea",
-                       "DelayedMatrixStats"
+                       "DelayedMatrixStats",
+                       "scran"
                       )
 
 git_req_packages <- c("rnabioco/clustifyr",
@@ -39,15 +37,6 @@ git_req_packages <- c("rnabioco/clustifyr",
                       "quon-titative-biology/scAlign",
                       "cole-trapnell-lab/monocle3"
                      )
-
-pkgs <- list("CRAN" = cran_req_packages,
-             "Bioconductor" = bioc_req_packages,
-             "Github" = git_req_packages) %>% 
-  map(~tibble(package = .x)) %>% 
-  bind_rows(., .id = "source")
-  
-
-pkgs
 
 ```
 
@@ -87,14 +76,20 @@ for (pack in git_download) {
 }
 ```
 
-## check that R packages load correctly
+## check that R packages installed
 
 ```{r load}
-lapply(c(cran_req_packages, 
-         bioc_req_packages, 
-         basename(git_req_packages)), 
-       library,
-       character.only = TRUE)
+
+required_pkgs <- c(cran_req_packages,
+                   bioc_req_packages,
+                   basename(git_req_packages)) 
+
+installed <- required_pkgs %in% installed.packages()
+
+if (all(!installed)) {
+  missing_pkgs <- required_pkgs[!installed]
+  stop(paste0(missing_pkgs, " not installed, please retry installation\n"))
+}
 
 sessionInfo()
 ```
@@ -215,7 +210,7 @@ conda install louvain
 Double check that the version of python that `reticulate` is using is the same as the 
 one that you are installing the packages into. 
 
-```{r}
+```{r, eval = FALSE}
 library(reticulate)
 py_config()
 
@@ -228,7 +223,7 @@ Sys.setenv(RETICULATE_PYTHON = "/usr/bin/python3")
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 # pip python version
 Sys.which("pip")
 ```
