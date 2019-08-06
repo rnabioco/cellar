@@ -25,11 +25,11 @@ sessionInfo()
 
 ## Try to install packages
 
+Note: Linux users may need to install libssl-dev, libcurl4-openssl-dev, and libxml2-dev (using apt, pacman, etc.) to successfully install these packages in R. Package names may differ by linux distribution.
+
 ```{r packages}
 installed_packages <- rownames(installed.packages())
 
-# Linux users may need to install libssl-dev, libcurl4-openssl-dev, and libxml2-dev (using apt, pacman, etc.) to successfully install these packages in R. Package names may differ by linux distribution (these are the Debian package names).
-s
 cran_req_packages <- c("Seurat", 
                        "BiocManager", 
                        "tidyverse", 
