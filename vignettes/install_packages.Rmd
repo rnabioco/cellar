@@ -1,5 +1,5 @@
 ---
-title: "install"
+title: "Packages required for the course"
 date: '`r Sys.Date()`'
 output: html_document
 ---
@@ -11,28 +11,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Knit this R Markdown
 
-Before class, make sure this RMD file knits, which installs and double checks for the required packages covered in class. [Just press the Knit button on top!] Installation of some packages will require answering prompted questions, so run the document interactively prior to tryint to knit.  
+Before class, make sure this RMarkdown file knits cleanly, which installs and  checks for the required packages covered in class. Installation of some packages will require answering prompted questions, so run the document interactively prior to trying to knit.  
 
 
-## Check R version
+## Required packages
+
+Here is a list of the packages that will be installed. 
+
 ```{r}
-if (!(as.numeric(R.Version()$major) >= 3 & as.numeric(R.Version()$minor >= 6))) {
-  error("please install latest version of R")
-}
-
-sessionInfo()
-```
-
-## Try to install packages
-
-```{r packages}
-options(pkgType="binary")
-installed_packages <- rownames(installed.packages())
-
 cran_req_packages <- c("Seurat", 
                        "BiocManager", 
                        "tidyverse", 
-                       "devtools"
+                       "devtools",
+                       "clustree"
                        )
 
 bioc_req_packages <- c("M3Drop",
@@ -48,6 +39,32 @@ git_req_packages <- c("rnabioco/clustifyr",
                       "quon-titative-biology/scAlign",
                       "cole-trapnell-lab/monocle3"
                      )
+
+pkgs <- list("CRAN" = cran_req_packages,
+             "Bioconductor" = bioc_req_packages,
+             "Github" = git_req_packages) %>% 
+  map(~tibble(package = .x)) %>% 
+  bind_rows(., .id = "source")
+  
+
+pkgs
+
+```
+
+## Check R version
+```{r}
+if (!(as.numeric(R.Version()$major) >= 3 & as.numeric(R.Version()$minor >= 6))) {
+  error("please install latest version of R")
+}
+
+sessionInfo()
+```
+
+## Try to install packages
+
+```{r packages}
+options(pkgType="binary")
+installed_packages <- rownames(installed.packages())
 
 # here are the packages not yet installed
 cran_download <- setdiff(cran_req_packages, installed_packages)
@@ -166,7 +183,7 @@ ERROR: compilation failed for package 'XXX'
 You need to download the command line tools for xcode. To do this open up the Terminal.app
 and execute:
 
-````
+```
 xcode-select --install
 ```
 
@@ -201,6 +218,13 @@ one that you are installing the packages into.
 ```{r}
 library(reticulate)
 py_config()
+
+# To change python version e.g. to /usr/bin/python3
+
+use_python("/usr/bin/python3", required = TRUE)
+
+# or set a environmental variable from R
+Sys.setenv(RETICULATE_PYTHON = "/usr/bin/python3")
 ```
 
 
