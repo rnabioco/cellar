@@ -120,8 +120,8 @@ py_info
 ```
 
 ```{r}
-modules_fullname <- c("umap-learn", "louvain", "virtualenv")
-modules_shortname <- c("umap", "louvain", "virtualenv")
+modules_fullname <- c("umap-learn", "louvain", "virtualenv", "cellbrowser")
+modules_shortname <- c("umap", "louvain", "virtualenv", "cellbrowser")
 
 modules_needed <- modules_fullname[!sapply( modules_shortname, py_module_available)]
 
