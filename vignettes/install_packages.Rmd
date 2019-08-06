@@ -112,13 +112,13 @@ py_info
 ```
 
 ```{r}
-modules_fullname <- c("umap-learn", "louvain")
-modules_shortname <- c("umap", "louvain")
+modules_fullname <- c("umap-learn", "louvain", "virtualenv")
+modules_shortname <- c("umap", "louvain", "virtualenv")
 
 modules_needed <- modules_fullname[!sapply( modules_shortname, py_module_available)]
 
 for(module in modules_needed) {
-  py_install(module)
+  py_install(module, method = "auto")
 }
 
 ```
