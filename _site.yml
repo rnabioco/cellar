@@ -1,0 +1,16 @@
+title: "Single-cell RNA-seq Workshop"
+output_dir: "docs"
+base_url: http://rnabioco.github.io/cellar
+favicon: img/logo.png
+exclude: ["*.xlsx"]
+navbar:
+  left:
+    - text: "Quality Control"
+      href: 2_filtering_QC.html
+    - text: "Multi-modal data"
+      href: 7_multimodal.html
+output:
+  distill::distill_article:
+    css: styles.css
+twitter:
+  site: "@rnabioco"
