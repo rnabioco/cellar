@@ -26,18 +26,22 @@ sessionInfo()
 ## Try to install packages
 
 ```{r packages}
+options(pkgType="binary")
 installed_packages <- rownames(installed.packages())
 
 cran_req_packages <- c("Seurat", 
                        "BiocManager", 
                        "tidyverse", 
-                       "devtools")
+                       "devtools"#,
+                       #"gsl"
+                       )
 
 bioc_req_packages <- c("M3Drop",
                        "scRecover",
                        "destiny",
                        "slingshot",
-                       "fgsea"
+                       "fgsea",
+                       "DelayedMatrixStats"
                       )
 
 git_req_packages <- c("rnabioco/clustifyr",
@@ -53,7 +57,7 @@ git_download <- git_req_packages[!basename(git_req_packages) %in% installed_pack
 
 # cran packages are installed with command `install.packages`
 for (pack in cran_download) {
-  install.packages(pack)
+  install.packages(pack,repos = "http://cran.us.r-project.org")
 }
 
 # bioconductor packages are installed with command `BiocManager::install`
