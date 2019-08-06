@@ -5,15 +5,10 @@
 README.html
 *_cache/
 index.md
-index.html
 .DS_Store
 *.txt
 *.rds
 *.xls*
 *.gz
 *.pdf
-*.html
-tcr/*
-runs/*
-results/*
 
