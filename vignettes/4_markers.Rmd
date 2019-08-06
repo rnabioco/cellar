@@ -1,0 +1,270 @@
+---
+title: 'cluster markers and cell type assignment'
+date: '`r Sys.Date()`'
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    vignette: >
+      %\VignetteEngine{knitr::rmarkdown}
+      %\VignetteEncoding{UTF-8}
+---
+
+```{r "knitr options", echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE,
+  echo = TRUE,
+  comment = "#>",
+  fig.align = "center"
+)
+```
+<style type="text/css">
+.main-container {
+  max-width: 2800px !important;
+  width: 2800px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+body {
+      max-width: 2800px !important;
+    }
+.table {
+    width: 100%;
+}
+</style>
+## finding markers and differential expression analysis
+
+### many proposed methods (for Seurat, we recommend default "wilcox" or "t")
+
+![Soneson and Robinson, 2018](4_markers_files/detests.jpg){width=600px}
+
+### important considerations
+1. keep things simple first (try not aligning, not regressing) and look at the results
+2. determine what variables to regress out
+```{r,}
+library(Seurat)
+library(tidyverse)
+sobj <- readRDS("filtered_sobj.rds")
+
+# log normalize
+sobj_l <- NormalizeData(sobj)
+sobj_l <- ScaleData(
+  sobj_l,
+  vars.to.regress = c("nCount_RNA", "percent_mito")
+  )
+
+# or sctransform
+sobj_sc <- suppressWarnings(SCTransform(
+  object = sobj, 
+  vars.to.regress = c("nCount_RNA", "percent_mito"), 
+  verbose = FALSE)
+  )
+```
+
+EXERCISE: How to regress out cell cycle heterogeneity, and do you need to?
+```{r}
+# Seurat stores a list of cell cycle specific genes for humans
+s.genes <- cc.genes$s.genes
+g2m.genes <- cc.genes$g2m.genes
+
+# score and phase call is added to metadata
+sobj_l <- CellCycleScoring(
+  sobj_l, s.features = s.genes, 
+  g2m.features = g2m.genes, 
+  set.ident = TRUE
+  )
+sobj_l@meta.data %>% head()
+
+# how would you look at whether cell cycle has strong effects on gene expression?
+
+# how would you regress it out?
+
+
+
+
+# ANSWERS
+# check PCA to see if cell cycle has strong effects
+sobj_l <- RunPCA(
+  sobj_l,
+  features = c(s.genes, g2m.genes),
+  verbose = FALSE,
+  npcs = 10
+  )
+
+# look for cell cycle-specific genes as main drivers of PCA
+apply(
+  sobj_l@reductions$pca@feature.loadings, 
+  MARGIN = 2, 
+  FUN = function(x) names(sort(abs(x), decreasing = TRUE)[1:10])
+  ) %>%
+  as.vector() %>%
+  unique() %>%
+  intersect(c(s.genes, g2m.genes))
+
+# DimPlot(sobj_l)
+# sobj_c <- ScaleData(
+#   sobj_l, 
+#   vars.to.regress = c("S.Score", "G2M.Score")
+#   )
+# sobj_c <- RunPCA(
+#   sobj_c, 
+#   features = c(s.genes, g2m.genes), 
+#   verbose = FALSE, 
+#   npcs = 10
+#   )
+# DimPlot(sobj_c)
+```
+
+3. use normalized data (slot is dependent on normalization method, also don't use integrated assay)
+```{r}
+# before normalization, "data" slot is the same as counts
+sobj@assays$RNA@data[101:105,101:105]
+
+# after log normalization, results are stored in "data" slot
+sobj_l@assays$RNA@data[101:105,101:105]
+
+# after sctransform, results are stored in new assay "SCT"
+sobj_sc@assays$SCT@data[101:105,101:105]
+sobj_sc@assays$RNA@data[101:105,101:105] # <- still same as counts, make sure not to use this
+```
+
+4. Note that marker genes found is very dependent on clustering and the compared populations
+
+### find all markers for each cluster
+```{r}
+# also remember to set ident to the desired comparison
+Idents(sobj_l) <- sobj_l@meta.data$Phase
+markers_df <- FindAllMarkers(
+  sobj_l,
+  assay = "RNA", # <- would be different for sobj_sc
+  slot = "data",
+  only.pos = TRUE
+  )
+markers_df %>% head()
+```
+
+### find DE genes for specific cell groups
+```{r}
+# DE analysis for ident1 vs ident2
+# markers_df2 <- FindMarkers(
+#   sobj_l,
+#   assay = "RNA", # <- would be different for sobj_sc
+#   slot = "data",
+#   ident.1 = 
+#   ident.2 =
+#   test.use = "t"
+#   )
+
+# ident1 vs ident2, using ident that is not currently active
+markers_df2 <- FindMarkers(
+  sobj_l,
+  assay = "RNA", # <- would be different for sobj_sc
+  slot = "data",
+  subset.ident = "S", # <- subset on current ident first, then switch idents
+  group.by = "orig.ident",
+  ident.1 = "control",
+  ident.2 = "treated",
+  test.use = "t"
+  )
+
+# set new idents for more customized comparisons
+Idents(
+  sobj_l, 
+  WhichCells(
+    object = sobj_l, 
+    idents = "G1", 
+    expression = ZFP36 > 1, 
+    slot = 'data'
+    )
+  ) <- 'ZFP36.pos'
+Idents(
+  sobj_l, 
+  WhichCells(
+    object = sobj_l, 
+    expression = ZFP36 <= 1, 
+    slot = 'data'
+    )
+  ) <- 'ZFP36.neg'
+```
+
+### find consensus DE genes for multi-sample dataset with `FindConservedMarkers`
+
+## cluster identities
+
+### manual check and cluster identity assignment
+```{r}
+
+```
+
+### towards a more automated approach of identity assignment
+1. inference from previous seurat object (requires very similar seurat object)
+```{r}
+# using the Seurat 3k pbmc example
+for (i in 1:length(pancreas.list)) {
+    pancreas.list[[i]] <- NormalizeData(pancreas.list[[i]], verbose = FALSE)
+    pancreas.list[[i]] <- FindVariableFeatures(pancreas.list[[i]], selection.method = "vst", 
+        nfeatures = 2000, verbose = FALSE)
+}
+
+pancreas.query <- pancreas.list[["fluidigmc1"]]
+pancreas.anchors <- FindTransferAnchors(reference = pancreas.integrated, query = pancreas.query, 
+    dims = 1:30)
+predictions <- TransferData(anchorset = pancreas.anchors, refdata = pancreas.integrated$celltype, 
+    dims = 1:30)
+pancreas.query <- AddMetaData(pancreas.query, metadata = predictions)
+```
+
+2. marker gene list (requires markers or gene list)
+```{r}
+# manually enter gene list
+library(clustifyr)
+genelist <- list(precusor_oligodendrocyte = c("Olig1", "Olig2"), mature_oligodendrocyte = c("Olig1", "Olig2", "Mbp"), microglia = c("Aif1", "Tmem119"), astrocyte = c("Gfap", "Aqp4"))
+typenames <- names(genelist)
+g2 <- sapply(typenames, FUN = function(x) {data.frame(type = x, gene = genelist[[x]])}, simplify = F)
+g2 <- do.call("rbind", g2)
+g2 <- g2 %>% mutate(expression = 1) %>% spread(key = "type", value = "expression") %>% tibble::column_to_rownames("gene")
+g2[is.na(g2)] <- 0
+res <- pos_neg_select(combined2@assays$RNA@data,
+               g2,
+               combined2@meta.data,
+               cluster_col = "seurat_clusters",
+               cutoff_n = 0,
+               cutoff_score = 0.5)
+call_res <- cor_to_call(res, threshold = 0.3)
+call_res
+newmeta <- combined2@meta.data %>% left_join(call_res, by = c("seurat_clusters" = "cluster")) %>% mutate(type = ifelse(str_detect(type, "r<0.3"), "unassigned", type)) %>% mutate(type = as.factor(type))
+combined2@meta.data$type <- newmeta$type
+DimPlot(combined2, label = T, group.by = "type") + NoLegend()
+
+# use a marker dataframe from previous analysis
+```
+
+3. prior knowledge of transcriptome profile (profiles from other scRNAseq, bulk RNAseq, or microarray)
+```{r}
+# use a generic reference
+library(clustifyrdata)
+braincol <- str_detect(colnames(ref_tabula_muris_facs), "-Brain")
+
+res <- clustify(combined2@assays$RNA@data,
+               ref_tabula_muris_facs[, braincol],
+               combined2@meta.data,
+               cluster_col = "seurat_clusters",
+               cutoff_n = 0,
+               cutoff_score = 0.4)
+call_res <- cor_to_call(res, threshold = 0.3)
+call_res
+newmeta <- combined2@meta.data %>% select(-type) %>% left_join(call_res, by = c("seurat_clusters" = "cluster")) %>% mutate(type = ifelse(str_detect(type, "r<0.3"), "unassigned", type)) %>% mutate(type = str_remove(type, "-Brain")) %>% mutate(type = as.factor(type))
+combined2@meta.data$type <- newmeta$type
+DimPlot(combined2, label = T, group.by = "type") + NoLegend()
+
+# build a reference from ucsc download data
+```
+
+## Other things to do with marker genes
+1. gene list to pathway activity score, via [`AUCell`](https://github.com/aertslab/AUCell)
+
+2. if TF expression is too low, consider [`SCENIC`](https://github.com/aertslab/SCENIC) for TF activity inference
+
+3. standard GO term analysis tools [`gProfiler2`](https://biit.cs.ut.ee/gprofiler/page/r)
