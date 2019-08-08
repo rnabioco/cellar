@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Working with Multi-modal Data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="2_filtering_QC.html">Quality Control</a>
+</li>
+<li>
+  <a href="7_multimodal.html">Multi-modal data</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore"><b style="font-size:45px;">Working with Multi-modal Data</b></h1>
+<h4 class="date">August 15<sup>th</sup>, 2019</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#creating-a-seurat-object-with-multiple-assays"><strong>Creating a Seurat object with multiple assays</strong></a></li>
+<li><a href="#demultiplexing-hashed-samples"><strong>Demultiplexing hashed samples</strong></a></li>
+<li><a href="#filtering-data-and-assessing-quality"><strong>Filtering data and assessing quality</strong></a></li>
+<li><a href="#clustering-cells-based-on-gene-expression"><strong>Clustering cells based on gene expression</strong></a></li>
+<li><a href="#clustering-cells-based-on-antibody-signal"><strong>Clustering cells based on antibody signal</strong></a></li>
+<li><a href="#visualizing-antibody-signal"><strong>Visualizing antibody signal</strong></a></li>
+<li><a href="#classifying-cells-based-on-antibody-signal"><strong>Classifying cells based on antibody signal</strong></a></li>
+<li><a href="#viewing-results-with-the-cell-browser"><strong>Viewing results with the Cell Browser</strong></a></li>
+</ul>
+</div>
+
+<p><br></p>
+<p><br></p>
+<div id="creating-a-seurat-object-with-multiple-assays" class="section level1">
+<h1><strong>Creating a Seurat object with multiple assays</strong></h1>
+<div id="loading-the-counts-matrices" class="section level2">
+<h2>Loading the counts matrices</h2>
+<pre class="r"><code># Data URL
+data_url = &quot;https://scrnaseq-workshop.s3-us-west-2.amazonaws.com&quot;
+
+# Import RNA matrix
+rna_mtx &lt;- file.path(data_url, &quot;CITEseq_cDNA.csv.gz&quot;) %&gt;%
+  read_csv() %&gt;%
+  column_to_rownames(&quot;X1&quot;) %&gt;%
+  as.sparse()
+
+rna_mtx[1:10, 1:10]</code></pre>
+<pre><code>#&gt; 10 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                
+#&gt; MIR1302-2HG . . . . . . . . . .
+#&gt; FAM138A     . . . . . . . . . .
+#&gt; OR4F5       . . . . . . . . . .
+#&gt; AL627309.1  . . . . . . . . . .
+#&gt; AL627309.3  . . . . . . . . . .
+#&gt; AL627309.2  . . . . . . . . . .
+#&gt; AL627309.4  . . . . . . . . . .
+#&gt; AL732372.1  . . . . . . . . . .
+#&gt; OR4F29      . . . . . . . . . .
+#&gt; AC114498.1  . . . . . . . . . .</code></pre>
+<pre class="r"><code># Import ADT matrix
+adt_mtx &lt;- file.path(data_url, &quot;CITEseq_ADT.csv.gz&quot;) %&gt;%
+  read_csv() %&gt;%
+  column_to_rownames(&quot;X1&quot;) %&gt;%
+  as.sparse()
+
+rownames(adt_mtx) &lt;- str_c(&quot;adt-&quot;, rownames(adt_mtx))
+
+adt_mtx[, 1:10]</code></pre>
+<pre><code>#&gt; 8 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                               
+#&gt; adt-CD14   11   2  14   1   .   1   1  . .   1
+#&gt; adt-CD19    9   . 165 295   .   3   6  4 2   1
+#&gt; adt-CD3     .  19  79   2   3   6   9  3 3   4
+#&gt; adt-CD4    69 360 293   7 159 321   1  7 7   4
+#&gt; adt-CD45    .   .   3   4   .   1   .  . 1   .
+#&gt; adt-CD45RA 25   3 246  16   8   5  18  6 4   9
+#&gt; adt-CD45RO  6   4 108   6   .   2   1  2 1   3
+#&gt; adt-CD8     7   .  36   6   .   . 473 21 7 197</code></pre>
+<pre class="r"><code># Import HTO matrix
+hto_mtx &lt;- file.path(data_url, &quot;CITEseq_HTO.csv.gz&quot;) %&gt;%
+  read_csv() %&gt;%
+  column_to_rownames(&quot;X1&quot;) %&gt;%
+  as.sparse()
+
+hto_mtx[, 1:10]</code></pre>
+<pre><code>#&gt; 4 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                             
+#&gt; HTO28 351   .   .  .   2 161   .   .   .   .
+#&gt; HTO29   6   2   3  1   1   2   2 107   2   .
+#&gt; HTO30   . 131 177 60   .   .   .   . 239 155
+#&gt; HTO44   1   .   .  . 122   . 172   .   1   .</code></pre>
+</div>
+<div id="creating-a-seurat-object" class="section level2">
+<h2>Creating a Seurat object</h2>
+<pre class="r"><code># Get list of common cell barcodes
+rna_bcs &lt;- colnames(rna_mtx)
+adt_bcs &lt;- colnames(adt_mtx)
+hto_bcs &lt;- colnames(hto_mtx)
+
+merged_bcs &lt;- rna_bcs %&gt;%
+  intersect(adt_bcs) %&gt;%
+  intersect(hto_bcs)
+
+# Create Seurat object
+sobj &lt;- rna_mtx %&gt;%
+  .[, rna_bcs %in% merged_bcs] %&gt;%
+  CreateSeuratObject(min.cells = 5)
+
+# Add antibody and cell hashing data to Seurat object
+sobj[[&quot;ADT&quot;]] &lt;- adt_mtx %&gt;%
+  .[, adt_bcs %in% merged_bcs] %&gt;%
+  CreateAssayObject()
+
+sobj[[&quot;HTO&quot;]] &lt;- hto_mtx %&gt;%
+  .[, hto_bcs %in% merged_bcs] %&gt;%
+  CreateAssayObject()
+
+sobj</code></pre>
+<pre><code>#&gt; An object of class Seurat 
+#&gt; 15032 features across 4292 samples within 3 assays 
+#&gt; Active assay: RNA (15020 features)
+#&gt;  2 other assays present: ADT, HTO</code></pre>
+<pre class="r"><code># Normalize HTO counts
+sobj &lt;- sobj %&gt;%
+  NormalizeData(
+    assay                = &quot;HTO&quot;,
+    normalization.method = &quot;CLR&quot;      # Centered log-ratio normalization
+  )</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="demultiplexing-hashed-samples" class="section level1">
+<h1><strong>Demultiplexing hashed samples</strong></h1>
+<div id="sample-demultiplexing" class="section level2">
+<h2>Sample demultiplexing</h2>
+<pre class="r"><code># Demultiplex samples
+# By default HTODemux will look for the &quot;HTO&quot; assay
+sobj &lt;- sobj %&gt;%
+  HTODemux()
+
+sobj@meta.data %&gt;%
+  head()</code></pre>
+<pre><code>#&gt;                     orig.ident nCount_RNA nFeature_RNA nCount_ADT
+#&gt; AAACCTGAGACAAAGG SeuratProject       3054         1217        388
+#&gt; AAACCTGAGCTACCGC SeuratProject       2411          989        337
+#&gt; AAACCTGCACCAGGTC SeuratProject       4182         1394        509
+#&gt; AAACCTGCACTCTGTC SeuratProject       3681         1456         43
+#&gt; AAACCTGGTATGAAAC SeuratProject       2503         1255        530
+#&gt; AAACCTGGTGAGTATA SeuratProject       1241          692        352
+#&gt;                  nFeature_ADT nCount_HTO nFeature_HTO HTO_maxID
+#&gt; AAACCTGAGACAAAGG            5        358            3     HTO28
+#&gt; AAACCTGAGCTACCGC            8        180            2     HTO30
+#&gt; AAACCTGCACCAGGTC            7        163            2     HTO28
+#&gt; AAACCTGCACTCTGTC            6        174            2     HTO44
+#&gt; AAACCTGGTATGAAAC            6        638            2     HTO28
+#&gt; AAACCTGGTGAGTATA            6         71            2     HTO44
+#&gt;                  HTO_secondID HTO_margin HTO_classification
+#&gt; AAACCTGAGACAAAGG        HTO29   3.211027              HTO28
+#&gt; AAACCTGAGCTACCGC        HTO29   3.448779              HTO30
+#&gt; AAACCTGCACCAGGTC        HTO29   2.802755              HTO28
+#&gt; AAACCTGCACTCTGTC        HTO29   3.148890              HTO44
+#&gt; AAACCTGGTATGAAAC        HTO29   3.649778              HTO28
+#&gt; AAACCTGGTGAGTATA        HTO29   2.285112              HTO44
+#&gt;                  HTO_classification.global hash.ID
+#&gt; AAACCTGAGACAAAGG                   Singlet   HTO28
+#&gt; AAACCTGAGCTACCGC                   Singlet   HTO30
+#&gt; AAACCTGCACCAGGTC                   Singlet   HTO28
+#&gt; AAACCTGCACTCTGTC                   Singlet   HTO44
+#&gt; AAACCTGGTATGAAAC                   Singlet   HTO28
+#&gt; AAACCTGGTGAGTATA                   Singlet   HTO44</code></pre>
+<pre class="r"><code># Create ridge plots showing HTO signal
+sobj %&gt;%
+  RidgePlot(
+    assay    = &quot;HTO&quot;,
+    features = rownames(hto_mtx),
+    ncol     = 2
+  )</code></pre>
+<p><img src="7_multimodal_files/figure-html/Demultiplex%20samples-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Rename cell identities with sample names
+sobj &lt;- sobj %&gt;%
+  RenameIdents(
+    &quot;HTO28&quot; = &quot;PBMC-1&quot;,
+    &quot;HTO29&quot; = &quot;PBMC-2&quot;,
+    &quot;HTO30&quot; = &quot;PBMC-3&quot;,
+    &quot;HTO44&quot; = &quot;PBMC-4&quot;
+  )
+
+# Add sample names to meta.data table
+sobj &lt;- sobj %&gt;%
+  AddMetaData(
+    metadata = Idents(sobj),
+    col.name = &quot;sample&quot;
+  )</code></pre>
+</div>
+<div id="exercise-compare-the-number-of-cells-with-each-hash.id" class="section level2">
+<h2>EXERCISE: Compare the number of cells with each hash.ID</h2>
+<pre class="r"><code># Use the meta.data table to compare the number of cells with each hash.ID
+
+# sobj@meta.data %&gt;%</code></pre>
+</div>
+<div id="answer" class="section level2">
+<h2>ANSWER</h2>
+<p><img src="7_multimodal_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="filtering-data-and-assessing-quality" class="section level1">
+<h1><strong>Filtering data and assessing quality</strong></h1>
+<div id="assessing-data-quality" class="section level2">
+<h2>Assessing data quality</h2>
+<pre class="r"><code># Add mitochondrial percentage to meta.data table
+sobj &lt;- sobj %&gt;%
+  PercentageFeatureSet(
+    assay    = &quot;RNA&quot;,
+    pattern  = &quot;^MT-&quot;, 
+    col.name = &quot;percent_mito&quot;
+  )
+
+# Create violin plots for gene expression data
+sobj %&gt;%
+  VlnPlot(
+    features = c(&quot;nCount_RNA&quot;, &quot;nFeature_RNA&quot;, &quot;percent_mito&quot;), 
+    ncol     = 3,
+    pt.size  = 0.25
+  )</code></pre>
+<p><img src="7_multimodal_files/figure-html/Create%20RNA%20violin%20plots-1.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>sobj %&gt;%
+  VlnPlot(
+    features = c(
+      &quot;nCount_ADT&quot;, &quot;nFeature_ADT&quot;,
+      &quot;nCount_HTO&quot;, &quot;nFeature_HTO&quot;
+    ),
+    ncol    = 2,
+    pt.size = 0.25,
+    log     = T
+  )</code></pre>
+<p><img src="7_multimodal_files/figure-html/Create%20ADT%20and%20HTO%20violin%20plots-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="exercise-how-many-cells-are-left-after-filtering" class="section level2">
+<h2>EXERCISE: How many cells are left after filtering?</h2>
+<pre class="r"><code># Filter cells based on number of genes detected, percent mito UMIs, and HTO_classification.global
+
+# filt_sobj &lt;- sobj %&gt;%
+#   subset(
+#     
+#     
+#     
+#     
+#   )</code></pre>
+</div>
+<div id="answer-1" class="section level2">
+<h2>ANSWER</h2>
+<pre><code>#&gt; An object of class Seurat 
+#&gt; 15032 features across 3644 samples within 3 assays 
+#&gt; Active assay: RNA (15020 features)
+#&gt;  2 other assays present: ADT, HTO</code></pre>
+<p><br></p>
+<p><br></p>
+<p>#<strong>Normalizing gene expression and antibody data</strong></p>
+<pre class="r"><code># Normalize expression data
+filt_sobj &lt;- filt_sobj %&gt;%
+  SCTransform(
+    vars.to.regress     = &quot;percent_mito&quot;,  
+    variable.features.n = 2000,
+    verbose             = FALSE
+  )
+
+# Normalize and scale antibody data
+filt_sobj &lt;- filt_sobj %&gt;%
+  NormalizeData(
+    assay                = &quot;ADT&quot;,
+    normalization.method = &quot;CLR&quot;   # Centered log-ratio normalization
+  ) %&gt;%
+  ScaleData(assay = &quot;ADT&quot;)</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="clustering-cells-based-on-gene-expression" class="section level1">
+<h1><strong>Clustering cells based on gene expression</strong></h1>
+<div id="perform-pricipal-component-analysis" class="section level2">
+<h2>Perform pricipal component analysis</h2>
+<pre class="r"><code># Perform PCA
+filt_sobj &lt;- filt_sobj %&gt;%
+  RunPCA(verbose = FALSE)       # By default only variable features are used for PCA
+
+# Plot standard deviations of principal components
+elbow_plot &lt;- filt_sobj %&gt;%
+  ElbowPlot(ndims = 50)
+
+# Create scatter plot comparing PC-1 and PC-2
+PCA_plot &lt;- filt_sobj %&gt;%
+  DimPlot(reduction = &quot;pca&quot;)
+
+plot_grid(
+  elbow_plot, PCA_plot,
+  nrow       = 1,
+  rel_widths = c(0.4, 0.6)
+)</code></pre>
+<p><img src="7_multimodal_files/figure-html/Perform%20PCA-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cluster-cells-using-gene-expression-data" class="section level2">
+<h2>Cluster cells using gene expression data</h2>
+<pre class="r"><code># Cluster cells
+filt_sobj &lt;- filt_sobj %&gt;%
+  FindNeighbors(dims = 1:40) %&gt;%
+  FindClusters(
+    resolution = 0.6,
+    verbose    = FALSE
+  )
+
+# Run UMAP
+# Use same PCs as clustering, by default reduction = &quot;pca&quot;
+filt_sobj &lt;- filt_sobj %&gt;%
+  RunUMAP(dims = 1:40)
+
+# Find marker genes for each cluster
+RNA_markers &lt;- filt_sobj %&gt;%
+  FindAllMarkers(only.pos = T) %&gt;%
+  filter(p_val_adj &lt; 0.05)
+
+# Add RNA clusters to meta.data
+filt_sobj &lt;- filt_sobj %&gt;%
+  AddMetaData(
+    metadata = Idents(filt_sobj),
+    col.name = &quot;RNA_clusters&quot;
+  )
+
+# Create UMAP
+filt_sobj %&gt;%
+  DimPlot(reduction = &quot;umap&quot;)</code></pre>
+<p><img src="7_multimodal_files/figure-html/Cluster%20cells%20and%20run%20UMAP-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="clustering-cells-based-on-antibody-signal" class="section level1">
+<h1><strong>Clustering cells based on antibody signal</strong></h1>
+<div id="cluster-cells-using-antibody-signal" class="section level2">
+<h2>Cluster cells using antibody signal</h2>
+<pre class="r"><code># Since there are only a few antibodies, instead of doing PCA just use a standard
+# euclidean distance matrix
+adt_data &lt;- filt_sobj@assays$ADT@data
+adt_dist &lt;- dist(t(adt_data))
+
+# Find clusters using distance matrix
+filt_sobj[[&quot;adt_snn&quot;]] &lt;- FindNeighbors(adt_dist)$snn
+
+filt_sobj &lt;- filt_sobj %&gt;%
+  FindClusters(
+    assay      = &quot;ADT&quot;,
+    resolution = 0.2,
+    graph.name = &quot;adt_snn&quot;
+  )
+
+# Add ADT clusters to meta.data
+filt_sobj &lt;- filt_sobj %&gt;%
+  AddMetaData(
+    metadata = Idents(filt_sobj),
+    col.name = &quot;ADT_clusters&quot;
+  )</code></pre>
+</div>
+<div id="create-umap-using-antibody-signal" class="section level2">
+<h2>Create UMAP using antibody signal</h2>
+<pre class="r"><code># Run UMAP
+filt_sobj &lt;- filt_sobj %&gt;%
+  RunUMAP(
+    reduction.name  = &quot;adt_umap&quot;,
+    reduction.key   = &quot;ADTUMAP_&quot;,
+    graph           = &quot;adt_snn&quot;
+  )
+
+# Create UMAP
+filt_sobj %&gt;%
+  DimPlot(reduction = &quot;adt_umap&quot;)</code></pre>
+<p><img src="7_multimodal_files/figure-html/Run%20UMAP%20for%20antibody%20data-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="exercise-which-cluster-has-cd19-as-its-top-marker" class="section level2">
+<h2>EXERCISE: Which cluster has CD19 as its top marker?</h2>
+<pre class="r"><code># Identify differentially expressed proteins for each cluster
+
+# filt_sobj %&gt;%
+#   FindAllMarkers(
+# 
+#   )</code></pre>
+</div>
+<div id="answer-2" class="section level2">
+<h2>ANSWER</h2>
+<pre><code>#&gt;            p_val avg_logFC pct.1 pct.2     p_val_adj cluster       gene
+#&gt; 1   0.000000e+00 1.9833363 1.000 0.935  0.000000e+00       0    adt-CD8
+#&gt; 2   0.000000e+00 2.5471134 1.000 0.904  0.000000e+00       1    adt-CD4
+#&gt; 3  4.599577e-147 1.6981277 0.894 0.349 3.679662e-146       3   adt-CD14
+#&gt; 4  2.093009e-103 0.8156108 0.937 0.614 1.674407e-102       3   adt-CD45
+#&gt; 5  5.462616e-102 1.3856033 0.987 0.864 4.370093e-101       3 adt-CD45RO
+#&gt; 6   9.938762e-80 0.3601482 0.997 0.913  7.951009e-79       3   adt-CD19
+#&gt; 7   3.042501e-10 0.4666591 0.997 0.981  2.434001e-09       3 adt-CD45RA
+#&gt; 8   4.685913e-82 3.4338342 1.000 0.918  3.748730e-81       4   adt-CD19
+#&gt; 9   1.807485e-20 0.4287725 0.992 0.982  1.445988e-19       4 adt-CD45RA
+#&gt; 10  7.557375e-18 0.5735419 0.984 0.870  6.045900e-17       4 adt-CD45RO</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="visualizing-antibody-signal" class="section level1">
+<h1><strong>Visualizing antibody signal</strong></h1>
+<div id="overlay-antibody-signal-on-umaps" class="section level2">
+<h2>Overlay antibody signal on UMAPs</h2>
+<pre class="r"><code># Set active.assay to ADT
+filt_sobj@active.assay &lt;- &quot;ADT&quot;
+
+# Overlay antibody signal on gene expression UMAP
+filt_sobj %&gt;%
+  FeaturePlot(
+    reduction  = &quot;umap&quot;,
+    features   = c(&quot;adt-CD3&quot;, &quot;adt-CD4&quot;, &quot;adt-CD8&quot;, &quot;adt-CD19&quot;),
+    cols       = c(&quot;#3288bd&quot;, &quot;#bd0026&quot;)
+  )</code></pre>
+<p><img src="7_multimodal_files/figure-html/Overlay%20antibody%20signal%20on%20UMAPs-1.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Overlay antibody signal on antibody UMAP
+filt_sobj %&gt;%
+  FeaturePlot(
+    reduction  = &quot;adt_umap&quot;,
+    features   = c(&quot;adt-CD3&quot;, &quot;adt-CD4&quot;, &quot;adt-CD8&quot;, &quot;adt-CD19&quot;),
+    cols       = c(&quot;#3288bd&quot;, &quot;#bd0026&quot;)
+  )</code></pre>
+<p><img src="7_multimodal_files/figure-html/Overlay%20antibody%20signal%20on%20UMAPs-2.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="create-ridge-plots" class="section level2">
+<h2>Create ridge plots</h2>
+<pre class="r"><code># Set ADT as the active assay
+filt_sobj@active.assay &lt;- &quot;ADT&quot;
+
+# Create ridge plot
+filt_sobj %&gt;%
+  RidgePlot(features = c(
+    &quot;adt-CD14&quot;, &quot;adt-CD45&quot;,
+    &quot;adt-CD19&quot;, &quot;adt-CD3&quot;,  
+    &quot;adt-CD4&quot;,  &quot;adt-CD8&quot;
+  ))</code></pre>
+<p><img src="7_multimodal_files/figure-html/Create%20ridge%20plots-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="create-heatmaps" class="section level2">
+<h2>Create heatmaps</h2>
+<pre class="r"><code>filt_sobj %&gt;%
+  DoHeatmap(
+    features = rownames(filt_sobj), 
+    angle    = 0
+  ) + 
+  NoLegend()</code></pre>
+<p><img src="7_multimodal_files/figure-html/Create%20heatmaps-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="classifying-cells-based-on-antibody-signal" class="section level1">
+<h1><strong>Classifying cells based on antibody signal</strong></h1>
+<div id="identify-cd19-cells" class="section level2">
+<h2>Identify CD19+ cells</h2>
+<pre class="r"><code># Set ADT as the active assay
+filt_sobj@active.assay &lt;- &quot;ADT&quot;
+
+# Plot CD3 and CD19 signal
+filt_sobj %&gt;%
+  FeatureScatter(&quot;adt-CD3&quot;, &quot;adt-CD19&quot;)</code></pre>
+<p><img src="7_multimodal_files/figure-html/Filter%20using%20antibody%20signal-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Identify CD19+ cells using antibody signal
+CD19_cells &lt;- filt_sobj %&gt;%
+  subset(`adt-CD19` &gt; 2.5 &amp; `adt-CD3` &lt; 1) %&gt;%
+  Cells()
+
+# Set cell identities
+labeled_sobj &lt;- filt_sobj %&gt;%
+  SetIdent(value = &quot;Other&quot;) %&gt;%
+  SetIdent(
+    value = &quot;CD19+&quot;, 
+    cells = CD19_cells
+  )
+
+labeled_sobj@active.ident %&gt;%
+  head()</code></pre>
+<pre><code>#&gt; AAACCTGAGACAAAGG AAACCTGCACCAGGTC AAACCTGGTATGAAAC AAACGGGTCACCTTAT 
+#&gt;            Other            Other            Other            Other 
+#&gt; AAAGATGAGTGTACCT AAAGATGCACAGCCCA 
+#&gt;            Other            Other 
+#&gt; Levels: CD19+ Other</code></pre>
+<pre class="r"><code># Label UMAP with new cell identities
+labeled_sobj %&gt;%
+  DimPlot(reduction = &quot;adt_umap&quot;)</code></pre>
+<p><img src="7_multimodal_files/figure-html/Filter%20using%20antibody%20signal-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="filter-cells-using-cellselector" class="section level2">
+<h2>Filter cells using CellSelector()</h2>
+<pre class="r"><code># Plot CD3 and CD19 signal
+CD19_plot &lt;- filt_sobj %&gt;%
+  FeatureScatter(&quot;adt-CD3&quot;, &quot;adt-CD19&quot;)
+
+CD19_plot
+
+# Identify CD19+ cells using antibody signal
+labeled_sobj &lt;- filt_sobj %&gt;%
+  SetIdent(value = &quot;Other&quot;)
+
+labeled_sobj &lt;- CellSelector(
+  plot   = CD19_plot,
+  object = labeled_sobj,
+  ident  = &quot;B cells&quot;
+)
+
+labeled_sobj@active.ident %&gt;%
+  head()
+
+# Label UMAP with new cell identities
+labeled_sobj %&gt;%
+  DimPlot(reduction = &quot;adt_umap&quot;)</code></pre>
+</div>
+<div id="exercise-identify-cd4-and-cd8-cells" class="section level2">
+<h2>EXERCISE: Identify CD4+ and CD8+ cells</h2>
+<pre class="r"><code># Plot CD4 and CD8 signal
+
+# filt_sobj %&gt;%
+#   FeatureScatter(&quot;adt_CD4&quot;, &quot;adt_CD8&quot;)
+
+# Identify CD4+ and CD8+ cells using antibody signal
+
+# Set cell identities
+
+# Label UMAP with new cell identities</code></pre>
+</div>
+<div id="answer-3" class="section level2">
+<h2>ANSWER</h2>
+<p><img src="7_multimodal_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="7_multimodal_files/figure-html/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="viewing-results-with-the-cell-browser" class="section level1">
+<h1><strong>Viewing results with the Cell Browser</strong></h1>
+<div id="merge-gene-expression-and-antibody-matrices" class="section level2">
+<h2>Merge gene expression and antibody matrices</h2>
+<pre class="r"><code># Combine RNA and ADT matrices
+merged_sobj &lt;- labeled_sobj
+RNA_data    &lt;- merged_sobj@assays$SCT@data
+ADT_data    &lt;- merged_sobj@assays$ADT@data
+merged_data &lt;- rbind(RNA_data, ADT_data)
+
+# Add merged matrix to Seurat object
+merged_sobj@assays$SCT@data &lt;- merged_data
+
+# Set active assay
+merged_sobj@active.assay &lt;- &quot;SCT&quot;</code></pre>
+</div>
+<div id="create-cell-browser-files" class="section level2">
+<h2>Create Cell Browser files</h2>
+<pre class="r"><code># Create Cell Browser directories
+dir.create(
+  path = &quot;cellbrowser/SCT&quot;,
+  recursive = T
+)
+
+# Export marker genes
+RNA_markers %&gt;%
+  rename(score = p_val_adj) %&gt;%
+  select(cluster, gene, score) %&gt;%
+  write_tsv(&quot;cellbrowser/SCT/RNA_markers.tsv&quot;)
+
+# Create Cell Browser files for gene expression data
+merged_sobj %&gt;%
+  ExportToCellbrowser(
+    dir          = &quot;cellbrowser/SCT&quot;,
+    reductions   = &quot;umap&quot;,
+    dataset.name = &quot;SCT&quot;,
+    markers.file = &quot;cellbrowser/SCT/RNA_markers.tsv&quot;,
+    
+    sample       = &quot;Sample&quot;,
+    RNA_clusters = &quot;Cluster&quot;,
+    ADT_clusters = &quot;ADT cluster&quot;,
+    cell_label   = &quot;Cell label&quot;,
+    
+    nCount_RNA   = &quot;RNA UMI count&quot;,
+    nFeature_RNA = &quot;Gene count&quot;,
+    percent_mito = &quot;Percent mito UMIs&quot;,
+    nCount_ADT   = &quot;ADT UMI count&quot;,
+    nFeature_ADT = &quot;Antibody count&quot;,
+    nCount_HTO   = &quot;HTO UMI count&quot;,
+    nFeature_HTO = &quot;HTO count&quot;
+  )</code></pre>
+<pre class="r"><code># Create Cell Browser directories
+dir.create(
+  path = &quot;cellbrowser/ADT&quot;,
+  recursive = T
+)
+
+# Export marker genes
+ADT_markers %&gt;%
+  rename(score = p_val_adj) %&gt;%
+  select(cluster, gene, score) %&gt;%
+  write_tsv(&quot;cellbrowser/ADT/ADT_markers.tsv&quot;)
+
+# Create Cell Browser files for antibody data
+merged_sobj %&gt;%
+  ExportToCellbrowser(
+    dir          = &quot;cellbrowser/ADT&quot;,
+    reductions   = &quot;adt_umap&quot;,
+    dataset.name = &quot;ADT&quot;,
+    markers.file = &quot;cellbrowser/ADT/ADT_markers.tsv&quot;,
+    
+    sample       = &quot;Sample&quot;,
+    ADT_clusters = &quot;Cluster&quot;,
+    RNA_clusters = &quot;RNA cluster&quot;,
+    cell_label   = &quot;Cell label&quot;,
+    
+    nCount_RNA   = &quot;RNA UMI count&quot;,
+    nFeature_RNA = &quot;Gene count&quot;,
+    percent_mito = &quot;Percent mito UMIs&quot;,
+    nCount_ADT   = &quot;ADT UMI count&quot;,
+    nFeature_ADT = &quot;Antibody count&quot;,
+    nCount_HTO   = &quot;HTO UMI count&quot;,
+    nFeature_HTO = &quot;HTO count&quot;
+  )</code></pre>
+</div>
+<div id="build-cell-browser-session" class="section level2">
+<h2>Build Cell Browser session</h2>
+<pre class="bash"><code>
+mkdir -p cellbrowser/html
+
+cbBuild \
+  -i cellbrowser/SCT/cellbrowser.conf \
+  -i cellbrowser/ADT/cellbrowser.conf \
+  -o cellbrowser/html
+</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

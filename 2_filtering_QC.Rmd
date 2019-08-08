@@ -2,7 +2,7 @@
 title: <b style="font-size:45px;">Data Filtering and Quality Control</b>
 date: "August 13<sup>th</sup>, 2019"
 output:
-  distill::distill_article:
+  html_document:
     toc: true
     toc_depth: 1
 ---

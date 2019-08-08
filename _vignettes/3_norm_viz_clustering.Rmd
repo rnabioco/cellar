@@ -5,10 +5,10 @@ date: "August 14<sup>th</sup>, 2019"
 output: 
   html_document:
     toc: true
-    toc_float: true
     toc_depth: 1
-    self_contained: true
-    highlight: "tango"
+    vignette: >
+      %\VignetteEngine{knitr::rmarkdown}
+      %\VignetteEncoding{UTF-8}
 bibliography: bib/refs.bib
 ---
 
@@ -19,9 +19,10 @@ library(tidyverse)
 library(cowplot)
 
 knitr::opts_chunk$set(
-  message = FALSE, 
-  warning = FALSE, 
-  comment = ""
+  message   = FALSE,
+  warning   = FALSE,
+  comment   = "#>",
+  fig.align = "center"
 )
 
 ```
