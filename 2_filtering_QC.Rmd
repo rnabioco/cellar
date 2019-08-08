@@ -2,12 +2,9 @@
 title: <b style="font-size:45px;">Data Filtering and Quality Control</b>
 date: "August 13<sup>th</sup>, 2019"
 output:
-  rmarkdown::html_vignette:
+  distill::distill_article:
     toc: true
     toc_depth: 1
-    vignette: >
-      %\VignetteEngine{knitr::rmarkdown}
-      %\VignetteEncoding{UTF-8}
 ---
 
 <br>
