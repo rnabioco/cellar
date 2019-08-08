@@ -1,35 +1,33 @@
 ---
 title: <b style="font-size:45px;">Working with Multi-modal Data</b>
-author: "Ryan Sheridan"
 date: "August 15<sup>th</sup>, 2019"
-output: 
-  html_document:
+output:
+  rmarkdown::html_vignette:
     toc: true
-    toc_float: true
     toc_depth: 1
-    self_contained: true
-    highlight: "tango"
+    vignette: >
+      %\VignetteEngine{knitr::rmarkdown}
+      %\VignetteEncoding{UTF-8}
 ---
 
 <br>
 
 <br>
 
-<br>
-
-#**Creating a Seurat object with multiple assays**
+# **Creating a Seurat object with multiple assays**
 
 ## Loading the counts matrices
-```{r "Load packages", include = F}
+```{r "Load packages", include = FALSE}
 
 library(Seurat)
 library(tidyverse)
 library(cowplot)
 
 knitr::opts_chunk$set(
-  message = F, 
-  warning = F,
-  comment = ""
+  message   = FALSE,
+  warning   = FALSE,
+  comment   = "#>",
+  fig.align = "center"
 )
 
 ```
@@ -112,7 +110,7 @@ sobj <- sobj %>%
 
 <br>
 
-#**Demultiplexing hashed samples**
+# **Demultiplexing hashed samples**
 
 ## Sample demultiplexing
 ```{r "Demultiplex samples", fig.width = 8, fig.height = 6}
@@ -163,7 +161,7 @@ sobj <- sobj %>%
 ```
 
 ## ANSWER
-```{r echo = F, fig.width = 7, fig.height = 4}
+```{r echo = FALSE, fig.width = 7, fig.height = 4}
 
 # Create bar graphs comparing cell count for each sample
 HTO_bars_1 <- sobj@meta.data %>%
@@ -206,7 +204,7 @@ plot_grid(
 
 <br>
 
-#**Filtering data and assessing quality**
+# **Filtering data and assessing quality**
 
 ## Assessing data quality
 ```{r "Create RNA violin plots", fig.width = 10}
@@ -260,7 +258,7 @@ sobj %>%
 ```
 
 ## ANSWER
-```{r echo = F}
+```{r echo = FALSE}
 
 # Filter cells based on HTO class, number of genes, and percent mito UMIs
 filt_sobj <- sobj %>%
@@ -281,14 +279,14 @@ filt_sobj
 
 #**Normalizing gene expression and antibody data**
 
-```{r "Normalize data", results = F}
+```{r "Normalize data", results = FALSE}
 
 # Normalize expression data
 filt_sobj <- filt_sobj %>%
   SCTransform(
     vars.to.regress     = "percent_mito",  
     variable.features.n = 2000,
-    verbose             = F
+    verbose             = FALSE
   )
 
 # Normalize and scale antibody data
@@ -305,14 +303,14 @@ filt_sobj <- filt_sobj %>%
 
 <br>
 
-#**Clustering cells based on gene expression**
+# **Clustering cells based on gene expression**
 
 ## Perform pricipal component analysis
 ```{r "Perform PCA", fig.width = 10, fig.height = 4}
 
 # Perform PCA
 filt_sobj <- filt_sobj %>%
-  RunPCA(verbose = F)       # By default only variable features are used for PCA
+  RunPCA(verbose = FALSE)       # By default only variable features are used for PCA
 
 # Plot standard deviations of principal components
 elbow_plot <- filt_sobj %>%
@@ -338,7 +336,7 @@ filt_sobj <- filt_sobj %>%
   FindNeighbors(dims = 1:40) %>%
   FindClusters(
     resolution = 0.6,
-    verbose    = F
+    verbose    = FALSE
   )
 
 # Run UMAP
@@ -368,10 +366,10 @@ filt_sobj %>%
 
 <br>
 
-#**Clustering cells based on antibody signal**
+# **Clustering cells based on antibody signal**
 
 ## Cluster cells using antibody signal
-```{r "Cluster data using antibody data", results = F}
+```{r "Cluster data using antibody data", results = FALSE}
 
 # Since there are only a few antibodies, instead of doing PCA just use a standard
 # euclidean distance matrix
@@ -427,7 +425,7 @@ filt_sobj %>%
 ```
 
 ## ANSWER
-```{r echo = F}
+```{r echo = FALSE}
 
 # Identify differentially expressed proteins for each cluster
 ADT_markers <- filt_sobj %>%
@@ -445,7 +443,7 @@ ADT_markers
 
 <br>
 
-#**Visualizing antibody signal**
+# **Visualizing antibody signal**
 
 ## Overlay antibody signal on UMAPs
 ```{r "Overlay antibody signal on UMAPs", fig.width = 10, fig.height = 8}
@@ -503,7 +501,7 @@ filt_sobj %>%
 
 <br>
 
-#**Classifying cells based on antibody signal**
+# **Classifying cells based on antibody signal**
 
 ## Identify CD19+ cells
 ```{r "Filter using antibody signal"}
@@ -538,7 +536,7 @@ labeled_sobj %>%
 ```
 
 ## Filter cells using CellSelector()
-```{r "Filter using CellSelector()", eval = F}
+```{r "Filter using CellSelector()", eval = FALSE}
 
 # Plot CD3 and CD19 signal
 CD19_plot <- filt_sobj %>%
@@ -584,7 +582,7 @@ labeled_sobj %>%
 ```
 
 ## ANSWER
-```{r echo = F}
+```{r echo = FALSE}
 
 # Compare CD3 and CD19 signal
 filt_sobj %>%
@@ -627,7 +625,7 @@ labeled_sobj %>%
 
 <br>
 
-#**Viewing results with the Cell Browser**
+# **Viewing results with the Cell Browser**
 
 ## Merge gene expression and antibody matrices
 ```{r "Merge RNA and ADT matrices"}
@@ -647,7 +645,7 @@ merged_sobj@active.assay <- "SCT"
 ```
 
 ## Create Cell Browser files
-```{r "Create gene expression Cell Browser files", eval = F}
+```{r "Create gene expression Cell Browser files", eval = FALSE}
 
 # Create Cell Browser directories
 dir.create(
@@ -685,7 +683,7 @@ merged_sobj %>%
 
 ```
 
-```{r "Create ADT Cell Browser files", eval = F}
+```{r "Create ADT Cell Browser files", eval = FALSE}
 
 # Create Cell Browser directories
 dir.create(
@@ -724,7 +722,7 @@ merged_sobj %>%
 ```
 
 ## Build Cell Browser session
-```{bash "Build Cell Browser session", eval = F}
+```{bash "Build Cell Browser session", eval = FALSE}
 
 mkdir -p cellbrowser/html
 

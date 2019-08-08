@@ -1,34 +1,31 @@
 ---
 title: <b style="font-size:45px;">Data Filtering and Quality Control</b>
-author: "Ryan Sheridan"
 date: "August 13<sup>th</sup>, 2019"
-output: 
-  html_document:
+output:
+  rmarkdown::html_vignette:
     toc: true
-    toc_float: true
     toc_depth: 1
-    self_contained: true
-    highlight: "tango"
+    vignette: >
+      %\VignetteEngine{knitr::rmarkdown}
+      %\VignetteEncoding{UTF-8}
 ---
 
 <br>
 
 <br>
 
-<br>
+# **Creating a Seurat object**
 
-#**Creating a Seurat object**
-
-```{r "Load packages", include = F}
+```{r "Load packages", include = FALSE}
 
 library(Seurat)
 library(tidyverse)
-library(cowplot)
 
 knitr::opts_chunk$set(
-  message = F, 
-  warning = F, 
-  comment = ""
+  message   = FALSE,
+  warning   = FALSE,
+  comment   = "#>",
+  fig.align = "center"
 )
 
 ```
@@ -58,7 +55,7 @@ sobj <- pbmc_mtx %>%
 
 <br>
 
-#**Interacting with the Seurat Object**
+# **Interacting with the Seurat Object**
 
 ## Retrieving raw and normalized counts
 ```{r "Retrieving raw and normalized counts"}
@@ -101,7 +98,7 @@ sobj@meta.data %>%
 ```
 
 ## Other data stored in the Seurat object
-```{r "Other data stored in the Seurat object", eval = F}
+```{r "Other data stored in the Seurat object", eval = FALSE}
 
 # Slots for downstream analysis
 sobj@graphs
@@ -114,7 +111,7 @@ sobj@reductions
 
 <br>
 
-#**Using Seurat functions to interact with the data**
+# **Using Seurat functions to interact with the data**
 
 ## Retrieving cell and features names
 ```{r "Retrieving cell names"}
@@ -189,7 +186,7 @@ sobj %>%
 
 <br>
 
-#**Assessing data quality**
+# **Assessing data quality**
 
 ## Calculate the percentage mitochondrial reads for each cell
 ```{r "Calculate percent mito"}
@@ -218,7 +215,7 @@ sobj@meta.data %>%
 ```
 
 ## ANSWER
-```{r echo = F}
+```{r echo = FALSE, fig.width = 8, fig.height = 6}
 
 # Using Seurat functions
 # sobj %>%
@@ -235,7 +232,8 @@ sobj@meta.data %>%
   geom_violin(size = 2) +
   geom_jitter(size = 0.5, color = "black", alpha = 0.4) +
   facet_wrap(~key, scales = "free") +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  cowplot::theme_cowplot()
 
 ```
 
@@ -257,7 +255,7 @@ sobj@meta.data %>%
 ```
 
 ## ANSWER
-```{r echo = F, fig.height = 8}
+```{r echo = FALSE, fig.width = 8, fig.height = 8}
 
 # Using Seurat functions
 # scatter_1 <- sobj %>%
@@ -275,11 +273,13 @@ sobj@meta.data %>%
 # Using ggplot2
 scatter_1 <- sobj@meta.data %>%
   ggplot(aes(nCount_RNA, percent_mito, color = orig.ident)) +
-  geom_point()
+  geom_point() +
+  cowplot::theme_cowplot()
 
 scatter_2 <- sobj@meta.data %>%
   ggplot(aes(nCount_RNA, nFeature_RNA, color = orig.ident)) +
-  geom_point()
+  geom_point() +
+  cowplot::theme_cowplot()
 
 CombinePlots(
   plots = list(scatter_1, scatter_2),
@@ -292,7 +292,7 @@ CombinePlots(
 
 <br>
 
-#**Filtering cells**
+# **Filtering cells**
 
 ```{r "Filtering cells"}
 
@@ -307,7 +307,7 @@ sobj <- sobj %>%
 ```
 
 ## Saving the Seurat object
-```{r "Saving Seurat object", eval = F}
+```{r "Saving Seurat object", eval = FALSE}
 
 sobj %>%
   write_rds("filtered_sobj.rds", compress = "gz")

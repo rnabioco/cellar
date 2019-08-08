@@ -144,7 +144,7 @@ p
 ```{r}
 library(monocle3)
 dat <- load_a549()
-dat <-  preprocess_cds(dat, num_dim = 10)
+dat <- preprocess_cds(dat, num_dim = 10)
 dat <- reduce_dimension(dat)
 
 res <- tryCatch(cluster_cells(dat), 

@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Ryan Sheridan" />
@@ -103,7 +104,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -321,48 +322,9 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -411,8 +373,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -496,16 +456,16 @@ div.tocify {
 <a class="sourceLine" id="cb1-9" data-line-number="9">pbmc_mtx[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]</a></code></pre></div>
 <pre><code>10 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
                                  
-MIR1302-10    . . . . . . . . . .
-FAM138A       . . . . . . . . . .
-OR4F5         . . . . . . . . . .
-RP11-34P13.7  . . . . . . . . . .
-RP11-34P13.8  . . . . . . . . . .
 AL627309.1    . . . . . . . . . .
-RP11-34P13.14 . . . . . . . . . .
-RP11-34P13.9  . . . . . . . . . .
-AP006222.2    . . . . . . . . . .
-RP4-669L17.10 . . . . . . . . . .</code></pre>
+RP11-206L10.2 . . . . . . . . . .
+LINC00115     . . . . . . . . . .
+NOC2L         . . . . . . . . 1 .
+KLHL17        . . . . . . . . . .
+PLEKHN1       . . . . . . . . . .
+HES4          . . . . . 2 . . . .
+ISG15         . . . . . 4 . 1 . 2
+AGRN          . . . . . . . . . .
+C1orf159      . . . . . . . . . .</code></pre>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># Create Seurat object using gene expression data</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">sobj &lt;-<span class="st"> </span>pbmc_mtx <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">CreateSeuratObject</span>(</a>
@@ -531,11 +491,11 @@ HES4, ISG15, AGRN, C1orf159 </code></pre>
 AL627309.1    . . . . . . . . . .
 RP11-206L10.2 . . . . . . . . . .
 LINC00115     . . . . . . . . . .
-NOC2L         . . . . . . . . . .
+NOC2L         . . . . . . . . 1 .
 KLHL17        . . . . . . . . . .
 PLEKHN1       . . . . . . . . . .
-HES4          . . . . . . . . . .
-ISG15         . . 1 9 . 1 . . . 3
+HES4          . . . . . 2 . . . .
+ISG15         . . . . . 4 . 1 . 2
 AGRN          . . . . . . . . . .
 C1orf159      . . . . . . . . . .</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># Normalized counts</span></a>
@@ -546,11 +506,11 @@ C1orf159      . . . . . . . . . .</code></pre>
 AL627309.1    . . . . . . . . . .
 RP11-206L10.2 . . . . . . . . . .
 LINC00115     . . . . . . . . . .
-NOC2L         . . . . . . . . . .
+NOC2L         . . . . . . . . 1 .
 KLHL17        . . . . . . . . . .
 PLEKHN1       . . . . . . . . . .
-HES4          . . . . . . . . . .
-ISG15         . . 1 9 . 1 . . . 3
+HES4          . . . . . 2 . . . .
+ISG15         . . . . . 4 . 1 . 2
 AGRN          . . . . . . . . . .
 C1orf159      . . . . . . . . . .</code></pre>
 </div>
@@ -561,11 +521,11 @@ C1orf159      . . . . . . . . . .</code></pre>
 <a class="sourceLine" id="cb10-3" data-line-number="3">sobj<span class="op">@</span>active.assay</a></code></pre></div>
 <pre><code>[1] &quot;RNA&quot;</code></pre>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">sobj<span class="op">@</span>active.ident[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]</a></code></pre></div>
-<pre><code>AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACATTGATCAGC-1 AAACCGTGCTTCCG-1 
+<pre><code>AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
             PBMC             PBMC             PBMC             PBMC 
-AAACCGTGTATGCG-1 AAACGCACTGGTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+AAAGTTTGATCACG-1 AAATCATGACCACA-1 AACATTGATGGGAG-1 AACCGATGCTCCCA-1 
             PBMC             PBMC             PBMC             PBMC 
-AAACGCTGTAGCCA-1 AAACGCTGTTTCTG-1 
+AACCGCCTCTACGA-1 AACCTTACGCGAGA-1 
             PBMC             PBMC 
 Levels: PBMC</code></pre>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># The meta.data table contains stats for each cell</span></a>
@@ -574,10 +534,10 @@ Levels: PBMC</code></pre>
 <pre><code>                 orig.ident nCount_RNA nFeature_RNA
 AAACATACAACCAC-1       PBMC       2419          779
 AAACATTGAGCTAC-1       PBMC       4901         1350
-AAACATTGATCAGC-1       PBMC       3145         1127
-AAACCGTGCTTCCG-1       PBMC       2637          958
-AAACCGTGTATGCG-1       PBMC        980          521
-AAACGCACTGGTAC-1       PBMC       2163          781</code></pre>
+AAACGCTGACCAGT-1       PBMC       2174          781
+AAACGCTGGTTCTT-1       PBMC       2259          789
+AAAGTTTGATCACG-1       PBMC       1265          441
+AAATCATGACCACA-1       PBMC       4125         1365</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co"># Modify orig.ident to include the sample number</span></a>
 <a class="sourceLine" id="cb16-2" data-line-number="2"><span class="co"># This is useful later when creating separate plots for each sample</span></a>
 <a class="sourceLine" id="cb16-3" data-line-number="3">sobj<span class="op">@</span>meta.data &lt;-<span class="st"> </span>sobj<span class="op">@</span>meta.data <span class="op">%&gt;%</span></a>
@@ -591,10 +551,10 @@ AAACGCACTGGTAC-1       PBMC       2163          781</code></pre>
 <pre><code>                 orig.ident nCount_RNA nFeature_RNA
 AAACATACAACCAC-1     PBMC-1       2419          779
 AAACATTGAGCTAC-1     PBMC-1       4901         1350
-AAACATTGATCAGC-1     PBMC-1       3145         1127
-AAACCGTGCTTCCG-1     PBMC-1       2637          958
-AAACCGTGTATGCG-1     PBMC-1        980          521
-AAACGCACTGGTAC-1     PBMC-1       2163          781</code></pre>
+AAACGCTGACCAGT-1     PBMC-1       2174          781
+AAACGCTGGTTCTT-1     PBMC-1       2259          789
+AAAGTTTGATCACG-1     PBMC-1       1265          441
+AAATCATGACCACA-1     PBMC-1       4125         1365</code></pre>
 </div>
 <div id="other-data-stored-in-the-seurat-object" class="section level2">
 <h2>Other data stored in the Seurat object</h2>
@@ -611,13 +571,13 @@ AAACGCACTGGTAC-1     PBMC-1       2163          781</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="co"># Get cell names</span></a>
 <a class="sourceLine" id="cb19-2" data-line-number="2"><span class="kw">Cells</span>(sobj) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb19-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">20</span>)</a></code></pre></div>
-<pre><code> [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACATTGATCAGC-1&quot;
- [4] &quot;AAACCGTGCTTCCG-1&quot; &quot;AAACCGTGTATGCG-1&quot; &quot;AAACGCACTGGTAC-1&quot;
- [7] &quot;AAACGCTGACCAGT-1&quot; &quot;AAACGCTGGTTCTT-1&quot; &quot;AAACGCTGTAGCCA-1&quot;
-[10] &quot;AAACGCTGTTTCTG-1&quot; &quot;AAACTTGAAAAACG-1&quot; &quot;AAACTTGATCCAGA-1&quot;
-[13] &quot;AAAGAGACGAGATA-1&quot; &quot;AAAGAGACGCGAGA-1&quot; &quot;AAAGAGACGGACTT-1&quot;
-[16] &quot;AAAGAGACGGCATT-1&quot; &quot;AAAGATCTGGGCAA-1&quot; &quot;AAAGCAGAAGCCAT-1&quot;
-[19] &quot;AAAGCAGATATCGG-1&quot; &quot;AAAGCCTGTATGCG-1&quot;</code></pre>
+<pre><code> [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+ [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot; &quot;AAATCATGACCACA-1&quot;
+ [7] &quot;AACATTGATGGGAG-1&quot; &quot;AACCGATGCTCCCA-1&quot; &quot;AACCGCCTCTACGA-1&quot;
+[10] &quot;AACCTTACGCGAGA-1&quot; &quot;AACTCACTCAAGCT-1&quot; &quot;AACTCGGAAAGTGA-1&quot;
+[13] &quot;AAGATGGAGATAAG-1&quot; &quot;AAGCCATGTCTCGC-1&quot; &quot;AAGCGTACGTCTTT-1&quot;
+[16] &quot;AAGGTCTGACAGTC-1&quot; &quot;AAGTCTCTCGGAGA-1&quot; &quot;AATAGGGAGAATGA-1&quot;
+[19] &quot;AATGGAGAATCGTG-1&quot; &quot;AATGGCTGTAAAGG-1&quot;</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># Get feature names</span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">rownames</span>(sobj) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">20</span>)</a></code></pre></div>
@@ -637,15 +597,15 @@ AAACGCACTGGTAC-1     PBMC-1       2163          781</code></pre>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="co"># Retrieve cell identities</span></a>
 <a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">Idents</span>(sobj) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb27-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">20</span>)</a></code></pre></div>
-<pre><code>AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACATTGATCAGC-1 AAACCGTGCTTCCG-1 
+<pre><code>AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
             PBMC             PBMC             PBMC             PBMC 
-AAACCGTGTATGCG-1 AAACGCACTGGTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+AAAGTTTGATCACG-1 AAATCATGACCACA-1 AACATTGATGGGAG-1 AACCGATGCTCCCA-1 
             PBMC             PBMC             PBMC             PBMC 
-AAACGCTGTAGCCA-1 AAACGCTGTTTCTG-1 AAACTTGAAAAACG-1 AAACTTGATCCAGA-1 
+AACCGCCTCTACGA-1 AACCTTACGCGAGA-1 AACTCACTCAAGCT-1 AACTCGGAAAGTGA-1 
             PBMC             PBMC             PBMC             PBMC 
-AAAGAGACGAGATA-1 AAAGAGACGCGAGA-1 AAAGAGACGGACTT-1 AAAGAGACGGCATT-1 
+AAGATGGAGATAAG-1 AAGCCATGTCTCGC-1 AAGCGTACGTCTTT-1 AAGGTCTGACAGTC-1 
             PBMC             PBMC             PBMC             PBMC 
-AAAGATCTGGGCAA-1 AAAGCAGAAGCCAT-1 AAAGCAGATATCGG-1 AAAGCCTGTATGCG-1 
+AAGTCTCTCGGAGA-1 AATAGGGAGAATGA-1 AATGGAGAATCGTG-1 AATGGCTGTAAAGG-1 
             PBMC             PBMC             PBMC             PBMC 
 Levels: PBMC</code></pre>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co"># Set cell identities</span></a>
@@ -678,7 +638,7 @@ Levels: PBMC</code></pre>
 <a class="sourceLine" id="cb32-2" data-line-number="2">sobj <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb32-3" data-line-number="3"><span class="st">  </span><span class="kw">subset</span>(<span class="dt">idents =</span> <span class="st">&quot;control&quot;</span>) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb32-4" data-line-number="4"><span class="st">  </span><span class="kw">ncol</span>()</a></code></pre></div>
-<pre><code>[1] 1350</code></pre>
+<pre><code>[1] 1342</code></pre>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1"><span class="co"># Subset based on expression and cell identity</span></a>
 <a class="sourceLine" id="cb34-2" data-line-number="2">sobj <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb34-3" data-line-number="3"><span class="st">  </span><span class="kw">subset</span>(CD8A <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">idents =</span> <span class="st">&quot;control&quot;</span>) <span class="op">%&gt;%</span></a>
@@ -706,12 +666,12 @@ Active assay: RNA (12572 features)</code></pre>
 <a class="sourceLine" id="cb38-8" data-line-number="8">sobj<span class="op">@</span>meta.data <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb38-9" data-line-number="9"><span class="st">  </span><span class="kw">head</span>()</a></code></pre></div>
 <pre><code>                 orig.ident nCount_RNA nFeature_RNA percent_mito
-AAACATACAACCAC-1    control       2419          779    3.0177759
-AAACATTGAGCTAC-1    control       4901         1350    3.7951438
-AAACATTGATCAGC-1    control       3145         1127    0.8903021
-AAACCGTGCTTCCG-1    control       2637          958    1.7444065
-AAACCGTGTATGCG-1    control        980          521    1.2244898
-AAACGCACTGGTAC-1    control       2163          781    1.6643551</code></pre>
+AAACATACAACCAC-1    control       2419          779     3.017776
+AAACATTGAGCTAC-1    control       4901         1350     3.795144
+AAACGCTGACCAGT-1    control       2174          781     3.817847
+AAACGCTGGTTCTT-1    control       2259          789     3.098716
+AAAGTTTGATCACG-1    control       1265          441     3.478261
+AAATCATGACCACA-1    control       4125         1365     4.581818</code></pre>
 </div>
 <div id="exercise-create-violinbox-plots-comparing-cell-metrics" class="section level2">
 <h2>EXERCISE: Create violin/box plots comparing cell metrics</h2>
@@ -773,6 +733,49 @@ $(document).ready(function () {
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
