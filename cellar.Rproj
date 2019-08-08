@@ -12,9 +12,4 @@ Encoding: UTF-8
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
 
-BuildType: Package
-PackageUseDevtools: Yes
-PackageInstallArgs: --no-multiarch --with-keep.source
-PackageBuildArgs: --no-build-vignettes
-PackageCheckArgs: --as-cran --ignore-vignettes
-PackageRoxygenize: rd,collate,namespace
+BuildType: Website
