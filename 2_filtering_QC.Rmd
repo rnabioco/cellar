@@ -1,5 +1,6 @@
 ---
 title: <b style="font-size:45px;">Data Filtering and Quality Control</b>
+author: "Ryan Sheridan"
 date: "August 13<sup>th</sup>, 2019"
 output:
   html_document:

@@ -1,14 +1,11 @@
 ---
 title: <b style="font-size:45px;">Normalization, Dimensionality Reduction and clustering</b>
-author: Kent Riemondy"
+author: "Kent Riemondy"
 date: "August 14<sup>th</sup>, 2019"
 output: 
   html_document:
     toc: true
     toc_depth: 1
-    vignette: >
-      %\VignetteEngine{knitr::rmarkdown}
-      %\VignetteEncoding{UTF-8}
 bibliography: bib/refs.bib
 ---
 

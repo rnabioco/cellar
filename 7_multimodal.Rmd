@@ -1,5 +1,6 @@
 ---
 title: <b style="font-size:45px;">Working with Multi-modal Data</b>
+author: "Ryan Sheridan"
 date: "August 15<sup>th</sup>, 2019"
 output:
   html_document:
