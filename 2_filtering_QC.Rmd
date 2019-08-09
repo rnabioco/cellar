@@ -70,8 +70,8 @@ sobj@assays$RNA@data[1:10, 1:10]
 
 ```
 
-## Accessing project meta.data
-```{r "Accessing meta.data"}
+## Storing multiple assays in the same Seurat object
+```{r}
 
 # The Seurat object stores the current default assay and cell identities
 # By default the cell identity is set to the project name
@@ -81,6 +81,11 @@ sobj@active.ident[1:10]
 # The meta.data table contains stats for each cell
 sobj@meta.data %>%
   head()
+
+```
+
+## Accessing project meta.data
+```{r "Accessing meta.data"}
 
 # Modify orig.ident to include the sample number
 # This is useful later when creating separate plots for each sample
