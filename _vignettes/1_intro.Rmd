@@ -179,7 +179,7 @@ cellranger output [html](http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbm
 ## reading UMI-barcode elbow plots
 ![model of final 10x library](1_intro_files/10xV3_seq.png){width=400px}
 
-The total UMI (unique molecular identifier - present each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but can be useful in other situations like bashing and CITE-seq.
+The total UMI (unique molecular identifier - present each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but can be useful in other situations like hashing and CITE-seq.
 
 for a standard scRNAseq run:
 
