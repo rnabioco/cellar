@@ -1,5 +1,5 @@
 ---
-title: 'Introduction to scRNAseq analysis'
+title: 'Introduction to scRNAseq Analysis'
 date: "August 12<sup>th</sup>, 2019"
 output:
   rmarkdown::html_vignette:
@@ -24,7 +24,7 @@ __rbi.fellows@ucdenver.edu__,
 
 RC1 South room 9101
 
-[office hours on Thursdays](https://rnabioco.github.io/rbi-project-summary/office-hours.html)
+[office hours on Thursday afternoons](https://rnabioco.github.io/rbi-project-summary/office-hours.html)
 
 ## outline of the workshop
 * Prereq: check all required packages are installed
@@ -52,13 +52,13 @@ RC1 South room 9101
 * Survey after the workshop for feedback
 
 ## limitations of scRNAseq
-![from seurat pbmc example](1_intro_files2/cd4vs8.png){width=800px}
+![from seurat pbmc example](1_intro_files2/cd4vs8.png){width=600px}
 
 1. dropout effect, only a small portion of the mRNAs from each cell is captured (see: GFP and other supposed markers)
 
 2. low number of detectable genes, might not detect low expressing genes at all (see: TFs)
 
-3. little info outside of gene counts (see: tail-seq, isoform info)
+3. little info outside of gene counts (see: no tail-seq, isoform info)
 
 4. discrepancies between RNA and protein, especially surface proteins (see: CD4+ vs CD8+)
 
@@ -78,12 +78,12 @@ RC1 South room 9101
 4. lysed/free RNA - background for all cells, interferes with clustering and markers  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(try: [SoupX](https://github.com/constantAmateur/SoupX))
 
-![example data with lyzed red blood cells](1_intro_files2/contaminant.png){width=800px}
+![example data with lysed red blood cells](1_intro_files2/contaminant.png){width=600px}
 
 5. different sex of mice in samples - makes sample comparisons harder  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(try: ignore known sex-dependent genes)
 
-6. batch effects - still preferrable to have all, or at least the direct comparison samples, captured at the same time  
+6. batch effects - still preferable to have all, or at least the direct comparison samples, captured at the same time  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(try: various alignment methods)
 
 7. n = ? - no consensus in the field, but aggregating 2 or more biological repeats, or hash multiple samples at the same time, should be valid
@@ -102,12 +102,12 @@ tab <- "
 |--------------|--------------------|---------------|------------------|----------------|---------------------------|
 |10x Chromium  |droplet-based       |polyA+ 3' only |10^5 per cell     |~2000 per cell  |~5k cells, low cost        |
 |Smart-seq2    |FACS-sorted         |full length    |10^6 per cell     |~4000 per cell  |manual pipetting, high cost|
-|sci-RNA-seq3   |combinatorial index |polyA+ 3' only |10^5 per cell     |~1000 per cell  |~1m cells, lowest cost     |
+|sci-RNA-seq3  |combinatorial index |polyA+ 3' only |10^5 per cell     |~1000 per cell  |~1m cells, lowest cost per |
 "
 cat(tab)
 ```
 
-variations within 10x system: standard 3', 5' + V(D)J, hashing, CITE-seq, variant-calling (very different sample prep, may require up to 4 library preps per sample)
+variations within 10x system: standard 3', 5' + V(D)J, antibody hashing, CITE-seq, variant-calling (very different sample preps, may require up to 4 library preps per sample)
 
 ### 2. alignment pipelines
 [cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation) (alternatives such as [Alevin](https://salmon.readthedocs.io/en/latest/alevin.html), [STARsolo](https://github.com/alexdobin/STAR/releases), [Kallisto](https://www.kallistobus.tools/))
@@ -118,7 +118,7 @@ cellranger count --id=123 \
                  --fastqs=/home/runs/HAT7ADXX/outs/fastq_path \
                  --sample=mysample
 ```
-~ 5-8 hours per sample on biochem department cluster Bodhi
+~ 5-8 hours per sample on biochem department cluster "Bodhi"
 
 theoretically can be ran locally on linux, but will require at least 32GB of RAM
 
@@ -126,9 +126,9 @@ other campus options include Rosalind, AWS
 
 cellranger output [html](http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_web_summary.html) and [loupe](http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_cloupe.cloupe) files
 
-### 3. key things to check for in the initial output
-1. number of cells close to expectations? Is the elbow plot reasonable?
-2. reads per cell (this is merely calculated as reads/cells, so somewhat inaccurate) - ideally ~50-100k, 
+### 3. key things to check for in the initial output html report
+1. number of cells close to expectations? reasonable elbow plot?
+2. reads per cell (this is merely calculated as reads/cells, so somewhat inaccurate) - ideally ~50-100k
 3. genes per cell, ideally ~2000
 4. sequencing saturation?
 5. any structure in the dimension reduction tSNE?
@@ -148,7 +148,9 @@ cellranger output [html](http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbm
 ## reading and making UMI-barcode elbow plots
 ![model of final 10x library](1_intro_files2/10xV3_seq.png){width=400px}
 
-The total UMI (unique molecular identifier - present each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but can be useful in other situations like bashing and CITE-seq.
+The total UMI (unique molecular identifier - represent each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but will also be useful in other situations like bashing and CITE-seq.
+
+![example of good and bad data](1_intro_files2/elbowcomp.png){width=400px}
 
 for a standard scRNAseq run:
 
@@ -160,44 +162,28 @@ for a standard scRNAseq run:
   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected inflection point of y axis (cutoff UMI count): >= 1000
   
-```{r, fig.width=6, fig.height=3, echo = T}
+```{r, fig.width=3, fig.height=3, echo = T}
 library(tidyverse)
-m1 <- readRDS("1_intro_files2/raw_matrix1.rds")
-m2 <- readRDS("1_intro_files2/raw_matrix2.rds")
-
-# gene x barcodes
-print(dim(m1))
-print(dim(m2))
+# use "raw" instead of "filtered" cellranger output folder
+data_url = "https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"
+m1 <- readRDS(url(file.path(data_url, "raw_matrix.rds")))
+# all genes x all barcodes
 
 counts <- Matrix::colSums(m1) # calculate total UMI read number for each cell barcode
 countdf <- as.data.frame(counts) %>% 
   as_tibble(rownames = "barcode") %>% 
   filter(counts >= 2) %>% # throw out cell barcodes with 1 or less UMI, this is mainly for time purposes
   arrange(desc(counts)) %>% # arrange by descending order
-  mutate(n = 1:n()) # rank
+  mutate(rank = 1:n()) # rank
 
-g1 <- ggplot(countdf, aes(x = n, y = counts)) +
+head(countdf) # barcodes now ranked by UMI counts
+
+ggplot(countdf, aes(x = rank, y = counts)) +
   geom_point() +
   labs(x = "barcodes", y = "UMI_counts") +
   theme_classic() +
   scale_x_log10() + 
   scale_y_log10()
-
-counts2 <- Matrix::colSums(m2)
-countdf2 <- as.data.frame(counts2) %>%
-  as_tibble(rownames = "barcode") %>% 
-  filter(counts2 >= 2) %>%
-  arrange(desc(counts2)) %>%
-  mutate(n = 1:n())
-
-g2 <- ggplot(countdf2, aes(x = n, y = counts2)) +
-  geom_point() +
-  labs(x = "barcodes", y = "UMI_counts") +
-  theme_classic() +
-  scale_x_log10() + 
-  scale_y_log10()
-
-cowplot::plot_grid(g2, g1, nrow = 1, labels = c("good", "bad"))
 ```
 
 ## briefly, tidyverse/dplyr verbs
@@ -220,18 +206,26 @@ meta %>% head() %>% print() # <- same as print(head(meta))
 
 ```{r, echo = T}
 # "select" certain columns of data
-meta2 <- meta %>% select(cell_id, nCount_RNA, RNA_snn_res.0.8, letter.idents)
+meta2 <- meta %>% select(cell_id, 
+                         nCount_RNA, 
+                         RNA_snn_res.0.8, 
+                         letter.idents)
 meta2 %>% head() %>% print()
 ```
 
 ```{r, echo = T}
 # "filter" data to select specific rows
-meta2 %>% filter(nCount_RNA >= 71, letter.idents == "A") %>% head() %>% print()
+meta2 %>% filter(nCount_RNA >= 71, 
+                 letter.idents == "A") %>%
+  head() %>%
+  print()
 ```
 
 ```{r, echo = T}
 # "arrange" the rows of your data into an order
-meta2 %>% arrange(nCount_RNA) %>% head() %>% print()
+meta2 %>% arrange(nCount_RNA) %>%
+  head() %>%
+  print()
 ```
 
 ```{r, echo = T}
@@ -243,7 +237,8 @@ meta3 %>% head() %>% print()
 
 ```{r, echo = T}
 # "summarise" chunks of you data (by group) in some way.
-meta3 %>% group_by(seurat_clusters) %>% summarize(n = n()) %>% head() %>% print()
+meta3 %>% group_by(seurat_clusters) %>%
+  summarise(n = n())
 ```
 
 ## reading material
