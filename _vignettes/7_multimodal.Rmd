@@ -141,7 +141,7 @@ To account for differences in antibody binding efficiencies, CITE-seq and cell h
 # Normalize HTO counts
 sobj <- sobj %>%
   NormalizeData(
-    assay                = "HTO",
+    assay = "HTO",
     normalization.method = "CLR"      # Centered log-ratio normalization
   )
 
