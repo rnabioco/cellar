@@ -6,6 +6,7 @@ output:
   html_vignette:
     toc: true
     toc_depth: 3
+    self_contained: true
 ---
 
 ```{r "knitr options", echo = FALSE, message = FALSE, warning = FALSE}
