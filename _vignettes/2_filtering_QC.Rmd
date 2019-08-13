@@ -334,12 +334,12 @@ sobj@meta.data %>%
 ```{r echo = FALSE, fig.width = 8, fig.height = 6}
 
 # Using Seurat functions
-# sobj %>%
-#   VlnPlot(
-#     features = c("nCount_RNA", "nFeature_RNA", "percent_mito"),
-#     ncol     = 3,
-#     pt.size  = 0.25
-#   )
+sobj %>%
+  VlnPlot(
+    features = c("nCount_RNA", "nFeature_RNA", "percent_mito"),
+    ncol     = 3,
+    pt.size  = 0.25
+  )
 
 # Using ggplot2
 sobj@meta.data %>%

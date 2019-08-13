@@ -1,8 +1,9 @@
 ---
-title: 'Introduction to scRNAseq Analysis'
-date: "August 12<sup>th</sup>, 2019"
+title: <b style="font-size:45px;">Introduction to scRNA-seq Analysis</b>
+author: "Rui Fu"
+date: "August 13<sup>th</sup>, 2019"
 output:
-  rmarkdown::html_vignette:
+  html_vignette:
     toc: true
     toc_depth: 3
 ---
