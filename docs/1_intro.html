@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Rui Fu" />
+
+
+<title>Introduction to scRNA-seq Analysis</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="1_intro.html">Introduction</a>
+</li>
+<li>
+  <a href="2_filtering_QC.html">Quality Control</a>
+</li>
+<li>
+  <a href="3_norm_viz_clustering.html">Clustering</a>
+</li>
+<li>
+  <a href="4_markers.html">Cell Type Annotation</a>
+</li>
+<li>
+  <a href="5_pseudotime.html">Pseudotime</a>
+</li>
+<li>
+  <a href="6_alignment.html">Dataset Alignment</a>
+</li>
+<li>
+  <a href="7_multimodal.html">Multi-modal Data</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore"><b style="font-size:45px;">Introduction to scRNA-seq Analysis</b></h1>
+<h4 class="author">Rui Fu</h4>
+<h4 class="date">August 13<sup>th</sup>, 2019</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro-to-rbi">intro to RBI</a></li>
+<li><a href="#outline-of-the-workshop">outline of the workshop</a></li>
+<li><a href="#limitations-of-scrnaseq">limitations of scRNAseq</a></li>
+<li><a href="#experimental-design-informatics-corrections">experimental design &gt;&gt; informatics corrections</a></li>
+<li><a href="#single-cell-rna-sequencing-overview">single cell RNA sequencing overview</a><ul>
+<li><a href="#sequencing-methods">1. sequencing methods</a></li>
+<li><a href="#alignment-pipelines">2. alignment pipelines</a></li>
+<li><a href="#key-things-to-check-for-in-the-initial-output-html-report">3. key things to check for in the initial output html report</a></li>
+<li><a href="#downstream-processing-in-r-or-python">4. downstream processing in R or python</a></li>
+</ul></li>
+<li><a href="#reading-and-making-umi-barcode-elbow-plots">reading and making UMI-barcode elbow plots</a></li>
+<li><a href="#briefly-tidyversedplyr-verbs">briefly, tidyverse/dplyr verbs</a></li>
+<li><a href="#reading-material">reading material</a></li>
+</ul>
+</div>
+
+<div id="intro-to-rbi" class="section level2">
+<h2>intro to RBI</h2>
+<p><strong><a href="mailto:rbi.fellows@ucdenver.edu" class="email">rbi.fellows@ucdenver.edu</a></strong>,</p>
+<p>RC1 South room9101</p>
+<p><a href="https://rnabioco.github.io/rbi-project-summary/office-hours.html">office hours on Thursday afternoons</a></p>
+</div>
+<div id="outline-of-the-workshop" class="section level2">
+<h2>outline of the workshop</h2>
+<ul>
+<li>Prereq: check all required packages are installed</li>
+<li>Day 1 (pm):
+<ul>
+<li>Say Hi</li>
+<li>Intro to scRNAseq</li>
+<li>Data preprocessing</li>
+<li>Import into R</li>
+<li>Quality control</li>
+</ul></li>
+<li>Day 2 (am):
+<ul>
+<li>Projections</li>
+<li>Clustering</li>
+<li>Finding markers</li>
+<li>Annotating cell types</li>
+</ul></li>
+<li>Day 2 (pm):
+<ul>
+<li>Pseudotime analysis</li>
+<li>Dataset alignment</li>
+</ul></li>
+<li>Day 3 (am):
+<ul>
+<li>Multimodal data (CITE-seq, hashing)</li>
+<li>Miscellaneous</li>
+</ul></li>
+<li>Day 3 (pm) : working through your own data</li>
+<li>Survey after the workshop for feedback</li>
+</ul>
+</div>
+<div id="limitations-of-scrnaseq" class="section level2">
+<h2>limitations of scRNAseq</h2>
+<div class="figure">
+<img src="1_intro_files2/cd4vs8.png" alt="from seurat pbmc example" width="600" />
+<p class="caption">from seurat pbmc example</p>
+</div>
+<ol style="list-style-type: decimal">
+<li><p>dropout effect, only a small portion of the mRNAs from each cell is captured (see: GFP and other supposed markers)</p></li>
+<li><p>low number of detectable genes, might not detect low expressing genes at all (see: TFs)</p></li>
+<li><p>little info outside of gene counts (see: no tail-seq, isoform info)</p></li>
+<li><p>discrepancies between RNA and protein, especially surface proteins (see: CD4+ vs CD8+)</p></li>
+<li><p>constantly evolving chemistry and bioinformatics tools (see: 10x v2/v3/v3.1, <a href="https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/algorithms/overview#cell_calling">bad cell calling in cellrangerV2</a>)</p></li>
+</ol>
+</div>
+<div id="experimental-design-informatics-corrections" class="section level2">
+<h2>experimental design &gt;&gt; informatics corrections</h2>
+<div class="figure">
+<img src="1_intro_files2/10xV3_model.png" alt="cell isolation process for 10x" width="400" />
+<p class="caption">cell isolation process for 10x</p>
+</div>
+<ol style="list-style-type: decimal">
+<li><p>too few or too many cells - 1000 cell lower limit for capture, and waste of money</p></li>
+<li><p>doublets - 10000 cells ~ 10% doublet rate<br />
+        (try: <a href="https://github.com/AllonKleinLab/scrublet">scrublet</a>)</p></li>
+<li><p>cell death - worse RNA capture, potentially different expression profile<br />
+        (try: MT-RNA cutoff, regress out MT-RNA score)</p></li>
+<li><p>lysed/free RNA - background for all cells, interferes with clustering and markers<br />
+        (try: <a href="https://github.com/constantAmateur/SoupX">SoupX</a>)</p></li>
+</ol>
+<div class="figure">
+<img src="1_intro_files2/contaminant.png" alt="example data with lysed red blood cells" width="600" />
+<p class="caption">example data with lysed red blood cells</p>
+</div>
+<ol start="5" style="list-style-type: decimal">
+<li><p>different sex of mice in samples - makes sample comparisons harder<br />
+        (try: ignore known sex-dependent genes)</p></li>
+<li><p>batch effects - still preferable to have all, or at least the direct comparison samples, captured at the same time<br />
+        (try: various alignment methods)</p></li>
+<li><p>n = ? - no consensus in the field, but aggregating 2 or more biological repeats, or hash multiple samples at the same time, should be valid</p></li>
+</ol>
+</div>
+<div id="single-cell-rna-sequencing-overview" class="section level2">
+<h2>single cell RNA sequencing overview</h2>
+<p>cell suspension -&gt; cDNA library -&gt; fastq file -&gt; gene expression matrix -&gt;</p>
+<p>    filtering -&gt; preprocessing -&gt; dimension reduction -&gt; clustering -&gt; identity and markers -&gt; pseudotime</p>
+<div id="sequencing-methods" class="section level3">
+<h3>1. sequencing methods</h3>
+<p>main platforms: 10x vs Smart-seq2 vs sci-RNA-seq3</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="18%" />
+<col width="13%" />
+<col width="16%" />
+<col width="14%" />
+<col width="24%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>method</th>
+<th>cell isolation</th>
+<th>coverage</th>
+<th>saturation read #</th>
+<th>gene detection</th>
+<th>throughput and cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10x Chromium</td>
+<td>droplet-based</td>
+<td>polyA+ 3’ only</td>
+<td>10^5 per cell</td>
+<td>~2000 per cell</td>
+<td>~5k cells, low cost</td>
+</tr>
+<tr class="even">
+<td>Smart-seq2</td>
+<td>FACS-sorted</td>
+<td>full length</td>
+<td>10^6 per cell</td>
+<td>~4000 per cell</td>
+<td>manual pipetting, high cost</td>
+</tr>
+<tr class="odd">
+<td>sci-RNA-seq3</td>
+<td>combinatorial index</td>
+<td>polyA+ 3’ only</td>
+<td>10^5 per cell</td>
+<td>~1000 per cell</td>
+<td>~1m cells, lowest cost per</td>
+</tr>
+</tbody>
+</table>
+<p>variations within 10x system: standard 3’, 5’ + V(D)J, antibody hashing, CITE-seq, variant-calling (very different sample preps, may require up to 4 library preps per sample)</p>
+</div>
+<div id="alignment-pipelines" class="section level3">
+<h3>2. alignment pipelines</h3>
+<p><a href="https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation">cellranger</a> performs alignment, filtering, UMI counting, clustering, and gene expression analysis. (alternatives such as <a href="https://salmon.readthedocs.io/en/latest/alevin.html">Alevin</a>, <a href="https://github.com/alexdobin/STAR/releases">STARsolo</a>, <a href="https://www.kallistobus.tools/">Kallisto</a>)</p>
+<pre class="bash"><code># in terminal
+cellranger count --id=123 \ 
+                 --transcriptome=/refdata-cellranger-GRCh38-3.0.0 \ 
+                 # build new transcriptome if you have GFP/RFP/transgene
+                 --fastqs=/home/runs/HAT7ADXX/outs/fastq_path \ 
+                 # a list of fastqs, a folder, or pass table via csv file
+                 --sample=mysample 
+                 # will need additional arguments for feature barcoding</code></pre>
+<p>output folder structure</p>
+<pre class="r"><code>KO_1_CDNA
+|-- KO_1_CDNA.mri.tgz
+|-- SC_RNA_COUNTER_CS
+|   |-- CLOUPE_PREPROCESS
+|   |-- EXPAND_SAMPLE_DEF
+|   |-- SC_RNA_COUNTER
+|   `-- fork0
+|-- _cmdline
+|-- _filelist
+|-- _finalstate
+|-- _invocation
+|-- _jobmode
+|-- _log
+|-- _mrosource
+|-- _perf
+|-- _sitecheck
+|-- _tags
+|-- _timestamp
+|-- _uuid
+|-- _vdrkill
+|-- _versions
+`-- outs
+    |-- analysis
+    |-- cloupe.cloupe # cloupe file for browser view
+    |-- filtered_feature_bc_matrix # use this fold for seurat
+    |-- filtered_feature_bc_matrix.h5
+    |-- metrics_summary.csv
+    |-- molecule_info.h5
+    |-- possorted_genome_bam.bam
+    |-- possorted_genome_bam.bam.bai
+    |-- raw_feature_bc_matrix # or this for seurat
+    |-- raw_feature_bc_matrix.h5
+    `-- web_summary.html # qc summary</code></pre>
+<p>~ 5-8 hours per sample on biochem department cluster “Bodhi”</p>
+<p>theoretically can be ran locally on linux, but will require at least 32GB of RAM</p>
+<p>other campus options include Rosalind, AWS</p>
+<p>cellranger output <a href="http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_web_summary.html">html</a> and <a href="http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_cloupe.cloupe">loupe</a> files</p>
+</div>
+<div id="key-things-to-check-for-in-the-initial-output-html-report" class="section level3">
+<h3>3. key things to check for in the initial output html report</h3>
+<ol style="list-style-type: decimal">
+<li>number of cells close to expectations? reasonable elbow plot?</li>
+<li>reads per cell (this is merely calculated as reads/cells, so somewhat inaccurate) - ideally ~50-100k</li>
+<li>genes per cell, ideally ~2000</li>
+<li>sequencing saturation?</li>
+<li>any structure in the dimension reduction tSNE?</li>
+</ol>
+</div>
+<div id="downstream-processing-in-r-or-python" class="section level3">
+<h3>4. downstream processing in R or python</h3>
+<ol style="list-style-type: decimal">
+<li>more accurate cell calling</li>
+<li>more stringent filtering</li>
+<li>regress out unwanted sources of variance</li>
+<li>appropriate choice of normalization method</li>
+<li>UMAP instead of tSNE projections, and fine-tuning</li>
+<li>fine-tuning of dataset alignment methods and parameters (by default cellranger does align during aggregation)</li>
+<li>find marker genes and assign cluster identities (may merge some)</li>
+<li>more flexible visualizations</li>
+<li>GO term analysis and other things</li>
+<li>export to a hosted browser, similar to cloupe</li>
+</ol>
+</div>
+</div>
+<div id="reading-and-making-umi-barcode-elbow-plots" class="section level2">
+<h2>reading and making UMI-barcode elbow plots</h2>
+<div class="figure">
+<img src="1_intro_files2/10xV3_seq.png" alt="model of final 10x library" width="600" />
+<p class="caption">model of final 10x library</p>
+</div>
+<p>The total UMI (unique molecular identifier - represent each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but will also be useful in other situations like hashing and CITE-seq.</p>
+<div class="figure">
+<img src="1_intro_files2/elbowcomp.png" alt="example of good and bad data" width="400" />
+<p class="caption">example of good and bad data</p>
+</div>
+<p>for a standard 10x scRNAseq run:</p>
+<p>        expected range of x axis (barcode) : ~ 10^5 (if using ggplot to visualize, might want to filter)</p>
+<p>        expected inflection point of x axis (cell number): ~ # of loaded cells / 2</p>
+<p>        expected range of y axis (UMI_counts) : ~ 10^4</p>
+<p>        expected inflection point of y axis (cutoff UMI count): ~ 1000</p>
+<pre class="r"><code>library(tidyverse)
+# use &quot;raw&quot; instead of &quot;filtered&quot; cellranger output folder
+data_url = &quot;https://scrnaseq-workshop.s3-us-west-2.amazonaws.com&quot;
+m1 &lt;- readRDS(url(file.path(data_url, &quot;raw_matrix.rds&quot;)))
+# all genes x all barcodes
+
+counts &lt;- Matrix::colSums(m1) # calculate total UMI read number for each cell barcode
+countdf &lt;- as.data.frame(counts) %&gt;% 
+  as_tibble(rownames = &quot;barcode&quot;) %&gt;% 
+  filter(counts &gt;= 2) %&gt;% # throw out cell barcodes with 1 or less UMI, this is mainly for time purposes
+  arrange(desc(counts)) %&gt;% # arrange by descending order
+  mutate(rank = 1:n()) # rank
+
+head(countdf) # barcodes now ranked by UMI counts
+#&gt; # A tibble: 6 x 3
+#&gt;   barcode          counts  rank
+#&gt;   &lt;chr&gt;             &lt;dbl&gt; &lt;int&gt;
+#&gt; 1 GCAGCCACATACCGTA  40745     1
+#&gt; 2 ATGGAGGGTGGTAACG  20916     2
+#&gt; 3 GTAACCATCGCTTGAA  19958     3
+#&gt; 4 TTCATGTGTCGTGTTA  19765     4
+#&gt; 5 GAATAGACATCCTGTC  18494     5
+#&gt; 6 GTCTCACGTTGGCCGT  17828     6
+
+ggplot(countdf, aes(x = rank, y = counts)) +
+  geom_point() +
+  labs(x = &quot;barcodes&quot;, y = &quot;UMI_counts&quot;) +
+  theme_classic() +
+  scale_x_log10() + 
+  scale_y_log10()</code></pre>
+<p><img src="1_intro_files/figure-html/unnamed-chunk-3-1.png" width="288" style="display: block; margin: auto;" /></p>
+</div>
+<div id="briefly-tidyversedplyr-verbs" class="section level2">
+<h2>briefly, tidyverse/dplyr verbs</h2>
+<p>The tidyverse is a collection of R packages designed for data science. All packages share design philosophy, grammar, and data structures.</p>
+<p>Seurat also uses some of the grammar, such as <code>group.by</code>.</p>
+<p>A large amount of code introduced in this workshop in based on matrix and dataframe manipulation. Therefore some basic understanding of tidyverse/dplyr will be helpful.</p>
+<p>Also, “%&gt;%” is used as “pipe”, similar to unix <code>|</code>.</p>
+<pre class="r"><code># we will look at metadata from pbmc_small from Seurat
+library(Seurat)
+library(tidyverse)
+# note that tidyverse is philosophically against rownames
+
+meta &lt;- pbmc_small@meta.data %&gt;% as_tibble(rownames = &quot;cell_id&quot;)
+meta %&gt;% head() %&gt;% print() # &lt;- same as print(head(meta))
+#&gt; # A tibble: 6 x 8
+#&gt;   cell_id orig.ident nCount_RNA nFeature_RNA RNA_snn_res.0.8 letter.idents
+#&gt;   &lt;chr&gt;   &lt;fct&gt;           &lt;dbl&gt;        &lt;int&gt; &lt;fct&gt;           &lt;fct&gt;        
+#&gt; 1 ATGCCA… SeuratPro…         70           47 0               A            
+#&gt; 2 CATGGC… SeuratPro…         85           52 0               A            
+#&gt; 3 GAACCT… SeuratPro…         87           50 1               B            
+#&gt; 4 TGACTG… SeuratPro…        127           56 0               A            
+#&gt; 5 AGTCAG… SeuratPro…        173           53 0               A            
+#&gt; 6 TCTGAT… SeuratPro…         70           48 0               A            
+#&gt; # … with 2 more variables: groups &lt;chr&gt;, RNA_snn_res.1 &lt;fct&gt;</code></pre>
+<pre class="r"><code># &quot;select&quot; certain columns of data
+meta2 &lt;- meta %&gt;% select(cell_id, 
+                         nCount_RNA, 
+                         RNA_snn_res.0.8, 
+                         letter.idents)
+meta2 %&gt;% head() %&gt;% print()
+#&gt; # A tibble: 6 x 4
+#&gt;   cell_id        nCount_RNA RNA_snn_res.0.8 letter.idents
+#&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;        
+#&gt; 1 ATGCCAGAACGACT         70 0               A            
+#&gt; 2 CATGGCCTGTGCAT         85 0               A            
+#&gt; 3 GAACCTGATGAACC         87 1               B            
+#&gt; 4 TGACTGGATTCTCA        127 0               A            
+#&gt; 5 AGTCAGACTGCACA        173 0               A            
+#&gt; 6 TCTGATACACGTGT         70 0               A</code></pre>
+<pre class="r"><code># &quot;filter&quot; data to select specific rows
+meta2 %&gt;% filter(nCount_RNA &gt;= 71, 
+                 letter.idents == &quot;A&quot;) %&gt;%
+  head() %&gt;%
+  print()
+#&gt; # A tibble: 6 x 4
+#&gt;   cell_id        nCount_RNA RNA_snn_res.0.8 letter.idents
+#&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;        
+#&gt; 1 CATGGCCTGTGCAT         85 0               A            
+#&gt; 2 TGACTGGATTCTCA        127 0               A            
+#&gt; 3 AGTCAGACTGCACA        173 0               A            
+#&gt; 4 GCAGCTCTGTTTCT         72 0               A            
+#&gt; 5 AATGTTGACAGTCA        100 0               A            
+#&gt; 6 AGAGATGATCTCGC        191 0               A</code></pre>
+<pre class="r"><code># &quot;arrange&quot; the rows of your data into an order
+meta2 %&gt;% arrange(nCount_RNA) %&gt;%
+  head() %&gt;%
+  print()
+#&gt; # A tibble: 6 x 4
+#&gt;   cell_id        nCount_RNA RNA_snn_res.0.8 letter.idents
+#&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;        
+#&gt; 1 CTTCATGACCGAAT         41 0               A            
+#&gt; 2 CATGAGACACGGGA         51 0               A            
+#&gt; 3 GATATAACACGCAT         52 0               A            
+#&gt; 4 AGGTCATGAGTGTC         62 0               A            
+#&gt; 5 TGGTATCTAAACAG         64 0               A            
+#&gt; 6 GTAAGCACTCATTC         67 0               A</code></pre>
+<pre class="r"><code># &quot;mutate&quot; your data frame to contain new columns
+meta3 &lt;- meta2 %&gt;% mutate(seurat_clusters = str_c(&quot;cluster_&quot;, letter.idents), 
+                          nCount_RNA_norm = nCount_RNA/max(nCount_RNA))
+meta3 %&gt;% head() %&gt;% print()
+#&gt; # A tibble: 6 x 6
+#&gt;   cell_id nCount_RNA RNA_snn_res.0.8 letter.idents seurat_clusters
+#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;         &lt;chr&gt;          
+#&gt; 1 ATGCCA…         70 0               A             cluster_A      
+#&gt; 2 CATGGC…         85 0               A             cluster_A      
+#&gt; 3 GAACCT…         87 1               B             cluster_B      
+#&gt; 4 TGACTG…        127 0               A             cluster_A      
+#&gt; 5 AGTCAG…        173 0               A             cluster_A      
+#&gt; 6 TCTGAT…         70 0               A             cluster_A      
+#&gt; # … with 1 more variable: nCount_RNA_norm &lt;dbl&gt;</code></pre>
+<pre class="r"><code># &quot;summarise&quot; chunks of you data (by group) in some way.
+meta3 %&gt;% group_by(seurat_clusters) %&gt;%
+  summarise(n = n())
+#&gt; # A tibble: 2 x 2
+#&gt;   seurat_clusters     n
+#&gt;   &lt;chr&gt;           &lt;int&gt;
+#&gt; 1 cluster_A          53
+#&gt; 2 cluster_B          27</code></pre>
+</div>
+<div id="reading-material" class="section level2">
+<h2>reading material</h2>
+<ol style="list-style-type: decimal">
+<li><a href="https://www.nature.com/articles/s12276-018-0071-8">Single-cell RNA sequencing technologies and bioinformatics pipelines</a></li>
+<li><a href="https://www.embopress.org/doi/10.15252/msb.20188746">Current best practices in single‐cell RNA‐seq analysis: a tutorial</a></li>
+<li><a href="https://scrnaseq-course.cog.sanger.ac.uk/website/index.html">“Analysis of single cell RNA-seq data” course</a></li>
+<li><a href="https://dplyr.tidyverse.org/articles/dplyr.html">Introduction to dplyr</a></li>
+</ol>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

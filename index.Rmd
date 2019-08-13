@@ -5,7 +5,6 @@ preview: img/rbi-twitter-card.png
 output:
   distill::distill_article:
     toc: false
-    toc_depth: 2
 ---
 
 ```{r setup, include = FALSE, eval = FALSE}

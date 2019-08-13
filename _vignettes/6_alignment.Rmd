@@ -1,0 +1,235 @@
+---
+title: <b style="font-size:45px;">Dataset alignment and batch correction</b>
+author: "Austin Gillen"
+date: "August 14<sup>th</sup>, 2019"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 1
+---
+
+```{r pkgs, include=FALSE}
+library(Seurat)
+library(tidyverse)
+library(cowplot)
+library(harmony)
+library(reticulate)
+library(SingleCellExperiment)
+library(scAlign)
+
+
+knitr::opts_chunk$set(
+  message   = FALSE,
+  warning   = FALSE,
+  comment   = "#>",
+  fig.align = "center"
+)
+```
+
+# Single-cell dataset alignment and batch correction
+
+- Intersample variaton can complicate the analysis of single cell data
+- This variation can include batch effects, technology-specific biases, experimental conditions, etc.
+- Robust methods are available to align datasets from different platforms, experimetal conditions, individuals and even species.
+
+## Packages covered:
+
+1) Harmony (https://github.com/immunogenomics/harmony)
+2) Seurat (https://satijalab.org/seurat/v3.0/integration.html)
+3) scAlign (https://github.com/quon-titative-biology/scAlign)
+
+## Load the Seurat pancreatic islet dataset(s)
+
+This object contains human pancreatic islet cell data from four single cell sequencing technologies, CelSeq (GSE81076), CelSeq2 (GSE85241), Fluidigm C1 (GSE86469), and SMART-Seq2 (E-MTAB-5061). Basic normalization has been performed, as described earlier in this workshop. The UMAP projection below illustrates the challenge: despite containing the same cell populations, the cells are separated not only by cell type (1st plot), but also by technology (2nd plot).
+
+```{r pancreas_data}
+so <- readRDS(gzcon(url("http://sandbox-temp.s3-website-us-west-1.amazonaws.com/pancreas.Rds")))
+
+DimPlot(so, reduction = "umap", group.by = "celltype")
+DimPlot(so, reduction = "umap", group.by = "tech")
+```
+
+## Quick and Flexible: Harmony
+
+![](https://github.com/immunogenomics/harmony/raw/master/vignettes/main.jpg){width=600px,align=center}
+
+Harmony works by weakly clustering cells and then calculating - and iteratively refining - a dataset correction factor for each cluster. This works well for most datasets, and is generally the first alignment strategy that I apply. Notably, harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the `raw.data`, `data` and `scale.data` slots are unmodified).
+
+### Running harmony on a Seurat object
+
+Harmony provides a wrapper function (`RunHarmony()`) that can take Seurat (v2 or v3) or SingleCellExperiment objects directly. Here, we run harmony with the default parameters and generate a plot to confirm convergence. `RunHarmony()` returns an object with a new dimensionality reduction - named harmony - that can be used for downstream projections and clustering.
+
+```{r harmony}
+so <- RunHarmony(so,
+                 group.by.vars = "tech",
+                 plot_convergence = T)
+
+# a new reduction now appears, in the form of 'harmony'
+so@reductions$harmony
+```
+
+We can use plot this new reduction directly, or use it to generate new UMAPs.
+
+Plotting the first two harmony dimensions directly already reveals the value of this approach - the cells are now spaptially clustered by cell type, rather than by technology:
+
+```{r harmony_plots}
+DimPlot(so, reduction = "harmony", group.by = "celltype")
+DimPlot(so, reduction = "harmony", group.by = "tech")
+```
+
+We can also generate UMAP projections from the harmony reductions.
+
+```{r harmony_umap, eval = F}
+# the first 20 harmony dimensions are a sane default
+so <- RunUMAP(so,
+              reduction = "harmony",
+              dims = 1:20,
+              reduction.name = "harmony_umap")
+
+DimPlot(so, reduction = "harmony_umap", group.by = "celltype")
+DimPlot(so, reduction = "harmony_umap", group.by = "tech")
+```
+
+This is a simplified example where we already have indepenedent clustering in all four samples. In a production analysis, you will likely want to cluster the cells using the harmony alignment:
+
+``` {r harmony_cluster, eval = F}
+so <- FindNeighbors(so, reduction = "harmony", dims = 1:20)
+so <- FindClusters(so, resolution = 0.5)
+```
+
+Harmony is also highly tunable. Additional co-variates can be included and the strength of alignment can be tuned for each co-variate using the theta argument.
+
+``` {r harmony_thera, eval = F}
+so <- RunHarmony(so,
+                 group.by.vars = c("tech", ...), # can be any metadata column
+                 theta = c(3,4)) # default theta = 2; higher value = more agressive integration
+```
+
+## Built-in, but more complex to run: Seurat v3 Integration
+
+![](https://satijalab.org/img/vignette_images/anchorsb_2018.png){width=400px, align=center}
+
+Seurat's built-in integration works by identifying ‘anchors’ between pairs of datasets. These anchors represent pairwise correspondences between individual cells (one in each dataset) that originate from the same biological state. These ‘anchors’ are then used to harmonize the datasets. Unlike Harmony, Seruat's integration approach does calculate corrected expression values.
+
+### Running Seurat v3 Integration
+
+To construct a reference, we will identify ‘anchors’ between the individual datasets. First, we split the combined object into a list, with each dataset as an element.
+
+```{r seurat_preprocess}
+so.list <- SplitObject(so, split.by = "tech")
+```
+
+Prior to finding anchors, we perform standard preprocessing (log-normalization), and identify variable features individually for each. Note that Seurat v3 implements an improved method for variable feature selection based on a variance stabilizing transformation ("vst")
+
+```{r seurat_preprocess}
+seurat.preprocess <- function(so){
+  so_tmp <- NormalizeData(so, verbose = FALSE)
+  so_tmp <- FindVariableFeatures(so_tmp, selection.method = "vst", 
+        nfeatures = 2000, verbose = FALSE)
+  so_tmp
+}
+
+so.list <- map(so.list, ~seurat.preprocess(.x))
+```
+
+Next, we identify anchors using the FindIntegrationAnchors function, which takes a list of Seurat objects as input. Here, we integrate the fout objects into a reference.
+
+We use all default parameters here for identifying anchors, including the ‘dimensionality’ of the dataset (30; feel free to try varying this parameter over a broad range, for example between 10 and 50).
+
+```{r seurat_findanchors}
+reference.list <- so.list[c("celseq", "celseq2", "smartseq2","fluidigmc1")]
+so.anchors <- FindIntegrationAnchors(object.list = reference.list, dims = 1:30)
+```
+
+We then pass these anchors to the IntegrateData function, which returns a Seurat object.
+
+The returned object will contain a new Assay, which holds an integrated (or ‘batch-corrected’) expression matrix for all cells, enabling them to be jointly analyzed.
+
+```{r seurat_integrate}
+so.integrated <- IntegrateData(anchorset = so.anchors, dims = 1:30)
+```
+
+After running IntegrateData, the Seurat object will contain a new Assay with the integrated expression matrix. Note that the original (uncorrected values) are still stored in the object in the “RNA” assay, so you can switch back and forth.
+
+We can then use this new integrated matrix for downstream analysis and visualization. Here we scale the integrated data, run PCA, and visualize the results with UMAP. The integrated datasets cluster by cell type, instead of by technology.
+
+```{r seurat_plot}
+# switch to integrated assay. The variable features of this assay are automatically
+# set during IntegrateData
+DefaultAssay(so.integrated) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+so.integrated <- ScaleData(so.integrated, verbose = FALSE)
+so.integrated <- RunPCA(so.integrated, npcs = 30, verbose = FALSE)
+so.integrated <- RunUMAP(so.integrated, reduction = "pca", dims = 1:30)
+p1 <- DimPlot(so.integrated, reduction = "umap", group.by = "tech")
+p2 <- DimPlot(so.integrated, reduction = "umap", group.by = "celltype", label = TRUE, 
+    repel = TRUE) + NoLegend()
+plot_grid(p1, p2)
+```
+
+## Deep learning: ScAlign
+
+![](){width=400px, align=center}
+
+ScAlign...
+
+### Running ScAlign on a Seurat object
+
+Starting from the so.list we generated for the Seurat integration, we can jump right into the ScAlign workflow.
+
+```{r scalign_preprocess, eval = F}
+scalign.preprocess <- function(so){
+    so_tmp <- NormalizeData(so)
+    so_tmp <- ScaleData(so_tmp, features = rownames(so_tmp))
+    so_tmp <- FindVariableFeatures(so_tmp,
+                                   selection.method = "vst",
+                                   nfeatures = 3000)
+  so_tmp
+}
+
+so.list <- map(so.list, ~scalign.preprocess(.x))
+```
+
+Next, we can extract a common set of genes across all datasets.
+
+```{r scalign_features, eval = F}
+genes.use <- unique(unlist(map(so.list, ~.x@assays$RNA@var.features)))
+```
+
+The general design of scAlign makes it agnostic to the input RNA-seq data representation. Thus, the input data can either be gene-level counts, transformations of those gene level counts or a preliminary step of dimensionality reduction such as canonical correlates or principal component scores. Here we convert the previously defined Seurat objects to SingleCellExperiment objects in order to create the combined scAlign object.
+
+```{r scalign_sce, eval = F}
+so.sce.list = lapply(so.list,
+                           function(seurat.obj){
+                             SingleCellExperiment(assays = list(logcounts = seurat.obj@assays$RNA@data[genes.use,],
+                                                                scale.data = seurat.obj@assays$RNA@scale.data[genes.use,]),
+                                                  colData = seurat.obj@meta.data)
+                            })
+```
+
+We now build the scAlign combined SCE object and append the results of the Harmony intregration. The ScAlign vignettes use the Seurat v2 RunMultiCCA reduction here, but the principle is the same.
+
+```{r scalign_align, eval = F}
+scAlignPancreas = scAlignCreateObject(sce.objects = so.sce.list,
+                                      project.name = "scAlign_Pancreatic_Islet",
+                                      labels = map(so.sce.list, ~.x@colData$tech))
+
+reducedDim(scAlignPancreas, "Harmony") = so@reductions$harmony@cell.embeddings[rownames(scAlignPancreas@colData),]
+```
+
+Finally, we align the pancreas islets sequenced across different protocols using the results of RunHarmony as input to scAlign.
+```{r}
+scAlignPancreas = scAlignMulti(scAlignPancreas,
+                        options=scAlignOptions(steps=15000,
+                                               log.every=5000,
+                                               architecture="large",   ## 3 layer neural network
+                                               num.dim=64),            ## Number of latent dimensions
+                        encoder.data="Harmony",
+                        supervised='none',
+                        run.encoder=TRUE,
+                        run.decoder=FALSE,
+                        log.results=TRUE,
+                        log.dir=file.path('./tmp'),
+                        device = "GPU")
+```

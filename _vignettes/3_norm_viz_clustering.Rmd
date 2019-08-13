@@ -1,11 +1,10 @@
 ---
 title: <b style="font-size:45px;">Normalization, Dimensionality Reduction and clustering</b>
-author: Kent Riemondy"
+author: "Kent Riemondy"
 date: "August 14<sup>th</sup>, 2019"
 output: 
   html_document:
     toc: true
-    toc_float: true
     toc_depth: 1
     self_contained: true
     highlight: "tango"
@@ -18,10 +17,10 @@ library(tidyverse)
 library(cowplot)
 
 knitr::opts_chunk$set(
-  message = FALSE, 
-  warning = FALSE, 
-  comment = "",
-  cache = TRUE
+  message   = FALSE,
+  warning   = FALSE,
+  comment   = "#>",
+  fig.align = "center"
 )
 
 ```
