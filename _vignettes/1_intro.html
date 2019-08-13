@@ -409,7 +409,52 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="sequencing-methods" class="section level3">
 <h3>1. sequencing methods</h3>
 <p>main platforms: 10x vs Smart-seq2 vs sci-RNA-seq3</p>
-<p>|method |cell isolation |coverage |saturation read # |gene detection |throughput and cost | |#————–|#——————–|#—————|#——————|#—————-|#—————————| |10x Chromium |droplet-based |polyA+ 3’ only |10^5 per cell |~2000 per cell |~5k cells, low cost | |Smart-seq2 |FACS-sorted |full length |10^6 per cell |~4000 per cell |manual pipetting, high cost| |sci-RNA-seq3 |combinatorial index |polyA+ 3’ only |10^5 per cell |~1000 per cell |~1m cells, lowest cost per |</p>
+<table>
+<colgroup>
+<col width="12%"></col>
+<col width="18%"></col>
+<col width="13%"></col>
+<col width="16%"></col>
+<col width="14%"></col>
+<col width="24%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>method</th>
+<th>cell isolation</th>
+<th>coverage</th>
+<th>saturation read #</th>
+<th>gene detection</th>
+<th>throughput and cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10x Chromium</td>
+<td>droplet-based</td>
+<td>polyA+ 3’ only</td>
+<td>10^5 per cell</td>
+<td>~2000 per cell</td>
+<td>~5k cells, low cost</td>
+</tr>
+<tr class="even">
+<td>Smart-seq2</td>
+<td>FACS-sorted</td>
+<td>full length</td>
+<td>10^6 per cell</td>
+<td>~4000 per cell</td>
+<td>manual pipetting, high cost</td>
+</tr>
+<tr class="odd">
+<td>sci-RNA-seq3</td>
+<td>combinatorial index</td>
+<td>polyA+ 3’ only</td>
+<td>10^5 per cell</td>
+<td>~1000 per cell</td>
+<td>~1m cells, lowest cost per</td>
+</tr>
+</tbody>
+</table>
 <p>variations within 10x system: standard 3’, 5’ + V(D)J, antibody hashing, CITE-seq, variant-calling (very different sample preps, may require up to 4 library preps per sample)</p>
 </div>
 <div id="alignment-pipelines" class="section level3">

@@ -100,7 +100,7 @@ main platforms: 10x vs Smart-seq2 vs sci-RNA-seq3
 ```{r table1, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 tab <- "
 |method        |cell isolation      |coverage       |saturation read # |gene detection  |throughput and cost        |
-|#--------------|#--------------------|#---------------|#------------------|#----------------|#---------------------------|
+|--------------|--------------------|---------------|------------------|----------------|---------------------------|
 |10x Chromium  |droplet-based       |polyA+ 3' only |10^5 per cell     |~2000 per cell  |~5k cells, low cost        |
 |Smart-seq2    |FACS-sorted         |full length    |10^6 per cell     |~4000 per cell  |manual pipetting, high cost|
 |sci-RNA-seq3  |combinatorial index |polyA+ 3' only |10^5 per cell     |~1000 per cell  |~1m cells, lowest cost per |
