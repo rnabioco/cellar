@@ -3,7 +3,7 @@ title: <b style="font-size:45px;">Introduction to scRNA-seq Analysis</b>
 author: "Rui Fu"
 date: "August 13<sup>th</sup>, 2019"
 output:
-  html_vignette:
+  html_document:
     toc: true
     toc_depth: 3
     self_contained: true
