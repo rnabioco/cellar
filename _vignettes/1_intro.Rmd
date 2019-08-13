@@ -1,6 +1,6 @@
 ---
 title: 'Introduction to scRNAseq Analysis'
-date: "August 12<sup>th</sup>, 2019"
+date: "August 13<sup>th</sup>, 2019"
 output:
   rmarkdown::html_vignette:
     toc: true
