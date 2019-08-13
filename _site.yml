@@ -5,6 +5,8 @@ repository_url: https://github.com/rnabioco/cellar
 favicon: img/logo.png
 navbar:
   left:
+    - text: "Introduction"
+      href: 1_intro.html
     - text: "Quality Control"
       href: 2_filtering_QC.html
     - text: "Multi-modal data"
