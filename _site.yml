@@ -9,15 +9,15 @@ navbar:
       href: 1_intro.html
     - text: "Quality Control"
       href: 2_filtering_QC.html
-    - text: "Cell clustering"
+    - text: "Clustering"
       href: 3_norm_viz_clustering.html
-    - text: "Annotating cell types"
+    - text: "Cell Type Annotation"
       href: 4_markers.html
     - text: "Pseudotime"
       href: 5_pseudotime.html
-    - text: "Dataset alignment"
+    - text: "Dataset Alignment"
       href: 6_alignment.html
-    - text: "Multi-modal data"
+    - text: "Multi-modal Data"
       href: 7_multimodal.html
 output:
   distill::distill_article:
