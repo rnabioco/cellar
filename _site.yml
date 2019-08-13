@@ -9,6 +9,14 @@ navbar:
       href: 1_intro.html
     - text: "Quality Control"
       href: 2_filtering_QC.html
+    - text: "Cell clustering"
+      href: 3_norm_viz_clustering.html
+    - text: "Annotating cell types"
+      href: 4_markers.html
+    - text: "Pseudotime"
+      href: 5_pseudotime.html
+    - text: "Dataset alignment"
+      href: 6_alignment.html
     - text: "Multi-modal data"
       href: 7_multimodal.html
 output:
