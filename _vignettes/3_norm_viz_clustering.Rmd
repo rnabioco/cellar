@@ -9,7 +9,6 @@ output:
     toc_depth: 1
     self_contained: true
     highlight: "tango"
-bibliography: bib/refs.bib
 ---
 
 ```{r pkgs, include=FALSE}
@@ -21,26 +20,24 @@ library(cowplot)
 knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE, 
-  comment = ""
+  comment = "",
+  cache = TRUE
 )
 
 ```
 
 # Processing single cell RNA-seq data
 
-- Normalization and Dimensionality reduction methods
+- Normalization and dimensionality reduction methods
 - Discuss visualization strategies for exploring single cell seq data
 - Discuss clustering methods commonly used for single cell data
-
 
 ## Data matrices generated during processing:
 
 1) UMIs (`counts`)
 2) log normalized counts (`data`)
 3) Scaled counts (`scaled.data`) 
-4) Dim reductions
-
-etc.
+4) Dim reductions (`reductions`)
 
 
 ## Reload previously generated dataset
@@ -53,7 +50,7 @@ so
 
 ## Normalization
 
-Normalization of the UMI count data is necessary due to the large variability in total counts observed across cells. This variability is generally thought to be due to inefficiencies in library preparation and variable sequenicng depths between cells. Without normalization the largest source of variabilty in the data would be due to technical differences rather than the biological differences of interest.
+Normalization of the UMI count data is necessary due to the large variability in total counts observed across cells. This variability is generally thought to be due to inefficiencies in library preparation and variable sequencing depths between cells. Without normalization the largest source of variabilty in the data would be due to technical differences rather than the biological differences of interest.
 
 
 ### Global size factor
@@ -87,7 +84,7 @@ The basic approach is as follows:
 4) derive cell-specific size factors using linear algebra
 
 
-First we need to convert out seurat object to a Bioconductor single cell data structure, the [SingleCellExperiment](ref) class. This class if similar to other bioC data strucutes (e.g. `SummarizedExperiment`). Seurat provides a conversion funciton to convert to an SingleCellExperiment object (and other formats, such as `loom` and `CellDataSet`).
+First we need to convert out seurat object to a Bioconductor single cell data structure, the [`SingleCellExperiment`](https://bioconductor.org/packages/devel/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html) class. This class is similar to other bioconductor data strucutes (e.g. `SummarizedExperiment`). Seurat provides a conversion function to convert to an SingleCellExperiment object (and other formats, such as `loom` and `CellDataSet`).
 
 
 ```{r}
@@ -142,8 +139,7 @@ logcounts(sce)[40:50, 40:50]
 ```
 
 
-
-Lastly we'll replace the `Seurat` normalized values with those from `scran` and store the sizeFactors in the meta.data
+Lastly, we'll replace the `Seurat` normalized values with those from `scran` and store the sizeFactors in the meta.data
 
 ```{r}
 so[["RNA"]] <- SetAssayData(so[["RNA"]],
@@ -159,7 +155,7 @@ Now we that have normalized values we can visualize expression across groups.
 
 ```{r}
 VlnPlot(so, "CD3E", slot = "counts")
-VlnPlot(so, c("CD4", "CD8A", "CD19"), slot = "data")
+VlnPlot(so, "CD3E", slot = "data")
 ```
 
 
@@ -179,22 +175,32 @@ VariableFeaturePlot(so)
 so@assays$RNA@var.features[1:10]
 ```
 
-An alternative approach uses the Bioconductor package [`M3Drop`](https://www.bioconductor.org/packages/release/bioc/html/M3Drop.html) [ref] . This approach does not model the variance in the data, but rather uses the information about dropouts to identify genes that have high variance. Specifically there is a clear relationship between the dropout rate and the abundance of a gene. 
+An alternative approach uses the Bioconductor package [`M3Drop`](https://www.bioconductor.org/packages/release/bioc/html/M3Drop.html) [ref] . This approach does not model the variance in the data, but rather uses the information about dropouts to identify genes that have high variance. Specifically there is a clear relationship between the dropout rate and the abundance of a gene. Genes that deviate from this relationship are often cell type markers. 
 
-Exercise: Plot the relationship...
-
+Exercise: Plot the relationship between the mean abundance of a gene and the proportion of cells that do not express the gene (i.e. dropout rate). Use the `counts` slot. 
 
 ```{r}
 # dropout rate per gene
+counts <- GetAssayData(so, "counts")
+
+dropout_rate <-  1 - (rowSums(counts > 0) / ncol(counts))
+avg_abundance <- rowMeans(counts)
 
 dropout <- data.frame(
-  dropout_rate = 1 - (rowSums(GetAssayData(so, "counts") > 0) / ncol(so)),
-  log_abundance = log(rowMeans(GetAssayData(so, "counts")))
+  dropout_rate = dropout_rate,
+  abundance = avg_abundance
 )
 
-ggplot(dropout, aes(log_abundance, dropout_rate)) +
+ggplot(dropout, aes(abundance, dropout_rate)) +
   geom_point() +
-  theme_cowplot()
+  theme_cowplot() +
+  scale_x_log10()
+
+```
+
+
+```{r}
+knitr::include_graphics("img/M3Drop.png")
 
 ```
 
@@ -204,7 +210,7 @@ library(M3Drop)
 # input either sce or counts slot from Seurat object
 counts <- NBumiConvertData(sce)
 
-# fits to model
+# fit to model
 fit <- NBumiFitModel(counts)
 
 # Identify genes with high dropout rate for a given abundance
@@ -219,10 +225,14 @@ How similar are the two appraoches?
 
 ```{r}
 shared_hvgs <- intersect(rownames(drop_hvg), VariableFeatures(so))
+
+length(shared_hvgs)
 ```
 
 
 Do these approaches really extract meaningful genes?
+
+## Exercise: Make a heatmap with the top 50 highly variable genes generated by Seurat or M3Drop. 
 
 ```{r, fig.width=8, fig.height=8}
 library(ComplexHeatmap)
@@ -239,11 +249,13 @@ VariableFeatures(so) <- shared_hvgs
 
 ## Scaling
 
-Next, we will scale the normalized expression values. The scaled values will only be used for dimensionality reduction and clustering, and not differential expression. The purpose of scaling is to scale the expression values for each gene onto a similar numeric scale. This avoid issues of have a gene that is highly expressed being given more weight in clustering simply because it has larger numbers. Scaling converts the normalized data into z-scores by default and the values are stored in the `scale.data` slot.
+Next, we will scale the normalized expression values. The scaled values will only be used for dimensionality reduction and clustering, and not differential expression. The purpose of scaling is to set the expression values for each gene onto a similar numeric scale. This avoid issues of have a gene that is highly expressed being given more weight in clustering simply because it has larger numbers. Scaling converts the normalized data into z-scores by default and the values are stored in the `scale.data` slot.
 
-Single cell data sets often contain various types of 'uninteresting' variation. These can include technical noise, batch effects and confounding biological variation (such as cell cycle stage). We can use modeling to regress these signals out of the analysis using ` ScaleData`. By default a linear model is fit between the the supplied variables (i.e `nUMI`, `proportion.mito`, etc.) and gene expression value. The residuals from this model are then scaled instead of the normalized gene expression.
+Single cell data sets often contain various types of 'uninteresting' variation. These can include technical noise, batch effects and confounding biological variation (such as cell cycle stage). We can use modeling to regress these signals out of the analysis using `ScaleData`. Variables present in the `meta.data` can be supplied as variables to regress. A linear model is fit between the the supplied variables (i.e `nUMI`, `proportion.mito`, etc.) and gene expression value. The residuals from this model are then scaled instead of the normalized gene expression.
 
 In general we recommend performing exploratory data analysis first without regressing any nuisance variables. Later, if you discover a nuisance variable (i.e. batch or cell cycle), then you can regress it out. 
+
+Note that some workflows( [`SimpleSingleCell`](https://f1000research.com/articles/5-2122/v2) and [`Current best practices`](https://www.embopress.org/doi/10.15252/msb.20188746) )omit this scaling step, as it can upweight the contribution of noisy low-expressed genes. If you want to omit this step simply assign the log-normalized values into the `scale.data` slot for compatibility with downstream Seurat functionality. 
 
 ```{r scale}
 
@@ -270,23 +282,20 @@ Heatmap(as.matrix(to_plot),
 
 ## Performing dimensionality reduction and clustering: PCA
 
-Heatmaps are useful for visualizing small numbers of genes (10s or 100s), but quickly become impractical for larger single cell datasets due to high dimensionality (1000s of cells X 20K genes). 
+Heatmaps are useful for visualizing small numbers of genes (10s or 100s), but quickly become impractical for larger single cell datasets due to high dimensionality (1000s of cells X 20000 genes). 
 
-Dimensionality reduction techinques are used in single cell data analysis generally for two purposes:
+Dimensionality reduction techniques are used in single cell data analysis generally for two purposes:
 
-1) Provide visualizations in 2 dimensions that convey information about relationships between cells
+1) Provide visualizations in 2 dimensions that convey information about relationships between cells.
 
-2) Reduce to computational burden of working with 20K dimenions.
+2) Reduce the computational burden of working with 20K dimenions to a smaller set of dimensions that capture signal.
 
-By identifying the highly variable genes we've already reduced the dimensions from 20K to ~1000. Next we will use Principal Componenets Analysis to identify a small subset of dimensions (10-100) that will be used for clustering and visualization. 
-
+By identifying the highly variable genes we've already reduced the dimensions from 20K to ~1500. Next we will use [Principal Component Analysis](http://setosa.io/ev/principal-component-analysis/) to identify a smaller subset of dimensions (10-100) that will be used for clustering and visualization. 
 
 
 ```{r, pca, message = F}
 so <- RunPCA(so,
-               features = VariableFeatures(so),
-               verbose = FALSE, set.seed = NULL)
-
+            features = VariableFeatures(so))
 
 DimPlot(so, reduction = "pca")
 ```
@@ -342,7 +351,7 @@ Note that most of the variation in the data is captured in a small number of PCs
 
 ### PCA
 
-Early single cell studies used PCA to visualize cell clusters, and by plotting the data in scatterplots reduced the dimensionality of the data to 2D. This is a fine appraoch for simple datasets, but often there is much more information present in higher prinicapl components.
+Early single cell studies used PCA to visualize single cell data, and by plotting the data in scatterplots reduced the dimensionality of the data to 2D. This is a fine approach for simple datasets, but often there is much more information present in higher prinicapl components.
 
 We can use PC1 and PC2 to begin to assess the structure of the dataset. 
 
@@ -387,15 +396,12 @@ Note how other PCs separate different cell populations (PPBP is a marker of mega
 
 ```{r}
 plot_pca(so, c("PPBP", "NKG7"), dims = c(2,3))
-
 ```
-
-
 
 
 ### t-SNE 
 
-The first two dimensions of PCA are not sufficient to capture the variation in these data due to the complexity. Howver PCA is useful in identifying a new set of dimensions (10-50) that capture most of the interesting variation in the data. This is useful because now with this reduced dataset we can use newer visualization technique to examine relationships between cells in 2 dimenions. 
+The first two dimensions of PCA are not sufficient to capture the variation in these data due to the complexity. However, PCA is useful in identifying a new set of dimensions (10-100) that capture most of the interesting variation in the data. This is useful because now with this reduced dataset we can use newer visualization technique to examine relationships between cells in 2 dimenions. 
 
  t-distributed stochastic neighbor embedding (tSNE) is a popular techinique for visualizing single cell datsets including mass cytometry data. A useful interactive tool to help you understand tSNE and interpret tSNE plots can be found [here](https://distill.pub/2016/misread-tsne/). 
  
@@ -404,6 +410,7 @@ Seurat provides a wrapper (`RunTSNE`) around the `Rtsne` package that generates 
 
 ```{r}
 # specify to use the first 15 prinicpal components
+# takes less than a minute 
 so <- RunTSNE(so, dims = 1:15)
 
 # again make wrapper to plot tsnes easily
@@ -414,53 +421,52 @@ plot_tsne <- function(sobj, features = "", ...){
             ...)
 }
 
-# use TSNEplot for factors, use FeaturePlot for everything else
-TSNEPlot(so)
+# use DimPlot for factors, use FeaturePlot for everything else
+DimPlot(so, reduction = "tsne")
 
 plot_tsne(so, "CD8A")
 ```
 
 EXERCISE: What effect does including all genes and all PCs (at least 50 PCs) have on the tSNE projection? Do clusters seem separated similarly?
 
-```{r echo = FALSE}
+```{r echo = FALSE, eval = FALSE}
+# takes a lot longer 
 so <- RunPCA(so, features = rownames(so))
 so <- RunTSNE(so, dims = 1:50)
 
-TSNEPlot(so)
+DimPlot(so, reduction = "tsne")
 ```
 
 
-EXERCISE: The perplexity paramter is key to producing a good visualization. Generate tSNE plots at a range of perplexities (min = 2, max = 100). What do you notice about the projections?
+EXERCISE: The perplexity paramter is key to producing a good visualization. Generate tSNE plots at a range of perplexities (2, 25, 250). What do you notice about the projections?
 
-```{r echo = FALSE}
+```{r echo = FALSE, eval = FALSE, fig.width=12, fig.height=8}
 # run on multiple perplexities
-ps <- seq(2, 52, by = 10)
 
-plts <- lapply(ps, 
-    function(x) {
-      so <- RunTSNE(so, 
-               dims = 1:10, 
-               perplexity = x)
-      
-      p <- TSNEPlot(so)
-      p
-    })
+ps <- c(2, 25, 250)
 
+lapply(ps,
+       function(x) {
+         RunTSNE(so,
+                 dims = 1:10,
+                 perplexity = x) %>%
+           DimPlot(., reduction = "tsne")
+       }) %>%
+  plot_grid(plotlist = ., ncol = 3)
 
 ```
 
 ### UMAP
 
-[`UMAP`](https://umap-learn.readthedocs.io/en/latest/parameters.html) is a newer algorithm for projecting data in 2D and have become very popular for single cell visualization. 
+[`UMAP`](https://umap-learn.readthedocs.io/en/latest/parameters.html) is a newer algorithm for projecting data in 2D (or higher) and has become very popular for single cell visualization. 
 
-Similar to RunTSNE we specify the number of PCA dimesions to pass to RunUMAP.
+Similar to RunTSNE we specify the number of PCA dimensions to pass to RunUMAP.
 
 ```{r}
 # specify to use the first 15 prinicpal components
 so <- RunUMAP(so, dims = 1:15)
 
-UMAPPlot(so)
-
+DimPlot(so, reduction = "umap")
 
 # again make wrapper to plot umaps easily
 plot_umap <- function(sobj, features = "", ...){
@@ -475,36 +481,30 @@ plot_umap(so, c("CST3", "PPBP"))
 
 
 
-EXERCISE: How does the projection change with varying parameters (min_dist, n_neighbors, etc)?
+EXERCISE: How does the projection change with varying the `min_dist` parameter ?
 
 
-```{r}
+```{r, eval = FALSE}
 
-plts <- lapply(c(5, 50, 100), function(n){
-  so <- RunUMAP(object = so, 
-                  n.neighbors = n, dims = 1:20)
-  p <- UMAPPlot(object = so)
-  p
-})
+d <- c(0.05, 0.1, 0.5)
 
-
-plts <- lapply(c(0.1, 0.25, 0.5), 
-            function(n){
-              
-  so <- RunUMAP(object = so, 
-                  n.neighbors = 30L, 
-                  min.dist= n,
-                  dims = 1:20)
-  
-  p <- UMAPPlot(object = so)
-  p
-})
+lapply(d, 
+       function(x) {
+ RunUMAP(object = so, 
+                n.neighbors = 30L, 
+                min.dist= x,
+                dims = 1:20) %>% 
+   DimPlot(., reduction = "umap")
+}) %>% 
+  plot_grid(plotlist = ., ncol = 3)
 
 ```
 
 ### Force directed graphs
 
-Include Graph as image...
+```{r}
+knitr::include_graphics("img/force_directed_graph.png")
+```
 
 ```{r, eval = FALSE}
 
@@ -519,6 +519,7 @@ net <- graph.adjacency(
 
 lo <- layout_with_fr(net)
 
+png("img/force_directed_graph.png")
 plot.igraph(net, 
             layout = lo,  
             edge.width = E(net)$weight,
@@ -526,34 +527,46 @@ plot.igraph(net,
             vertex.color = so$seurat_clusters,
             vertex.size = 0, 
             curved = T)
+dev.off()
 ```
 
 
-## Diffusion Map
+### Diffusion Maps
+
+[destiny](https://academic.oup.com/bioinformatics/article/32/8/1241/1744143) is an R package that implements [diffusion maps](https://en.wikipedia.org/wiki/Diffusion_map) for visualization and dimensionality reduction of single cell RNA-seq. 
+
 
 ```{r}
 library(destiny)
-df_map <- DiffusionMap(as.matrix(GetAssayData(so, "data")[VariableFeatures(so), ]))
 
+# expects matrix with cells as rows and genes as columns
+input_data <- t(as.matrix(GetAssayData(so, "data"))[VariableFeatures(so), ])
+                        
+df_map <- DiffusionMap(input_data)
+ 
 palette(cube_helix(6))
-plot(df_map, 1:2)
+plot(df_map, 1:2, col = so@meta.data$percent_mito)
+
+# See plotting options
+#?plot.DiffusionMap
 ```
 
 
 ## Clustering single cell data
 
-The PCA/UMAP/tSNE plots above indicate that there are likely different cell types present in the data as we can see clear clusters. Next we will formally cluster the dataset to assign cells to clusters. 
+The PCA/UMAP/tSNE plots above indicate that there are likely different cell types present in the data as we can see clusters. Next we will formally cluster the dataset to assign cells to clusters. See this recent benchmarking paper for discussion of best clustering methods. [Duo et al, 2018 A systematic performance evaluation of clustering methods for single-cell RNA-seq data](https://f1000research.com/articles/7-1141)
 
-[Duo et al, 2018 A systematic performance evaluation of clustering methods for single-cell RNA-seq data](https://f1000research.com/articles/7-1141)
+Graph based clustering methods are commonly used for single cell data, because they can scale to millions of cells, produce reasonable assignments, and have tunable parameters. The approach that is implemented in Seurat is performed as follows:
 
+1) construct a K-nearest (KNN) neighbor matrix.
+2) calculate shared nearest neighbors (SNN) using the jaccard index. 
+3) use the [Louvain](https://en.wikipedia.org/wiki/Louvain_modularity) community detection algorithm to assign clusters. 
 
-### Graph based clustering
+This general approach was originally adopted in the single cell community in the PhenoGraph algorithm developed by [Levain et al 2015](https://doi.org/10.1016/j.cell.2015.05.047).
 
-Description of graph based clustering. 
+In Seurat the clustering is done using two functions:`FindNeighbors` which computes the KNN and SNN graphs, and `FindClusters` which finds clusters.
 
-KNN grpah -> SNN graph using jaccard index of shared neighbors -> community detection algo (Louvain). originally used in Levain et al 2015.
-
-First we compute a set of nearest neighbor graphs. Then we call the clustering algorithm.
+`FindNeighbors` calculates the KNN graph using the PCA matrix as input (or other dimensionality reductions). 
 
 ```{r}
 so <- FindNeighbors(so, 
@@ -562,59 +575,68 @@ so <- FindNeighbors(so,
               k.param = 15)
 
 so <- FindClusters(so, resolution = 0.5)
+
+
+so$RNA_snn_res.0.5 %>% head()
+so$seurat_clusters %>% head()
 ```
 
-## Exercise: Resolution and k.param are key parameters, what effect does varying them have on the clustering?
+## Exercise: Resolution and k.param are key parameters, what effect does varying them have on the clustering? Try a few resolution settings between 0.05 and 1 and k.param settings between 5 to 100. 
 
-```{r echo = FALSE}
+```{r echo = FALSE, eval = FALSE}
 
 ns <- c(5, 30, 100)
-plts <- list()
-for (n in ns){
-  so <- FindNeighbors(so, 
-              reduction = "pca",
-              dims = 1:15,
-              k.param = n)
-  so <- FindClusters(so, resolution = 0.5)
-  p <- UMAPPlot(so)
-  plts[[n]] <- p
-}
 
-plts 
+lapply(ns,
+       function(n) {
+         so <- FindNeighbors(so,
+                             reduction = "pca",
+                             dims = 1:15,
+                             k.param = n)
+         so <- FindClusters(so, resolution = 0.5)
+         DimPlot(so, reduction = "umap")
+       }) %>% 
+  plot_grid(plotlist = ., nrow = 3)
 
 
+```
+
+```{r echo = FALSE}
 so <- FindNeighbors(so,
                     reduction = "pca",
                     dims = 1:15,
                     k.param = 30)
-  
-res <- seq(0.1, 0.5, 0.1)
-plts <- list()
-for (n in res){
-  so <- FindClusters(so, resolution = n)
-  p <- UMAPPlot(so)
-  plts[[paste0("res", n)]] <- p
-}
 
-plts 
+res <- c(0.1, 0.3, 0.5, 1.0)
 
+lapply(res,
+       function(n) {
+         so <- FindClusters(so, resolution = n)
+         DimPlot(so, reduction = "umap")
+})
+
+# to compute multiple settings as once
+so <- FindClusters(so, resolution = res)
 ```
+
 
 
 ## How many clusters?
 
-Clustering algorithms produce clusters, even if there isn't anything meaningfully different between cells. Determining hte optimal number of clusters can be tricky and also dependent on the biological question. 
+Clustering algorithms produce clusters, even if there isn't anything meaningfully different between cells. Determining the optimal number of clusters can be tricky and also dependent on the biological question. 
 
 Some guidelines:
-1) Cluster the data into a low number of clusters to identify cell types, then recluster to generate additional clusters to define sub-populations of cell types. 
+1) Cluster the data into a small number of clusters to identify cell types, then recluster to generate additional clusters to define sub-populations of cell types. 
 
-2) To determine if the data is overclustered examine differentially expressed genes between clusters. If the clusters have few or no differentially expressed genes then the data is overclustered. Similar clusters can also be merged post-hoc if necessary as sometimes it is difficult to use 1 clustering setting for many diverse cell populations.
+2) To determine if the data is overclustered examine differentially expressed genes between clusters. If the clusters have few or no differentially expressed genes then the data is overclustered. Similar clusters can be merged post-hoc if necessary as sometimes it is difficult to use 1 clustering approach for many diverse cell populations.
 
 ## Assessing relationships between clusters
 
 Hierarchical clustering can be used to visualize the relationships between clusters. The average expression of each cluster is computed then the distances between the clusters are used for hierarchical clustering.
 
 ```{r}
+
+Idents(so) <- "RNA_snn_res.0.5"
 so <- BuildClusterTree(so)
 
 PlotClusterTree(so)
@@ -624,7 +646,7 @@ PlotClusterTree(so)
 The [`clustree`](https://lazappi.github.io/clustree/index.html) package provides a nice plotting utility to visualize the relationship of cells at different resolution settings. 
 
 
-```{r, fig.width=98 fig.height=8}
+```{r clustree, fig.height = 6}
 library(clustree)
 
 clustree(so)
@@ -634,21 +656,21 @@ clustree(so)
 
 ## Rename to clusters
 
-Finally let's define the "cluster" as those generated with a resolution of 0.5 with 20 neighbors
+Finally let's define a meta data column as `clusters` as those generated with a resolution of 0.5 with 30 neighbors.
+
 ```{r}
 so$clusters <- so$RNA_snn_res.0.5
 
 ```
+
 ## Save object and metadata
 
 It's always a good idea to store the cell metadata, particularly the clustering and projections, as these may change with reruns of the same data, for example if a package is updated or if the `seed.use` argument changes. 
 
-```{r save}
+```{r save, eval = FALSE}
 dir.create("data", showWarnings = FALSE)
 
 saveRDS(so, "data/clustered_sobj.rds")
-
-
 
 to_keep <- c(colnames(so@meta.data), "UMAP_1", "UMAP_2")
 
