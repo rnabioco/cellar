@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>Introduction to scRNAseq Analysis</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<link rel="stylesheet" href="/home/rmsheridan/R/x86_64-pc-linux-gnu-library/3.6/rmarkdown/rmarkdown/templates/html_vignette/resources/vignette.css" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to scRNAseq Analysis</h1>
+<h4 class="date">August 12<sup>th</sup>, 2019</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#intro-to-rbi">intro to RBI</a></li>
+<li><a href="#outline-of-the-workshop">outline of the workshop</a></li>
+<li><a href="#limitations-of-scrnaseq">limitations of scRNAseq</a></li>
+<li><a href="#experimental-design-informatics-corrections">experimental design &gt;&gt; informatics corrections</a></li>
+<li><a href="#single-cell-rna-sequencing-overview">single cell RNA sequencing overview</a><ul>
+<li><a href="#sequencing-methods">1. sequencing methods</a></li>
+<li><a href="#alignment-pipelines">2. alignment pipelines</a></li>
+<li><a href="#key-things-to-check-for-in-the-initial-output-html-report">3. key things to check for in the initial output html report</a></li>
+<li><a href="#downstream-processing-in-r-or-python">4. downstream processing in R or python</a></li>
+</ul></li>
+<li><a href="#reading-and-making-umi-barcode-elbow-plots">reading and making UMI-barcode elbow plots</a></li>
+<li><a href="#briefly-tidyversedplyr-verbs">briefly, tidyverse/dplyr verbs</a></li>
+<li><a href="#reading-material">reading material</a></li>
+</ul>
+</div>
+
+<div id="intro-to-rbi" class="section level2">
+<h2>intro to RBI</h2>
+<p><strong><a href="mailto:rbi.fellows@ucdenver.edu" class="email">rbi.fellows@ucdenver.edu</a></strong>,</p>
+<p>RC1 South room9101</p>
+<p><a href="https://rnabioco.github.io/rbi-project-summary/office-hours.html">office hours on Thursday afternoons</a></p>
+</div>
+<div id="outline-of-the-workshop" class="section level2">
+<h2>outline of the workshop</h2>
+<ul>
+<li>Prereq: check all required packages are installed</li>
+<li>Day 1 (pm):
+<ul>
+<li>Say Hi</li>
+<li>Intro to scRNAseq</li>
+<li>Data preprocessing</li>
+<li>Import into R</li>
+<li>Quality control</li>
+</ul></li>
+<li>Day 2 (am):
+<ul>
+<li>Projections</li>
+<li>Clustering</li>
+<li>Finding markers</li>
+<li>Annotating cell types</li>
+</ul></li>
+<li>Day 2 (pm):
+<ul>
+<li>Pseudotime analysis</li>
+<li>Dataset alignment</li>
+</ul></li>
+<li>Day 3 (am):
+<ul>
+<li>Multimodal data (CITE-seq, hashing)</li>
+<li>Miscellaneous</li>
+</ul></li>
+<li>Day 3 (pm) : working through your own data</li>
+<li>Survey after the workshop for feedback</li>
+</ul>
+</div>
+<div id="limitations-of-scrnaseq" class="section level2">
+<h2>limitations of scRNAseq</h2>
+<div class="figure">
+<img src="1_intro_files2/cd4vs8.png" alt="from seurat pbmc example" width="600" />
+<p class="caption">from seurat pbmc example</p>
+</div>
+<ol style="list-style-type: decimal">
+<li><p>dropout effect, only a small portion of the mRNAs from each cell is captured (see: GFP and other supposed markers)</p></li>
+<li><p>low number of detectable genes, might not detect low expressing genes at all (see: TFs)</p></li>
+<li><p>little info outside of gene counts (see: no tail-seq, isoform info)</p></li>
+<li><p>discrepancies between RNA and protein, especially surface proteins (see: CD4+ vs CD8+)</p></li>
+<li><p>constantly evolving chemistry and bioinformatics tools (see: 10x v2/v3/v3.1, <a href="https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/algorithms/overview#cell_calling">bad cell calling in cellrangerV2</a>)</p></li>
+</ol>
+</div>
+<div id="experimental-design-informatics-corrections" class="section level2">
+<h2>experimental design &gt;&gt; informatics corrections</h2>
+<div class="figure">
+<img src="1_intro_files2/10xV3_model.png" alt="cell isolation process for 10x" width="400" />
+<p class="caption">cell isolation process for 10x</p>
+</div>
+<ol style="list-style-type: decimal">
+<li><p>too few or too many cells - 1000 cell lower limit for capture, and waste of money</p></li>
+<li><p>doublets - 10000 cells ~ 10% doublet rate<br />
+        (try: <a href="https://github.com/AllonKleinLab/scrublet">scrublet</a>)</p></li>
+<li><p>cell death - worse RNA capture, potentially different expression profile<br />
+        (try: MT-RNA cutoff, regress out MT-RNA score)</p></li>
+<li><p>lysed/free RNA - background for all cells, interferes with clustering and markers<br />
+        (try: <a href="https://github.com/constantAmateur/SoupX">SoupX</a>)</p></li>
+</ol>
+<div class="figure">
+<img src="1_intro_files2/contaminant.png" alt="example data with lysed red blood cells" width="600" />
+<p class="caption">example data with lysed red blood cells</p>
+</div>
+<ol start="5" style="list-style-type: decimal">
+<li><p>different sex of mice in samples - makes sample comparisons harder<br />
+        (try: ignore known sex-dependent genes)</p></li>
+<li><p>batch effects - still preferable to have all, or at least the direct comparison samples, captured at the same time<br />
+        (try: various alignment methods)</p></li>
+<li><p>n = ? - no consensus in the field, but aggregating 2 or more biological repeats, or hash multiple samples at the same time, should be valid</p></li>
+</ol>
+</div>
+<div id="single-cell-rna-sequencing-overview" class="section level2">
+<h2>single cell RNA sequencing overview</h2>
+<p>cell suspension -&gt; cDNA library -&gt; fastq file -&gt; gene expression matrix -&gt;</p>
+<p>    filtering -&gt; preprocessing -&gt; dimension reduction -&gt; clustering -&gt; identity and markers -&gt; pseudotime</p>
+<div id="sequencing-methods" class="section level3">
+<h3>1. sequencing methods</h3>
+<p>main platforms: 10x vs Smart-seq2 vs sci-RNA-seq3</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="18%" />
+<col width="13%" />
+<col width="16%" />
+<col width="14%" />
+<col width="24%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>method</th>
+<th>cell isolation</th>
+<th>coverage</th>
+<th>saturation read #</th>
+<th>gene detection</th>
+<th>throughput and cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10x Chromium</td>
+<td>droplet-based</td>
+<td>polyA+ 3’ only</td>
+<td>10^5 per cell</td>
+<td>~2000 per cell</td>
+<td>~5k cells, low cost</td>
+</tr>
+<tr class="even">
+<td>Smart-seq2</td>
+<td>FACS-sorted</td>
+<td>full length</td>
+<td>10^6 per cell</td>
+<td>~4000 per cell</td>
+<td>manual pipetting, high cost</td>
+</tr>
+<tr class="odd">
+<td>sci-RNA-seq3</td>
+<td>combinatorial index</td>
+<td>polyA+ 3’ only</td>
+<td>10^5 per cell</td>
+<td>~1000 per cell</td>
+<td>~1m cells, lowest cost per</td>
+</tr>
+</tbody>
+</table>
+<p>variations within 10x system: standard 3’, 5’ + V(D)J, antibody hashing, CITE-seq, variant-calling (very different sample preps, may require up to 4 library preps per sample)</p>
+</div>
+<div id="alignment-pipelines" class="section level3">
+<h3>2. alignment pipelines</h3>
+<p><a href="https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation">cellranger</a> performs alignment, filtering, UMI counting, clustering, and gene expression analysis. (alternatives such as <a href="https://salmon.readthedocs.io/en/latest/alevin.html">Alevin</a>, <a href="https://github.com/alexdobin/STAR/releases">STARsolo</a>, <a href="https://www.kallistobus.tools/">Kallisto</a>)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># in terminal</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="ex">cellranger</span> count --id=123 <span class="dt">\ </span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">                 <span class="ex">--transcriptome</span>=/refdata-cellranger-GRCh38-3.0.0 <span class="dt">\ </span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">                 <span class="co"># build new transcriptome if you have GFP/RFP/transgene</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">                 <span class="ex">--fastqs</span>=/home/runs/HAT7ADXX/outs/fastq_path <span class="dt">\ </span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">                 <span class="co"># a list of fastqs, a folder, or pass table via csv file</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">                 <span class="ex">--sample</span>=mysample </a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">                 <span class="co"># will need additional arguments for feature barcoding</span></a></code></pre></div>
+<p>output folder structure</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">KO_<span class="dv">1</span>_CDNA</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="op">|--</span><span class="st"> </span>KO_<span class="dv">1</span>_CDNA.mri.tgz</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="op">|--</span><span class="st"> </span>SC_RNA_COUNTER_CS</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="op">|</span><span class="st">   </span><span class="er">|</span><span class="op">--</span><span class="st"> </span>CLOUPE_PREPROCESS</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="op">|</span><span class="st">   </span><span class="er">|</span><span class="op">--</span><span class="st"> </span>EXPAND_SAMPLE_DEF</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="op">|</span><span class="st">   </span><span class="er">|</span><span class="op">--</span><span class="st"> </span>SC_RNA_COUNTER</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="op">|</span><span class="st">   `</span><span class="dt">-- fork0</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="dt">|-- _cmdline</span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="dt">|-- _filelist</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="dt">|-- _finalstate</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="dt">|-- _invocation</span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="dt">|-- _jobmode</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="dt">|-- _log</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="dt">|-- _mrosource</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="dt">|-- _perf</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="dt">|-- _sitecheck</span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="dt">|-- _tags</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="dt">|-- _timestamp</span></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="dt">|-- _uuid</span></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="dt">|-- _vdrkill</span></a>
+<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="dt">|-- _versions</span></a>
+<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="st">`</span><span class="op">--</span><span class="st"> </span>outs</a>
+<a class="sourceLine" id="cb2-23" data-line-number="23">    <span class="op">|--</span><span class="st"> </span>analysis</a>
+<a class="sourceLine" id="cb2-24" data-line-number="24">    <span class="op">|--</span><span class="st"> </span>cloupe.cloupe <span class="co"># cloupe file for browser view</span></a>
+<a class="sourceLine" id="cb2-25" data-line-number="25">    <span class="op">|--</span><span class="st"> </span>filtered_feature_bc_matrix <span class="co"># use this fold for seurat</span></a>
+<a class="sourceLine" id="cb2-26" data-line-number="26">    <span class="op">|--</span><span class="st"> </span>filtered_feature_bc_matrix.h5</a>
+<a class="sourceLine" id="cb2-27" data-line-number="27">    <span class="op">|--</span><span class="st"> </span>metrics_summary.csv</a>
+<a class="sourceLine" id="cb2-28" data-line-number="28">    <span class="op">|--</span><span class="st"> </span>molecule_info.h5</a>
+<a class="sourceLine" id="cb2-29" data-line-number="29">    <span class="op">|--</span><span class="st"> </span>possorted_genome_bam.bam</a>
+<a class="sourceLine" id="cb2-30" data-line-number="30">    <span class="op">|--</span><span class="st"> </span>possorted_genome_bam.bam.bai</a>
+<a class="sourceLine" id="cb2-31" data-line-number="31">    <span class="op">|--</span><span class="st"> </span>raw_feature_bc_matrix <span class="co"># or this for seurat</span></a>
+<a class="sourceLine" id="cb2-32" data-line-number="32">    <span class="op">|--</span><span class="st"> </span>raw_feature_bc_matrix.h5</a>
+<a class="sourceLine" id="cb2-33" data-line-number="33">    <span class="st">`</span><span class="dt">-- web_summary.html # qc summary</span></a></code></pre></div>
+<p>~ 5-8 hours per sample on biochem department cluster “Bodhi”</p>
+<p>theoretically can be ran locally on linux, but will require at least 32GB of RAM</p>
+<p>other campus options include Rosalind, AWS</p>
+<p>cellranger output <a href="http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_web_summary.html">html</a> and <a href="http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_cloupe.cloupe">loupe</a> files</p>
+</div>
+<div id="key-things-to-check-for-in-the-initial-output-html-report" class="section level3">
+<h3>3. key things to check for in the initial output html report</h3>
+<ol style="list-style-type: decimal">
+<li>number of cells close to expectations? reasonable elbow plot?</li>
+<li>reads per cell (this is merely calculated as reads/cells, so somewhat inaccurate) - ideally ~50-100k</li>
+<li>genes per cell, ideally ~2000</li>
+<li>sequencing saturation?</li>
+<li>any structure in the dimension reduction tSNE?</li>
+</ol>
+</div>
+<div id="downstream-processing-in-r-or-python" class="section level3">
+<h3>4. downstream processing in R or python</h3>
+<ol style="list-style-type: decimal">
+<li>more accurate cell calling</li>
+<li>more stringent filtering</li>
+<li>regress out unwanted sources of variance</li>
+<li>appropriate choice of normalization method</li>
+<li>UMAP instead of tSNE projections, and fine-tuning</li>
+<li>fine-tuning of dataset alignment methods and parameters (by default cellranger does align during aggregation)</li>
+<li>find marker genes and assign cluster identities (may merge some)</li>
+<li>more flexible visualizations</li>
+<li>GO term analysis and other things</li>
+<li>export to a hosted browser, similar to cloupe</li>
+</ol>
+</div>
+</div>
+<div id="reading-and-making-umi-barcode-elbow-plots" class="section level2">
+<h2>reading and making UMI-barcode elbow plots</h2>
+<div class="figure">
+<img src="1_intro_files2/10xV3_seq.png" alt="model of final 10x library" width="600" />
+<p class="caption">model of final 10x library</p>
+</div>
+<p>The total UMI (unique molecular identifier - represent each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but will also be useful in other situations like hashing and CITE-seq.</p>
+<div class="figure">
+<img src="1_intro_files2/elbowcomp.png" alt="example of good and bad data" width="400" />
+<p class="caption">example of good and bad data</p>
+</div>
+<p>for a standard 10x scRNAseq run:</p>
+<p>        expected range of x axis (barcode) : ~ 10^5 (if using ggplot to visualize, might want to filter)</p>
+<p>        expected inflection point of x axis (cell number): ~ # of loaded cells / 2</p>
+<p>        expected range of y axis (UMI_counts) : ~ 10^4</p>
+<p>        expected inflection point of y axis (cutoff UMI count): ~ 1000</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co"># use &quot;raw&quot; instead of &quot;filtered&quot; cellranger output folder</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">data_url =<span class="st"> &quot;https://scrnaseq-workshop.s3-us-west-2.amazonaws.com&quot;</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">m1 &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="kw">url</span>(<span class="kw">file.path</span>(data_url, <span class="st">&quot;raw_matrix.rds&quot;</span>)))</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co"># all genes x all barcodes</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">counts &lt;-<span class="st"> </span>Matrix<span class="op">::</span><span class="kw">colSums</span>(m1) <span class="co"># calculate total UMI read number for each cell barcode</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">countdf &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(counts) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="st">  </span><span class="kw">as_tibble</span>(<span class="dt">rownames =</span> <span class="st">&quot;barcode&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="st">  </span><span class="kw">filter</span>(counts <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># throw out cell barcodes with 1 or less UMI, this is mainly for time purposes</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(counts)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># arrange by descending order</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">rank =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>()) <span class="co"># rank</span></a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="kw">head</span>(countdf) <span class="co"># barcodes now ranked by UMI counts</span></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; # A tibble: 6 x 3</span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt;   barcode          counts  rank</span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt;   &lt;chr&gt;             &lt;dbl&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; 1 GCAGCCACATACCGTA  40745     1</span></a>
+<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co">#&gt; 2 ATGGAGGGTGGTAACG  20916     2</span></a>
+<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="co">#&gt; 3 GTAACCATCGCTTGAA  19958     3</span></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="co">#&gt; 4 TTCATGTGTCGTGTTA  19765     4</span></a>
+<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="co">#&gt; 5 GAATAGACATCCTGTC  18494     5</span></a>
+<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="co">#&gt; 6 GTCTCACGTTGGCCGT  17828     6</span></a>
+<a class="sourceLine" id="cb3-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="kw">ggplot</span>(countdf, <span class="kw">aes</span>(<span class="dt">x =</span> rank, <span class="dt">y =</span> counts)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;barcodes&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;UMI_counts&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28"><span class="st">  </span><span class="kw">theme_classic</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-29" data-line-number="29"><span class="st">  </span><span class="kw">scale_x_log10</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-30" data-line-number="30"><span class="st">  </span><span class="kw">scale_y_log10</span>()</a></code></pre></div>
+<p><img src="1_intro_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /></p>
+</div>
+<div id="briefly-tidyversedplyr-verbs" class="section level2">
+<h2>briefly, tidyverse/dplyr verbs</h2>
+<p>The tidyverse is a collection of R packages designed for data science. All packages share design philosophy, grammar, and data structures.</p>
+<p>Seurat also uses some of the grammar, such as <code>group.by</code>.</p>
+<p>A large amount of code introduced in this workshop in based on matrix and dataframe manipulation. Therefore some basic understanding of tidyverse/dplyr will be helpful.</p>
+<p>Also, “%&gt;%” is used as “pipe”, similar to unix <code>|</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># we will look at metadata from pbmc_small from Seurat</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">library</span>(Seurat)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># note that tidyverse is philosophically against rownames</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6">meta &lt;-<span class="st"> </span>pbmc_small<span class="op">@</span>meta.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(<span class="dt">rownames =</span> <span class="st">&quot;cell_id&quot;</span>)</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7">meta <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">print</span>() <span class="co"># &lt;- same as print(head(meta))</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; # A tibble: 6 x 8</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt;   cell_id orig.ident nCount_RNA nFeature_RNA RNA_snn_res.0.8 letter.idents</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;   &lt;fct&gt;           &lt;dbl&gt;        &lt;int&gt; &lt;fct&gt;           &lt;fct&gt;        </span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; 1 ATGCCA… SeuratPro…         70           47 0               A            </span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; 2 CATGGC… SeuratPro…         85           52 0               A            </span></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; 3 GAACCT… SeuratPro…         87           50 1               B            </span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; 4 TGACTG… SeuratPro…        127           56 0               A            </span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; 5 AGTCAG… SeuratPro…        173           53 0               A            </span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; 6 TCTGAT… SeuratPro…         70           48 0               A            </span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; # … with 2 more variables: groups &lt;chr&gt;, RNA_snn_res.1 &lt;fct&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># &quot;select&quot; certain columns of data</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">meta2 &lt;-<span class="st"> </span>meta <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(cell_id, </a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">                         nCount_RNA, </a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">                         RNA_snn_res.<span class="fl">0.8</span>, </a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">                         letter.idents)</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">meta2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">print</span>()</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; # A tibble: 6 x 4</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt;   cell_id        nCount_RNA RNA_snn_res.0.8 letter.idents</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;        </span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 1 ATGCCAGAACGACT         70 0               A            </span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 2 CATGGCCTGTGCAT         85 0               A            </span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; 3 GAACCTGATGAACC         87 1               B            </span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; 4 TGACTGGATTCTCA        127 0               A            </span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; 5 AGTCAGACTGCACA        173 0               A            </span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; 6 TCTGATACACGTGT         70 0               A</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># &quot;filter&quot; data to select specific rows</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">meta2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(nCount_RNA <span class="op">&gt;=</span><span class="st"> </span><span class="dv">71</span>, </a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">                 letter.idents <span class="op">==</span><span class="st"> &quot;A&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="st">  </span><span class="kw">head</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="st">  </span><span class="kw">print</span>()</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; # A tibble: 6 x 4</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt;   cell_id        nCount_RNA RNA_snn_res.0.8 letter.idents</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;        </span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; 1 CATGGCCTGTGCAT         85 0               A            </span></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; 2 TGACTGGATTCTCA        127 0               A            </span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; 3 AGTCAGACTGCACA        173 0               A            </span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt; 4 GCAGCTCTGTTTCT         72 0               A            </span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt; 5 AATGTTGACAGTCA        100 0               A            </span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt; 6 AGAGATGATCTCGC        191 0               A</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># &quot;arrange&quot; the rows of your data into an order</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">meta2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(nCount_RNA) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">  </span><span class="kw">print</span>()</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; # A tibble: 6 x 4</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt;   cell_id        nCount_RNA RNA_snn_res.0.8 letter.idents</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;        </span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 1 CTTCATGACCGAAT         41 0               A            </span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; 2 CATGAGACACGGGA         51 0               A            </span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; 3 GATATAACACGCAT         52 0               A            </span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; 4 AGGTCATGAGTGTC         62 0               A            </span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; 5 TGGTATCTAAACAG         64 0               A            </span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; 6 GTAAGCACTCATTC         67 0               A</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># &quot;mutate&quot; your data frame to contain new columns</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">meta3 &lt;-<span class="st"> </span>meta2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">seurat_clusters =</span> <span class="kw">str_c</span>(<span class="st">&quot;cluster_&quot;</span>, letter.idents), </a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">                          <span class="dt">nCount_RNA_norm =</span> nCount_RNA<span class="op">/</span><span class="kw">max</span>(nCount_RNA))</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">meta3 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">print</span>()</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; # A tibble: 6 x 6</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt;   cell_id nCount_RNA RNA_snn_res.0.8 letter.idents seurat_clusters</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt;         &lt;chr&gt;          </span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#&gt; 1 ATGCCA…         70 0               A             cluster_A      </span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; 2 CATGGC…         85 0               A             cluster_A      </span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt; 3 GAACCT…         87 1               B             cluster_B      </span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt; 4 TGACTG…        127 0               A             cluster_A      </span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; 5 AGTCAG…        173 0               A             cluster_A      </span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; 6 TCTGAT…         70 0               A             cluster_A      </span></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt; # … with 1 more variable: nCount_RNA_norm &lt;dbl&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># &quot;summarise&quot; chunks of you data (by group) in some way.</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">meta3 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(seurat_clusters) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">n =</span> <span class="kw">n</span>())</a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt;   seurat_clusters     n</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;           &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; 1 cluster_A          53</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; 2 cluster_B          27</span></a></code></pre></div>
+</div>
+<div id="reading-material" class="section level2">
+<h2>reading material</h2>
+<ol style="list-style-type: decimal">
+<li><a href="https://www.nature.com/articles/s12276-018-0071-8">Single-cell RNA sequencing technologies and bioinformatics pipelines</a></li>
+<li><a href="https://www.embopress.org/doi/10.15252/msb.20188746">Current best practices in single‐cell RNA‐seq analysis: a tutorial</a></li>
+<li><a href="https://scrnaseq-course.cog.sanger.ac.uk/website/index.html">“Analysis of single cell RNA-seq data” course</a></li>
+<li><a href="https://dplyr.tidyverse.org/articles/dplyr.html">Introduction to dplyr</a></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

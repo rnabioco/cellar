@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Ryan Sheridan" />
+
+
+<title>Data Filtering and Quality Control</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="2_filtering_QC.html">Quality Control</a>
+</li>
+<li>
+  <a href="7_multimodal.html">Multi-modal data</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore"><b style="font-size:45px;">Data Filtering and Quality Control</b></h1>
+<h4 class="author">Ryan Sheridan</h4>
+<h4 class="date">August 13<sup>th</sup>, 2019</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#creating-a-seurat-object"><strong>Creating a Seurat object</strong></a></li>
+<li><a href="#interacting-with-the-seurat-object"><strong>Interacting with the Seurat object</strong></a></li>
+<li><a href="#assessing-quality"><strong>Assessing quality</strong></a></li>
+<li><a href="#filtering-cells"><strong>Filtering cells</strong></a></li>
+</ul>
+</div>
+
+<p><br></p>
+<p><br></p>
+<div id="creating-a-seurat-object" class="section level1">
+<h1><strong>Creating a Seurat object</strong></h1>
+<p>Single-cell RNA-seq counts are usually stored as a sparse matrix due to the high percentage of zeros. In a sparse matrix zeros are removed and only non-zero values are stored, which saves memory and speeds up operations.</p>
+<p>The <code>Read10X</code> function can be used with the output directory generated by Cell Ranger to load the counts data as a sparse matrix. However, our data is saved as a comma-separated table, which can be loaded as a data.frame and then converted to a sparse matrix.</p>
+<pre class="r"><code># Import matrix of counts
+data_url &lt;- &quot;https://scrnaseq-workshop.s3-us-west-2.amazonaws.com&quot;
+
+pbmc_mtx &lt;- file.path(data_url, &quot;PBMC_cDNA.csv.gz&quot;) %&gt;%
+  read_csv() %&gt;%
+  column_to_rownames(&quot;X1&quot;) %&gt;%
+  as.sparse()
+
+pbmc_mtx[1:10, 1:10]</code></pre>
+<pre><code>#&gt; 10 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .
+#&gt; PLEKHN1       . . . . . . . . . .
+#&gt; HES4          . . . . . 2 . . . .
+#&gt; ISG15         . . . . . 4 . 1 . 2
+#&gt; AGRN          . . . . . . . . . .
+#&gt; C1orf159      . . . . . . . . . .</code></pre>
+<pre class="r"><code># Calculate fraction of zeros
+n_zeros &lt;- pbmc_mtx[pbmc_mtx == 0] %&gt;%
+  length()
+
+n_zeros / length(pbmc_mtx)</code></pre>
+<pre><code>#&gt; [1] 0.9328582</code></pre>
+<p>Analysis using <code>Seurat</code> is centered around the <code>Seurat</code> object, which serves as a container to store the input data and any results that are generated. A <code>Seurat</code> object can be created from our sparse matrix using the <code>CreateSeuratObject</code> function.</p>
+<p>When processing multiple scRNA-seq samples with <code>cellranger aggr</code>, the cell barcodes will be labeled with a sample number. This sample number can be easily extracted and saved using the <code>names.field</code> and <code>names.delim</code> options.</p>
+<p>The <code>CreateSeuratObject</code> function also allows us to perform some initial QC filtering. The <code>min.cells</code> option filters features (genes) to only include those that are present in a minimum number of cells.</p>
+<pre class="r"><code># Create Seurat object using gene expression data
+sobj &lt;- pbmc_mtx %&gt;%
+  CreateSeuratObject(
+    min.cells   = 5,  # Remove genes that are detected in &lt;5 cells
+    names.delim = &quot;-&quot;,
+    names.field = 2
+  )</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+<div id="interacting-with-the-seurat-object" class="section level1">
+<h1><strong>Interacting with the Seurat object</strong></h1>
+<div id="handling-multiple-assays" class="section level2">
+<h2>Handling multiple assays</h2>
+<p>The <code>Seurat</code> object is organized into a heirarchy of data structures with the outermost layer including a number of “slots”, which can be accessed using the <code>@</code> operator.</p>
+<p>With <code>Seurat</code> v3.0, the <code>Seurat</code> object has been modified to allow users to easily store multiple scRNA-seq assays (CITE-seq, cell hashing, etc.) in the same object. The data from each assay is stored as a list in the <code>assays</code> slot. To switch between different assays users can change the value stored in the <code>active.assay</code> slot. We can also view the current default assay using the <code>DefaultAssay</code> function. Many <code>Seurat</code> functions also include an <code>assay</code> argument that lets users specify the desired assay.</p>
+<div id="seurat-object-structure" class="section level3">
+<h3><code>Seurat</code> object structure</h3>
+<ul>
+<li>assays
+<ul>
+<li>RNA
+<ul>
+<li>counts</li>
+<li>data</li>
+<li>var.features</li>
+</ul></li>
+<li>ADT
+<ul>
+<li>counts</li>
+<li>data</li>
+<li>var.features</li>
+</ul></li>
+</ul></li>
+<li>active.assay</li>
+<li>active.idents</li>
+<li>meta.data</li>
+</ul>
+<pre class="r"><code># Assays are stored as a list in the &quot;assays&quot; slot
+sobj@assays</code></pre>
+<pre><code>#&gt; $RNA
+#&gt; Assay data with 12572 features for 2700 cells
+#&gt; First 10 features:
+#&gt;  AL627309.1, RP11-206L10.2, LINC00115, NOC2L, KLHL17, PLEKHN1,
+#&gt; HES4, ISG15, AGRN, C1orf159</code></pre>
+<pre class="r"><code># The Seurat object stores the current default assay
+sobj@active.assay</code></pre>
+<pre><code>#&gt; [1] &quot;RNA&quot;</code></pre>
+<pre class="r"><code>DefaultAssay(sobj)</code></pre>
+<pre><code>#&gt; [1] &quot;RNA&quot;</code></pre>
+<p><br></p>
+</div>
+</div>
+<div id="retrieving-raw-and-normalized-counts" class="section level2">
+<h2>Retrieving raw and normalized counts</h2>
+<p>The data from each assay is stored as separate <code>Assay</code> objects that are also divided into slots that store the raw and normalized counts along with other downstream results. We can use the <code>GetAssayData</code> function to retrieve the raw and normalized counts matrices.</p>
+<pre class="r"><code># Raw counts
+sobj@assays$RNA@counts[1:5, 1:10]</code></pre>
+<pre><code>#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+<pre class="r"><code>sobj %&gt;%
+  GetAssayData(slot = &quot;counts&quot;) %&gt;%
+  .[1:5, 1:10]</code></pre>
+<pre><code>#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+<pre class="r"><code># Normalized counts
+# This matrix is the same as counts since we haven&#39;t normalized the data yet
+sobj@assays$RNA@data[1:5, 1:10]</code></pre>
+<pre><code>#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+<pre class="r"><code>sobj %&gt;%
+  GetAssayData(slot = &quot;data&quot;) %&gt;%
+  .[1:5, 1:10]</code></pre>
+<pre><code>#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+<p><br></p>
+</div>
+<div id="retrieving-cell-and-features-names" class="section level2">
+<h2>Retrieving cell and features names</h2>
+<p>Cell barcodes and gene names can be retrieved from the <code>Seurat</code> object using the <code>colnames</code> and <code>rownames</code> functions, respectively. We can run these functions directly on the <code>Seurat</code> object to automatically retrieve information for the default assay.</p>
+<pre class="r"><code># Get cell names
+sobj@assays$RNA@counts %&gt;%
+  colnames() %&gt;%
+  head(20)</code></pre>
+<pre><code>#&gt;  [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+#&gt;  [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot; &quot;AAATCATGACCACA-1&quot;
+#&gt;  [7] &quot;AACATTGATGGGAG-1&quot; &quot;AACCGATGCTCCCA-1&quot; &quot;AACCGCCTCTACGA-1&quot;
+#&gt; [10] &quot;AACCTTACGCGAGA-1&quot; &quot;AACTCACTCAAGCT-1&quot; &quot;AACTCGGAAAGTGA-1&quot;
+#&gt; [13] &quot;AAGATGGAGATAAG-1&quot; &quot;AAGCCATGTCTCGC-1&quot; &quot;AAGCGTACGTCTTT-1&quot;
+#&gt; [16] &quot;AAGGTCTGACAGTC-1&quot; &quot;AAGTCTCTCGGAGA-1&quot; &quot;AATAGGGAGAATGA-1&quot;
+#&gt; [19] &quot;AATGGAGAATCGTG-1&quot; &quot;AATGGCTGTAAAGG-1&quot;</code></pre>
+<pre class="r"><code>sobj %&gt;%
+  Cells() %&gt;%
+  head(20)</code></pre>
+<pre><code>#&gt;  [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+#&gt;  [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot; &quot;AAATCATGACCACA-1&quot;
+#&gt;  [7] &quot;AACATTGATGGGAG-1&quot; &quot;AACCGATGCTCCCA-1&quot; &quot;AACCGCCTCTACGA-1&quot;
+#&gt; [10] &quot;AACCTTACGCGAGA-1&quot; &quot;AACTCACTCAAGCT-1&quot; &quot;AACTCGGAAAGTGA-1&quot;
+#&gt; [13] &quot;AAGATGGAGATAAG-1&quot; &quot;AAGCCATGTCTCGC-1&quot; &quot;AAGCGTACGTCTTT-1&quot;
+#&gt; [16] &quot;AAGGTCTGACAGTC-1&quot; &quot;AAGTCTCTCGGAGA-1&quot; &quot;AATAGGGAGAATGA-1&quot;
+#&gt; [19] &quot;AATGGAGAATCGTG-1&quot; &quot;AATGGCTGTAAAGG-1&quot;</code></pre>
+<pre class="r"><code>sobj %&gt;%
+  colnames() %&gt;%
+  head(20)</code></pre>
+<pre><code>#&gt;  [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+#&gt;  [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot; &quot;AAATCATGACCACA-1&quot;
+#&gt;  [7] &quot;AACATTGATGGGAG-1&quot; &quot;AACCGATGCTCCCA-1&quot; &quot;AACCGCCTCTACGA-1&quot;
+#&gt; [10] &quot;AACCTTACGCGAGA-1&quot; &quot;AACTCACTCAAGCT-1&quot; &quot;AACTCGGAAAGTGA-1&quot;
+#&gt; [13] &quot;AAGATGGAGATAAG-1&quot; &quot;AAGCCATGTCTCGC-1&quot; &quot;AAGCGTACGTCTTT-1&quot;
+#&gt; [16] &quot;AAGGTCTGACAGTC-1&quot; &quot;AAGTCTCTCGGAGA-1&quot; &quot;AATAGGGAGAATGA-1&quot;
+#&gt; [19] &quot;AATGGAGAATCGTG-1&quot; &quot;AATGGCTGTAAAGG-1&quot;</code></pre>
+<pre class="r"><code># Get feature names
+sobj@assays$RNA@counts %&gt;%
+  rownames() %&gt;%
+  head(20)</code></pre>
+<pre><code>#&gt;  [1] &quot;AL627309.1&quot;    &quot;RP11-206L10.2&quot; &quot;LINC00115&quot;     &quot;NOC2L&quot;        
+#&gt;  [5] &quot;KLHL17&quot;        &quot;PLEKHN1&quot;       &quot;HES4&quot;          &quot;ISG15&quot;        
+#&gt;  [9] &quot;AGRN&quot;          &quot;C1orf159&quot;      &quot;TNFRSF18&quot;      &quot;TNFRSF4&quot;      
+#&gt; [13] &quot;SDF4&quot;          &quot;B3GALT6&quot;       &quot;UBE2J2&quot;        &quot;ACAP3&quot;        
+#&gt; [17] &quot;PUSL1&quot;         &quot;CPSF3L&quot;        &quot;GLTPD1&quot;        &quot;DVL1&quot;</code></pre>
+<pre class="r"><code>sobj %&gt;%
+  rownames() %&gt;%
+  head(20)</code></pre>
+<pre><code>#&gt;  [1] &quot;AL627309.1&quot;    &quot;RP11-206L10.2&quot; &quot;LINC00115&quot;     &quot;NOC2L&quot;        
+#&gt;  [5] &quot;KLHL17&quot;        &quot;PLEKHN1&quot;       &quot;HES4&quot;          &quot;ISG15&quot;        
+#&gt;  [9] &quot;AGRN&quot;          &quot;C1orf159&quot;      &quot;TNFRSF18&quot;      &quot;TNFRSF4&quot;      
+#&gt; [13] &quot;SDF4&quot;          &quot;B3GALT6&quot;       &quot;UBE2J2&quot;        &quot;ACAP3&quot;        
+#&gt; [17] &quot;PUSL1&quot;         &quot;CPSF3L&quot;        &quot;GLTPD1&quot;        &quot;DVL1&quot;</code></pre>
+<pre class="r"><code># Get cell (colums) and feature (rows) counts
+ncol(sobj)</code></pre>
+<pre><code>#&gt; [1] 2700</code></pre>
+<pre class="r"><code>nrow(sobj)</code></pre>
+<pre><code>#&gt; [1] 12572</code></pre>
+<p><br></p>
+</div>
+<div id="accessing-project-meta.data" class="section level2">
+<h2>Accessing project meta.data</h2>
+<p>The <code>Seurat</code> object includes a data.frame that contains cell meta data for all of the assays present in the <code>Seurat</code> object. This data.frame is stored in the <code>meta.data</code> slot and can be accessed using double brackets (<code>[[]]</code>) or the <code>FetchData</code> function. As we move through our analysis, information will be automatically added to the meta.data. We can also manually add or modify information stored in the meta.data, which is useful when creating custom plots.</p>
+<p>Initially the meta.data table will include the number of counts for each cell and the number of genes (or other features) detected for each cell. There is also an <code>orig.ident</code> column which contains the original cell labels (identities). Since we used the <code>names.field</code> argument when creating our <code>Seurat</code> object, this column will include the sample number.</p>
+<pre class="r"><code># The meta.data table contains stats for each cell
+sobj@meta.data %&gt;%
+  head()</code></pre>
+<pre><code>#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt; AAACATACAACCAC-1          1       2419          779
+#&gt; AAACATTGAGCTAC-1          1       4901         1350
+#&gt; AAACGCTGACCAGT-1          1       2174          781
+#&gt; AAACGCTGGTTCTT-1          1       2259          789
+#&gt; AAAGTTTGATCACG-1          1       1265          441
+#&gt; AAATCATGACCACA-1          1       4125         1365</code></pre>
+<pre class="r"><code>sobj[[&quot;nCount_RNA&quot;]] %&gt;%
+  head()</code></pre>
+<pre><code>#&gt;                  nCount_RNA
+#&gt; AAACATACAACCAC-1       2419
+#&gt; AAACATTGAGCTAC-1       4901
+#&gt; AAACGCTGACCAGT-1       2174
+#&gt; AAACGCTGGTTCTT-1       2259
+#&gt; AAAGTTTGATCACG-1       1265
+#&gt; AAATCATGACCACA-1       4125</code></pre>
+<pre class="r"><code>sobj %&gt;%
+  FetchData(vars = &quot;nCount_RNA&quot;) %&gt;%
+  head()</code></pre>
+<pre><code>#&gt;                  nCount_RNA
+#&gt; AAACATACAACCAC-1       2419
+#&gt; AAACATTGAGCTAC-1       4901
+#&gt; AAACGCTGACCAGT-1       2174
+#&gt; AAACGCTGGTTCTT-1       2259
+#&gt; AAAGTTTGATCACG-1       1265
+#&gt; AAATCATGACCACA-1       4125</code></pre>
+<pre class="r"><code># FetchData can also be used to retrieve other data from the Seurat object
+sobj %&gt;%
+  FetchData(
+    vars = &quot;CD8A&quot;, 
+    slot = &quot;counts&quot;
+  ) %&gt;%
+  head()</code></pre>
+<pre><code>#&gt;                  CD8A
+#&gt; AAACATACAACCAC-1    1
+#&gt; AAACATTGAGCTAC-1    0
+#&gt; AAACGCTGACCAGT-1    0
+#&gt; AAACGCTGGTTCTT-1    1
+#&gt; AAAGTTTGATCACG-1    0
+#&gt; AAATCATGACCACA-1    0</code></pre>
+<p><br></p>
+</div>
+<div id="setting-cell-identities" class="section level2">
+<h2>Setting cell identities</h2>
+<p>The cell identities are used by various functions when grouping and plotting cells. When first creating a <code>Seurat</code> object, the cell identities will be set to the same values present in the <code>orig.ident</code> column in the meta.data table. The current cell identities are stored in the <code>active.ident</code> slot and can be accessed using the <code>Idents</code> function. Cell identities can be renamed using the <code>RenameIdents</code> function. Changing the cell identites will not alter the names stored in the meta.data table or vice versa. To update the meta.data table, we can use the <code>AddMetaData</code> function.</p>
+<pre class="r"><code># By default the cell identity is set to the project name
+sobj@active.ident %&gt;%
+  head()</code></pre>
+<pre><code>#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;                1                1                1                1 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;                1                1 
+#&gt; Levels: 1 2</code></pre>
+<pre class="r"><code>sobj %&gt;%
+  Idents() %&gt;%
+  head()</code></pre>
+<pre><code>#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;                1                1                1                1 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;                1                1 
+#&gt; Levels: 1 2</code></pre>
+<pre class="r"><code># Rename cell identities
+sobj &lt;- sobj %&gt;%
+  RenameIdents(
+    &quot;1&quot; = &quot;control&quot;,
+    &quot;2&quot; = &quot;treated&quot;
+  )
+
+sobj %&gt;%
+  Idents() %&gt;%
+  head()</code></pre>
+<pre><code>#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;          control          control          control          control 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;          control          control 
+#&gt; Levels: control treated</code></pre>
+<pre class="r"><code># Add cell identities to the meta.data table
+sobj &lt;- sobj %&gt;%
+  AddMetaData(
+    metadata = Idents(sobj),
+    col.name = &quot;orig.ident&quot;
+  )
+
+sobj@meta.data %&gt;%
+  head()</code></pre>
+<pre><code>#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt; AAACATACAACCAC-1    control       2419          779
+#&gt; AAACATTGAGCTAC-1    control       4901         1350
+#&gt; AAACGCTGACCAGT-1    control       2174          781
+#&gt; AAACGCTGGTTCTT-1    control       2259          789
+#&gt; AAAGTTTGATCACG-1    control       1265          441
+#&gt; AAATCATGACCACA-1    control       4125         1365</code></pre>
+<p><br></p>
+</div>
+<div id="subsetting-the-seurat-object" class="section level2">
+<h2>Subsetting the Seurat object</h2>
+<p>The cells and features present in the <code>Seurat</code> object can be filtering using the <code>subset</code> function.</p>
+<pre class="r"><code># Subset based on gene expression
+sobj %&gt;%
+  subset(subset = CD8A &gt; 1) %&gt;%
+  ncol()</code></pre>
+<pre><code>#&gt; [1] 107</code></pre>
+<pre class="r"><code># Subset based on cell identity
+sobj %&gt;%
+  subset(idents = &quot;control&quot;) %&gt;%
+  ncol()</code></pre>
+<pre><code>#&gt; [1] 1342</code></pre>
+<pre class="r"><code># Subset with vector of features
+sobj %&gt;%
+  subset(features = c(&quot;CD4&quot;, &quot;CD8A&quot;)) %&gt;%
+  rownames()</code></pre>
+<pre><code>#&gt; [1] &quot;CD8A&quot; &quot;CD4&quot;</code></pre>
+<pre class="r"><code># Subset with vector of cell barcodes
+sobj %&gt;%
+  subset(cells = c(&quot;AAACGCTGACCAGT-1&quot;, &quot;AAATCATGACCACA-1&quot;, &quot;TTTCGAACACCTGA-2&quot;)) %&gt;%
+  colnames()</code></pre>
+<pre><code>#&gt; [1] &quot;AAACGCTGACCAGT-1&quot; &quot;AAATCATGACCACA-1&quot; &quot;TTTCGAACACCTGA-2&quot;</code></pre>
+<pre class="r"><code># Subset using multiple criteria
+sobj %&gt;%
+  subset(CD8A &gt; 1, idents = &quot;control&quot;) %&gt;%
+  ncol()</code></pre>
+<pre><code>#&gt; [1] 56</code></pre>
+<pre class="r"><code># Subset based on meta.data columns
+sobj %&gt;%
+  subset(nFeature_RNA &gt; 250)</code></pre>
+<pre><code>#&gt; An object of class Seurat 
+#&gt; 12572 features across 2697 samples within 1 assay 
+#&gt; Active assay: RNA (12572 features)</code></pre>
+<p><br></p>
+</div>
+<div id="other-data-slots" class="section level2">
+<h2>Other data slots</h2>
+<pre class="r"><code>sobj@reductions
+sobj@graphs</code></pre>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="assessing-quality" class="section level1">
+<h1><strong>Assessing quality</strong></h1>
+<p>Metrics that are commonly used to assess cell quality include:</p>
+<ul>
+<li>Number of counts per cell barcode</li>
+<li>Number of genes per barcode</li>
+<li>The percentage of counts from mitochondrial genes per barcode</li>
+</ul>
+<p>A low number of counts, a low number of detected genes, and a high percentage of mitochondrial counts suggests that the cell had a broken membrane and the cytoplasmic mRNA leaked out. Conversely, an abnormally high number of counts and detected genes could indicate the presence of a doublet.</p>
+<p><br></p>
+<div id="quantify-mitochondrial-counts" class="section level2">
+<h2>Quantify mitochondrial counts</h2>
+<p>To calculate the percentage of mitochondrial counts for each cell we can use the <code>PercentageFeatureSet</code> function.</p>
+<pre class="r"><code># Calculate percentage of mitochondrial reads for each cell
+sobj &lt;- sobj %&gt;%
+  PercentageFeatureSet(
+    pattern  = &quot;^MT-&quot;, 
+    col.name = &quot;percent_mito&quot;
+  )
+
+sobj@meta.data %&gt;%
+  head()</code></pre>
+<pre><code>#&gt;                  orig.ident nCount_RNA nFeature_RNA percent_mito
+#&gt; AAACATACAACCAC-1    control       2419          779     3.017776
+#&gt; AAACATTGAGCTAC-1    control       4901         1350     3.795144
+#&gt; AAACGCTGACCAGT-1    control       2174          781     3.817847
+#&gt; AAACGCTGGTTCTT-1    control       2259          789     3.098716
+#&gt; AAAGTTTGATCACG-1    control       1265          441     3.478261
+#&gt; AAATCATGACCACA-1    control       4125         1365     4.581818</code></pre>
+<p><br></p>
+</div>
+<div id="exercise-create-violinbox-plots-comparing-cell-metrics" class="section level2">
+<h2>EXERCISE: Create violin/box plots comparing cell metrics</h2>
+<pre class="r"><code># Create violin/boxplots comparing nCount, nFeature, and percent_mito for each sample
+
+# sobj@meta.data %&gt;%</code></pre>
+<p><br></p>
+</div>
+<div id="answer" class="section level2">
+<h2>ANSWER</h2>
+<p><img src="2_filtering_QC_files/figure-html/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><br></p>
+</div>
+<div id="exercise-create-scatter-plots-comparing-cell-metrics" class="section level2">
+<h2>EXERCISE: Create scatter plots comparing cell metrics</h2>
+<pre class="r"><code># Create a scatter plot comparing nCount and percent_mito
+
+# sobj@meta.data %&gt;%
+
+
+
+# Create a scatter plot comparing nCount and nFeature
+
+# sobj@meta.data %&gt;%</code></pre>
+<p><br></p>
+</div>
+<div id="answer-1" class="section level2">
+<h2>ANSWER</h2>
+<p><img src="2_filtering_QC_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><br></p>
+<p><br></p>
+</div>
+</div>
+<div id="filtering-cells" class="section level1">
+<h1><strong>Filtering cells</strong></h1>
+<p>To filter cells we can use the <code>subset</code> function.</p>
+<pre class="r"><code># Filter cells based on number of genes and percent mito UMIs
+sobj &lt;- sobj %&gt;%
+  subset(
+    nFeature_RNA &gt; 250 &amp;   # Remove cells with &lt;250 detected genes
+    nFeature_RNA &lt; 2500 &amp;  # Remove cells with &gt;2500 detected genes (could be doublets)
+    percent_mito &lt; 10      # Remove cells with &gt;10% mitochondrial reads
+  )
+
+# Add filtering cutoffs on original scatter plots
+p_1 &lt;- p_1 +
+  geom_hline(yintercept = 10, linetype = 2)
+
+p_2 &lt;- p_2 +
+  geom_hline(yintercept = c(250, 2500), linetype = 2)
+
+CombinePlots(
+  plots = list(p_1, p_2), 
+  nrow  = 2
+)</code></pre>
+<p><img src="2_filtering_QC_files/figure-html/Filtering%20cells-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># How many cells were removed?
+ncol(sobj)</code></pre>
+<pre><code>#&gt; [1] 2686</code></pre>
+<p><br></p>
+<div id="saving-the-seurat-object" class="section level2">
+<h2>Saving the Seurat object</h2>
+<pre class="r"><code>dir.create(&quot;data&quot;, showWarnings = FALSE)
+
+write_rds(sobj, path = &quot;data/filtered_sobj.rds&quot;)</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
