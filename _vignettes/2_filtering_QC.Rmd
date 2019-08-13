@@ -79,6 +79,22 @@ sobj <- pbmc_mtx %>%
 The `Seurat` object is organized into a heirarchy of data structures with the outermost layer including a number of "slots", which can be accessed using the `@` operator.
 
 With `Seurat` v3.0, the `Seurat` object has been modified to allow users to easily store multiple scRNA-seq assays (CITE-seq, cell hashing, etc.) in the same object. The data from each assay is stored as a list in the `assays` slot. To switch between different assays users can change the value stored in the `active.assay` slot. We can also view the current default assay using the `DefaultAssay` function. Many `Seurat` functions also include an `assay` argument that lets users specify the desired assay.
+
+### `Seurat` object structure
+
+* assays
+    * RNA
+        * counts
+        * data
+        * var.features
+    * ADT
+        * counts
+        * data
+        * var.features
+* active.assay
+* active.idents
+* meta.data
+
 ```{r "Handling multiple assays"}
 
 # Assays are stored as a list in the "assays" slot
@@ -227,7 +243,7 @@ The cells and features present in the `Seurat` object can be filtering using the
 
 # Subset based on gene expression
 sobj %>%
-  subset(CD8A > 1) %>%
+  subset(subset = CD8A > 1) %>%
   ncol()
 
 # Subset based on cell identity
@@ -362,17 +378,17 @@ sobj@meta.data %>%
 ```{r echo = FALSE, fig.width = 8, fig.height = 8}
 
 # Using Seurat functions
-# scatter_1 <- sobj %>%
-#   FeatureScatter(
-#     feature1 = "nCount_RNA", 
-#     feature2 = "percent_mito"
-#   )
+p_1 <- sobj %>%
+  FeatureScatter(
+    feature1 = "nCount_RNA",
+    feature2 = "percent_mito"
+  )
 
-# scatter_2 <- sobj %>%
-#   FeatureScatter(
-#     feature1 = "nCount_RNA",
-#     feature2 = "nFeature_RNA"
-#   )
+p_2 <- sobj %>%
+  FeatureScatter(
+    feature1 = "nCount_RNA",
+    feature2 = "nFeature_RNA"
+  )
 
 # Using ggplot2
 p_1 <- sobj@meta.data %>%
@@ -404,9 +420,9 @@ To filter cells we can use the `subset` function.
 # Filter cells based on number of genes and percent mito UMIs
 sobj <- sobj %>%
   subset(
-    nFeature_RNA > 250 &   # Remove cells with < 250 detected genes
-    nFeature_RNA < 2500 &  # Remove cells with > 2500 detected genes (could be doublets)
-    percent_mito < 10      # Remove cells with >15% mitochondrial reads
+    nFeature_RNA > 250 &   # Remove cells with <250 detected genes
+    nFeature_RNA < 2500 &  # Remove cells with >2500 detected genes (could be doublets)
+    percent_mito < 10      # Remove cells with >10% mitochondrial reads
   )
 
 # Add filtering cutoffs on original scatter plots
@@ -433,8 +449,7 @@ ncol(sobj)
 
 dir.create("data", showWarnings = FALSE)
 
-sobj %>%
-  write_rds("data/filtered_sobj.rds")
+write_rds(sobj, path = "data/filtered_sobj.rds")
 
 ```
 
