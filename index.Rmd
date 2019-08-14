@@ -30,11 +30,11 @@ A basic understanding of the R programming language. Individuals without R exper
   + [Quality control](2_filtering_QC.html)
     
 * **Session 2** | August 14<sup>th</sup>, 9:00am - 12:00pm
-  + [Clustering](3_clustering.html)
+  + [Clustering](3_norm_viz_clustering.html)
   + [Cell type annotation](4_markers.html)
 
 * **Session 3** | August 14<sup>th</sup>, 1:00pm - 4:00pm
-  + [Pseudotime](5_pseudotime.html)
+  + [Pseudotime](5_trajectories.html)
   + [Dataset alignment](6_alignment.html)
 
 * **Session 4** | August 15<sup>th</sup>, 9:00am - 12:00pm
