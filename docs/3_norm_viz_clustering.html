@@ -1355,7 +1355,13 @@
 
 <div class="d-article">
 <h2 id="schedule-for-today">Schedule for today</h2>
-<p>9:00-10:20 Normalization, clustering, and visualization 10:30-11:50 Finding markers and annotating cell types 12:00 - 1:00pm Lunch/Break 1:00-2:20 Trajectory inference methods 2:30-4:00 Dataset alignmnet and batch correction</p>
+<ul>
+<li><p>9:00-10:20 Normalization, clustering, and visualization</p></li>
+<li><p>10:30-11:50 Finding markers and annotating cell types</p></li>
+<li><p>12:00 - 1:00pm Lunch/Break</p></li>
+<li><p>1:00-2:20 Trajectory inference methods</p></li>
+<li><p>2:30-4:00 Dataset alignmnet and batch correction</p></li>
+</ul>
 <h2 id="topics-for-this-session">Topics for this session:</h2>
 <ul>
 <li>Normalization and dimensionality reduction methods</li>
@@ -1372,7 +1378,7 @@
 <li>Find marker genes enriched in clusters.</li>
 <li>Repeat Steps 4-7 until satisfied with data</li>
 </ol>
-<p>Seurat accomplishes these steps using a succicent set of functions:</p>
+<p>Seurat accomplishes these steps using a succicnt set of functions:</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 NormalizeData()
@@ -1474,36 +1480,36 @@ counts(sce)[40:50, 40:50]</code></pre>
 logcounts(sce)[40:50, 40:50]</code></pre>
 <pre><code>
 #&gt; 11 x 11 sparse Matrix of class &quot;dgCMatrix&quot;
-#&gt;                                                                     
-#&gt; GNB1          .        . .        .        . .        . . .        .
-#&gt; PRKCZ         .        . .        .        . .        . . .        .
-#&gt; RP5-892K4.1   .        . .        .        . .        . . .        .
-#&gt; C1orf86       .        . .        .        . .        . . .        .
-#&gt; SKI           .        . .        .        . .        . . .        .
-#&gt; RER1          1.787605 . 1.527969 1.731479 . .        . . 2.711917 .
-#&gt; PEX10         .        . .        .        . .        . . .        .
-#&gt; PANK4         .        . .        .        . .        . . .        .
-#&gt; RP3-395M20.12 .        . .        .        . .        . . .        .
-#&gt; TNFRSF14      .        . .        .        . 1.732627 . . .        .
-#&gt; RP3-395M20.9  .        . .        .        . .        . . .        .
-#&gt;                
-#&gt; GNB1          .
-#&gt; PRKCZ         .
-#&gt; RP5-892K4.1   .
-#&gt; C1orf86       .
-#&gt; SKI           .
-#&gt; RER1          .
-#&gt; PEX10         .
-#&gt; PANK4         .
-#&gt; RP3-395M20.12 .
-#&gt; TNFRSF14      .
-#&gt; RP3-395M20.9  .</code></pre>
+#&gt;                                                          
+#&gt; GNB1          .        . .        .        . .        . .
+#&gt; PRKCZ         .        . .        .        . .        . .
+#&gt; RP5-892K4.1   .        . .        .        . .        . .
+#&gt; C1orf86       .        . .        .        . .        . .
+#&gt; SKI           .        . .        .        . .        . .
+#&gt; RER1          1.787605 . 1.527969 1.731479 . .        . .
+#&gt; PEX10         .        . .        .        . .        . .
+#&gt; PANK4         .        . .        .        . .        . .
+#&gt; RP3-395M20.12 .        . .        .        . .        . .
+#&gt; TNFRSF14      .        . .        .        . 1.732627 . .
+#&gt; RP3-395M20.9  .        . .        .        . .        . .
+#&gt;                           
+#&gt; GNB1          .        . .
+#&gt; PRKCZ         .        . .
+#&gt; RP5-892K4.1   .        . .
+#&gt; C1orf86       .        . .
+#&gt; SKI           .        . .
+#&gt; RER1          2.711917 . .
+#&gt; PEX10         .        . .
+#&gt; PANK4         .        . .
+#&gt; RP3-395M20.12 .        . .
+#&gt; TNFRSF14      .        . .
+#&gt; RP3-395M20.9  .        . .</code></pre>
 <pre class="r"><code>
 #genes
 rownames(sce)[1:5]</code></pre>
 <pre><code>
-#&gt; [1] &quot;AL627309.1&quot;    &quot;RP11-206L10.2&quot; &quot;LINC00115&quot;     &quot;NOC2L&quot;        
-#&gt; [5] &quot;KLHL17&quot;</code></pre>
+#&gt; [1] &quot;AL627309.1&quot;    &quot;RP11-206L10.2&quot; &quot;LINC00115&quot;    
+#&gt; [4] &quot;NOC2L&quot;         &quot;KLHL17&quot;</code></pre>
 <pre class="r"><code>
 #cells
 colnames(sce)[1:5]</code></pre>
@@ -1515,20 +1521,20 @@ colnames(sce)[1:5]</code></pre>
 colData(sce)[1:5, ]</code></pre>
 <pre><code>
 #&gt; DataFrame with 5 rows and 5 columns
-#&gt;                  orig.ident nCount_RNA nFeature_RNA     percent_mito
-#&gt;                    &lt;factor&gt;  &lt;numeric&gt;    &lt;integer&gt;        &lt;numeric&gt;
-#&gt; AAACATACAACCAC-1    control       2419          779 3.01777594047127
-#&gt; AAACATTGAGCTAC-1    control       4901         1350 3.79514384819425
-#&gt; AAACGCTGACCAGT-1    control       2174          781 3.81784728610856
-#&gt; AAACGCTGGTTCTT-1    control       2259          789  3.0987162461266
-#&gt; AAAGTTTGATCACG-1    control       1265          441 3.47826086956522
-#&gt;                     ident
-#&gt;                  &lt;factor&gt;
-#&gt; AAACATACAACCAC-1  control
-#&gt; AAACATTGAGCTAC-1  control
-#&gt; AAACGCTGACCAGT-1  control
-#&gt; AAACGCTGGTTCTT-1  control
-#&gt; AAAGTTTGATCACG-1  control</code></pre>
+#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt;                    &lt;factor&gt;  &lt;numeric&gt;    &lt;integer&gt;
+#&gt; AAACATACAACCAC-1    control       2419          779
+#&gt; AAACATTGAGCTAC-1    control       4901         1350
+#&gt; AAACGCTGACCAGT-1    control       2174          781
+#&gt; AAACGCTGGTTCTT-1    control       2259          789
+#&gt; AAAGTTTGATCACG-1    control       1265          441
+#&gt;                      percent_mito    ident
+#&gt;                         &lt;numeric&gt; &lt;factor&gt;
+#&gt; AAACATACAACCAC-1 3.01777594047127  control
+#&gt; AAACATTGAGCTAC-1 3.79514384819425  control
+#&gt; AAACGCTGACCAGT-1 3.81784728610856  control
+#&gt; AAACGCTGGTTCTT-1  3.0987162461266  control
+#&gt; AAAGTTTGATCACG-1 3.47826086956522  control</code></pre>
 <pre class="r"><code>
 # get gene metadata
 rowData(sce)[1:5, ]</code></pre>

@@ -23,15 +23,15 @@ knitr::opts_chunk$set(
 
 ## Schedule for today
 
-9:00-10:20  Normalization, clustering, and visualization  
+- 9:00-10:20  Normalization, clustering, and visualization  
 
-10:30-11:50  Finding markers and annotating cell types  
+- 10:30-11:50  Finding markers and annotating cell types  
 
-12:00 - 1:00pm  Lunch/Break  
+- 12:00 - 1:00pm  Lunch/Break  
 
-1:00-2:20 Trajectory inference methods  
+- 1:00-2:20 Trajectory inference methods  
 
-2:30-4:00 Dataset alignmnet and batch correction  
+- 2:30-4:00 Dataset alignmnet and batch correction  
 
 
 ## Topics for this session:
@@ -50,7 +50,7 @@ knitr::opts_chunk$set(
 6) Find marker genes enriched in clusters.
 7) Repeat Steps 4-7 until satisfied with data
 
-Seurat accomplishes these steps using a succicent set of functions:
+Seurat accomplishes these steps using a succicnt set of functions:
 
 ```{r eval = FALSE, echo = TRUE}
 NormalizeData()
