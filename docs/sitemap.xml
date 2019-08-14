@@ -2,14 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" version="1.0">
   <url>
     <loc>https://rnabioco.github.io/cellar/1_intro.html</loc>
-    <lastmod>2019-08-13T16:00:37-06:00</lastmod>
+    <lastmod>2019-08-13T17:47:42-06:00</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/cellar/2_filtering_QC.html</loc>
-    <lastmod>2019-08-13T15:55:40-06:00</lastmod>
+    <lastmod>2019-08-13T17:47:42-06:00</lastmod>
+  </url>
+  <url>
+    <loc>https://rnabioco.github.io/cellar/6_alignment.html</loc>
+    <lastmod>2019-08-13T18:28:59-06:00</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/cellar/</loc>
-    <lastmod>2019-08-13T16:18:04-06:00</lastmod>
+    <lastmod>2019-08-13T17:47:43-06:00</lastmod>
   </url>
 </urlset>
