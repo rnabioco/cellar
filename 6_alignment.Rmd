@@ -20,6 +20,7 @@ library(scAlign)
 knitr::opts_chunk$set(
   message   = FALSE,
   warning   = FALSE,
+  echo      = TRUE,
   comment   = "#>",
   fig.align = "center"
 )
@@ -259,20 +260,26 @@ plot_grid(sca_umap_cell_plot, sca_umap_tech_plot, nrow = 2)
 
 ## Comparing all three integration methods
 
-All three integration/alignment methods do a similar job of harmonizing the four sequencing techniques. Method selection, tuning and assessment is highly dependent on knowledge of the experimental design and underlying biology.
+All three integration/alignment methods do a similar job of aligning shared cell types across the four sequencing techniques.
 
-```{r final_plot, fig.height=12, fig.width=10}
-CombinePlots(list(pre_cell_plot,
-                  h_umap_cell_plot,
-                  s_umap_cell_plot,
-                  sca_umap_cell_plot),
-             legend = "none",
-             ncol = 2)
-
-CombinePlots(list(pre_tech_plot,
-                  h_umap_tech_plot,
-                  s_umap_tech_plot,
-                  sca_umap_tech_plot),
+```{r final_plot_cell, fig.height=12, fig.width=10}
+CombinePlots(list(pre_cell_plot + ggtitle("Unaligned"),
+                  h_umap_cell_plot + ggtitle("Harmony"),
+                  s_umap_cell_plot + ggtitle("Seurat"),
+                  sca_umap_cell_plot + ggtitle("scAlign")),
              legend = "none",
              ncol = 2)
 ```
+
+And all three techniques do a satisfactory job of eliminating intra-cluster technology bias.
+
+``` {r final_plot_tech, fig.height=12, fig.width=10}
+CombinePlots(list(pre_tech_plot + ggtitle("Unaligned"),
+                  h_umap_tech_plot + ggtitle("Harmony"),
+                  s_umap_tech_plot + ggtitle("Seurat"),
+                  sca_umap_tech_plot + ggtitle("scAlign")),
+             legend = "none",
+             ncol = 2)
+```
+
+Ultimately, method selection, tuning and assessment is highly dependent on knowledge of the experimental design and underlying biology.
