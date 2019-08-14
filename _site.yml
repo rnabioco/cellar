@@ -14,7 +14,7 @@ navbar:
     - text: "Cell Type Annotation"
       href: 4_markers.html
     - text: "Pseudotime"
-      href: 5_pseudotime.html
+      href: 5_trajectories.html
     - text: "Dataset Alignment"
       href: 6_alignment.html
     - text: "Multi-modal Data"
