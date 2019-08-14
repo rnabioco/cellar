@@ -1354,11 +1354,11 @@
 </div>
 
 <div class="d-article">
-<h1 id="single-cell-data-set-alignment-and-batch-correction">Single cell data set alignment and batch correction</h1>
+<h1 id="single-cell-dataset-alignment-and-batch-correction">Single cell dataset alignment and batch correction</h1>
 <ul>
 <li>Inter-sample variation can complicate the analysis of single cell data.</li>
 <li>This variation can include batch effects, technology-specific biases, experimental conditions, etc.</li>
-<li>Robust methods are available to align data sets from different platforms, experimental conditions, individuals and even species.</li>
+<li>Robust methods are available to align datasets from different platforms, experimental conditions, individuals and even species.</li>
 </ul>
 <h2 id="packages-covered">Packages covered:</h2>
 <ol type="1">
@@ -1384,7 +1384,7 @@ plot_grid(pre_cell_plot, pre_tech_plot, nrow = 2)</code></pre>
 </div>
 <h2 id="quick-and-flexible-harmony">Quick and Flexible: Harmony</h2>
 <p><img src="https://github.com/immunogenomics/harmony/raw/master/vignettes/main.jpg" /></p>
-<p>Harmony works by weakly clustering cells and then calculating - and iteratively refining - a data set correction factor for each cluster. This works well for most data sets. Notably, harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the <code>raw.data</code>, <code>data</code> and <code>scale.data</code> slots are unmodified).</p>
+<p>Harmony works by weakly clustering cells and then calculating - and iteratively refining - a dataset correction factor for each cluster. This works well for most datasets. Notably, harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the <code>raw.data</code>, <code>data</code> and <code>scale.data</code> slots are unmodified).</p>
 <h3 id="running-harmony-on-a-seurat-object">Running harmony on a Seurat object</h3>
 <p>Harmony provides a wrapper function (<code>RunHarmony()</code>) that can take Seurat (v2 or v3) or SingleCellExperiment objects directly. Here, we run harmony with the default parameters and generate a plot to confirm convergence. <code>RunHarmony()</code> returns an object with a new dimensionality reduction - named harmony - that can be used for downstream projections and clustering.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1443,9 +1443,9 @@ so &lt;- RunHarmony(so,
 </div>
 <h2 id="built-in-but-more-complex-to-run-seurat-v3-integration">Built-in, but more complex to run: Seurat v3 Integration</h2>
 <p><img src="https://satijalab.org/img/vignette_images/anchorsb_2018.png" data-align="center" /></p>
-<p>Seurat’s built-in integration works by identifying ‘anchors’ between pairs of data sets. These anchors represent pairwise correspondences between individual cells (one in each dataset) that originate from the same biological state. These ‘anchors’ are then used to harmonize the data sets. Unlike Harmony, Seruat’s integration approach does calculate corrected expression values.</p>
+<p>Seurat’s built-in integration works by identifying ‘anchors’ between pairs of datasets. These anchors represent pairwise correspondences between individual cells (one in each dataset) that originate from the same biological state. These ‘anchors’ are then used to harmonize the datasets. Unlike Harmony, Seruat’s integration approach does calculate corrected expression values.</p>
 <h3 id="running-seurat-v3-integration">Running Seurat v3 Integration</h3>
-<p>To construct a reference, we will identify ‘anchors’ between the individual data sets. First, we split the combined object into a list, with each data set as an element.</p>
+<p>To construct a reference, we will identify ‘anchors’ between the individual datasets. First, we split the combined object into a list, with each dataset as an element.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 so.list &lt;- SplitObject(so, split.by = &quot;tech&quot;)</code></pre>
@@ -1463,7 +1463,7 @@ seurat.preprocess &lt;- function(so){
 so.list &lt;- map(so.list, ~seurat.preprocess(.x))</code></pre>
 </div>
 <p>Next, we identify anchors using the FindIntegrationAnchors function, which takes a list of Seurat objects as input. Here, we integrate the four objects into a reference.</p>
-<p>We use all default parameters here for identifying anchors, including the ‘dimensionality’ of the data set (30; feel free to try varying this parameter over a broad range, for example between 10 and 50).</p>
+<p>We use all default parameters here for identifying anchors, including the ‘dimensionality’ of the dataset (30; feel free to try varying this parameter over a broad range, for example between 10 and 50).</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 reference.list &lt;- so.list[c(&quot;celseq&quot;, &quot;celseq2&quot;, &quot;smartseq2&quot;,&quot;fluidigmc1&quot;)]
@@ -1475,7 +1475,7 @@ so.anchors &lt;- FindIntegrationAnchors(object.list = reference.list, dims = 1:3
 <pre class="r"><code>
 so.integrated &lt;- IntegrateData(anchorset = so.anchors, dims = 1:30)</code></pre>
 </div>
-<p>We can then use this new integrated matrix for downstream analysis and visualization. Here we scale the integrated data, run PCA, and visualize the results with UMAP. The integrated data sets cluster by cell type, instead of by technology.</p>
+<p>We can then use this new integrated matrix for downstream analysis and visualization. Here we scale the integrated data, run PCA, and visualize the results with UMAP. The integrated datasets cluster by cell type, instead of by technology.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 # switch to integrated assay. The variable features of this assay are automatically
@@ -1509,7 +1509,7 @@ scalign.preprocess &lt;- function(so){
 
 so.list &lt;- map(so.list, ~scalign.preprocess(.x))</code></pre>
 </div>
-<p>Next, we can extract a common set of genes across all data sets.</p>
+<p>Next, we can extract a common set of genes across all datasets.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 genes.use &lt;- unique(unlist(map(so.list, ~.x@assays$RNA@var.features)))</code></pre>
@@ -1570,10 +1570,10 @@ plot_grid(sca_umap_cell_plot, sca_umap_tech_plot, nrow = 2)</code></pre>
 <p>All three integration/alignment methods do a similar job of aligning shared cell types across the four sequencing techniques.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-CombinePlots(list(pre_cell_plot,
-                  h_umap_cell_plot,
-                  s_umap_cell_plot,
-                  sca_umap_cell_plot),
+CombinePlots(list(pre_cell_plot + ggtitle(&quot;Unaligned&quot;),
+                  h_umap_cell_plot + ggtitle(&quot;Harmony&quot;),
+                  s_umap_cell_plot + ggtitle(&quot;Seurat&quot;),
+                  sca_umap_cell_plot + ggtitle(&quot;scAlign&quot;)),
              legend = &quot;none&quot;,
              ncol = 2)</code></pre>
 <p><img src="6_alignment_files/figure-html5/final_plot_cell-1.png" width="960" style="display: block; margin: auto;" /></p>
@@ -1581,15 +1581,15 @@ CombinePlots(list(pre_cell_plot,
 <p>And all three techniques do a satisfactory job of eliminating intra-cluster technology bias.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-CombinePlots(list(pre_tech_plot,
-                  h_umap_tech_plot,
-                  s_umap_tech_plot,
-                  sca_umap_tech_plot),
+CombinePlots(list(pre_tech_plot + ggtitle(&quot;Unaligned&quot;),
+                  h_umap_tech_plot + ggtitle(&quot;Harmony&quot;),
+                  s_umap_tech_plot + ggtitle(&quot;Seurat&quot;),
+                  sca_umap_tech_plot + ggtitle(&quot;scAlign&quot;)),
              legend = &quot;none&quot;,
              ncol = 2)</code></pre>
 <p><img src="6_alignment_files/figure-html5/final_plot_tech-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
-<p>Ultimately, method selection, tuning and assessment is highly dependent on knowledge of the experimental design and underlying biology.</p>
+<p>Ultimately, method selection, tuning, and assessment is highly dependent on knowledge of the experimental design and underlying biology.</p>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>

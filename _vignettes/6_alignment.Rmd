@@ -26,11 +26,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Single cell data set alignment and batch correction
+# Single cell dataset alignment and batch correction
 
 - Inter-sample variation can complicate the analysis of single cell data.
 - This variation can include batch effects, technology-specific biases, experimental conditions, etc.
-- Robust methods are available to align data sets from different platforms, experimental conditions, individuals and even species.
+- Robust methods are available to align datasets from different platforms, experimental conditions, individuals and even species.
 
 ## Packages covered:
 
@@ -59,7 +59,7 @@ plot_grid(pre_cell_plot, pre_tech_plot, nrow = 2)
 
 ![](https://github.com/immunogenomics/harmony/raw/master/vignettes/main.jpg){width=600px,align=center}
 
-Harmony works by weakly clustering cells and then calculating - and iteratively refining - a data set correction factor for each cluster. This works well for most data sets. Notably, harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the `raw.data`, `data` and `scale.data` slots are unmodified).
+Harmony works by weakly clustering cells and then calculating - and iteratively refining - a dataset correction factor for each cluster. This works well for most datasets. Notably, harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the `raw.data`, `data` and `scale.data` slots are unmodified).
 
 ### Running harmony on a Seurat object
 
@@ -119,11 +119,11 @@ so <- RunHarmony(so,
 
 ![](https://satijalab.org/img/vignette_images/anchorsb_2018.png){width=400px, align=center}
 
-Seurat's built-in integration works by identifying ‘anchors’ between pairs of data sets. These anchors represent pairwise correspondences between individual cells (one in each dataset) that originate from the same biological state. These ‘anchors’ are then used to harmonize the data sets. Unlike Harmony, Seruat's integration approach does calculate corrected expression values.
+Seurat's built-in integration works by identifying ‘anchors’ between pairs of datasets. These anchors represent pairwise correspondences between individual cells (one in each dataset) that originate from the same biological state. These ‘anchors’ are then used to harmonize the datasets. Unlike Harmony, Seruat's integration approach does calculate corrected expression values.
 
 ### Running Seurat v3 Integration
 
-To construct a reference, we will identify ‘anchors’ between the individual data sets. First, we split the combined object into a list, with each data set as an element.
+To construct a reference, we will identify ‘anchors’ between the individual datasets. First, we split the combined object into a list, with each dataset as an element.
 
 ```{r seurat_split}
 so.list <- SplitObject(so, split.by = "tech")
@@ -144,7 +144,7 @@ so.list <- map(so.list, ~seurat.preprocess(.x))
 
 Next, we identify anchors using the FindIntegrationAnchors function, which takes a list of Seurat objects as input. Here, we integrate the four objects into a reference.
 
-We use all default parameters here for identifying anchors, including the ‘dimensionality’ of the data set (30; feel free to try varying this parameter over a broad range, for example between 10 and 50).
+We use all default parameters here for identifying anchors, including the ‘dimensionality’ of the dataset (30; feel free to try varying this parameter over a broad range, for example between 10 and 50).
 
 ```{r seurat_findanchors}
 reference.list <- so.list[c("celseq", "celseq2", "smartseq2","fluidigmc1")]
@@ -159,7 +159,7 @@ The returned object will contain a new Assay, which holds an integrated (or ‘b
 so.integrated <- IntegrateData(anchorset = so.anchors, dims = 1:30)
 ```
 
-We can then use this new integrated matrix for downstream analysis and visualization. Here we scale the integrated data, run PCA, and visualize the results with UMAP. The integrated data sets cluster by cell type, instead of by technology.
+We can then use this new integrated matrix for downstream analysis and visualization. Here we scale the integrated data, run PCA, and visualize the results with UMAP. The integrated datasets cluster by cell type, instead of by technology.
 
 ```{r seurat_plot, fig.height=12, fig.width=10}
 # switch to integrated assay. The variable features of this assay are automatically
@@ -197,7 +197,7 @@ scalign.preprocess <- function(so){
 so.list <- map(so.list, ~scalign.preprocess(.x))
 ```
 
-Next, we can extract a common set of genes across all data sets.
+Next, we can extract a common set of genes across all datasets.
 
 ```{r scalign_features}
 genes.use <- unique(unlist(map(so.list, ~.x@assays$RNA@var.features)))
@@ -282,4 +282,4 @@ CombinePlots(list(pre_tech_plot + ggtitle("Unaligned"),
              ncol = 2)
 ```
 
-Ultimately, method selection, tuning and assessment is highly dependent on knowledge of the experimental design and underlying biology.
+Ultimately, method selection, tuning, and assessment is highly dependent on knowledge of the experimental design and underlying biology.
