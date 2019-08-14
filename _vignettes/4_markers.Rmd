@@ -33,7 +33,7 @@ After clustering, differential expression testing (DE analysis, similar to bulk 
 ### important considerations
 1. keep things simple first and look at the results (try not aligning, not regressing) 
 
-2. determine what variables to regress out (batch, nCount_RNA, percent_mito, cell cycle, if needed) during scaling
+2. determine what variables to regress out (batch, nCount_RNA, percent_mito, cell cycle, if needed) during scaling (note this only affects dimension reduction and clustering)
 
 ```{r}
 library(Seurat)
@@ -119,6 +119,8 @@ topPCAgenes
 topPCAgenes %>%
   as.vector() %>%
   intersect(c(s.genes, g2m.genes)) # see how many S and G2M genes intersect with that list
+
+# or just check top variable genes
 ```
 
 ```{r, eval = F}
@@ -194,6 +196,13 @@ Idents(sobj_clusters) %>% head() # note that with this method, some cell idents 
 markers_df4 <- FindMarkers(sobj_clusters,
                            ident.1 = "ZFP36.pos",
                            ident.2 = "ZFP36.neg")
+
+
+Idents(sobj_clusters,
+       WhichCells(object = sobj_clusters,
+                  idents = "1",
+                  expression = sizeFactors >= 1, # would usually do this for transgenes etc
+                  slot = 'data')) <- 'cluster1_large'
 ```
 
 Genes of interest can then be visualized as violin plots or feature plots.
@@ -337,6 +346,8 @@ res
 # look at UMAP
 DimPlot(res, label = TRUE, group.by = "type") + NoLegend() # saved in "type" metadata column
 ```
+
+Also see more tutorials at [`clustifyr`](https://rnabioco.github.io/clustifyr/), and prebuilt references from large scRNAseq/bulk RNAseq/microarray datasets at package [`clustifyrdata`](https://github.com/rnabioco/clustifyrdata).
 
 ### cell type composition
 Insight into different samples can be gained from the proportion of cells that fall into each cell type. Unfortunately, no dedicated tools are available for statistical testing.
