@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="generator" content="distill" />
+
+  <style type="text/css">
+  /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
+  body {
+    visibility: hidden;
+  }
+  </style>
+
+ <!--radix_placeholder_import_source-->
+ <!--/radix_placeholder_import_source-->
+
+  <!--radix_placeholder_meta_tags-->
+  <title>Single-cell RNA-seq Workshop: Trajectory inference</title>
+  
+  
+  <link rel="icon" type="image/png" href="img/logo.png"/>
+  
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2019-08-14"/>
+  <meta property="article:created" itemprop="dateCreated" content="2019-08-14"/>
+  <meta name="article:author" content="Kent Riemondy"/>
+  
+  <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
+  <meta property="og:title" content="Single-cell RNA-seq Workshop: Trajectory inference"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:site_name" content="Single-cell RNA-seq Workshop"/>
+  
+  <!--  https://dev.twitter.com/cards/types/summary -->
+  <meta property="twitter:card" content="summary"/>
+  <meta property="twitter:title" content="Single-cell RNA-seq Workshop: Trajectory inference"/>
+  <meta property="twitter:site" content="@rnabioco"/>
+  
+  <!--/radix_placeholder_meta_tags-->
+  <!--radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-rmarkdown-metadata">
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Trajectory inference"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]}]}]},{"type":"character","attributes":{},"value":["2019-08-14"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_depth","self_contained","highlight"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[1]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["tango"]}]}]}]}
+  </script>
+  <!--/radix_placeholder_rmarkdown_metadata-->
+  <!--radix_placeholder_navigation_in_header-->
+  
+  <script type="application/javascript">
+  
+    window.headroom_prevent_pin = false;
+  
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+  
+      // initialize headroom for banner
+      var header = $('header').get(0);
+      var headerHeight = header.offsetHeight;
+      var headroom = new Headroom(header, {
+        onPin : function() {
+          if (window.headroom_prevent_pin) {
+            window.headroom_prevent_pin = false;
+            headroom.unpin();
+          }
+        }
+      });
+      headroom.init();
+      if(window.location.hash)
+        headroom.unpin();
+      $(header).addClass('headroom--transition');
+  
+      // offset scroll location for banner on hash change
+      // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
+      window.addEventListener("hashchange", function(event) {
+        window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
+      });
+  
+      // responsive menu
+      $('.distill-site-header').each(function(i, val) {
+        var topnav = $(this);
+        var toggle = topnav.find('.nav-toggle');
+        toggle.on('click', function() {
+          topnav.toggleClass('responsive');
+        });
+      });
+  
+      // nav dropdowns
+      $('.nav-dropbtn').click(function(e) {
+        $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
+        $(this).parent().siblings('.nav-dropdown')
+           .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
+      });
+      $("body").click(function(e){
+        $('.nav-dropdown-content').removeClass('nav-dropdown-active');
+      });
+      $(".nav-dropdown").click(function(e){
+        e.stopPropagation();
+      });
+    });
+  </script>
+  
+  <style type="text/css">
+  
+  /* Theme (user-documented overrideables for nav appearance) */
+  
+  .distill-site-nav {
+    color: rgba(255, 255, 255, 0.8);
+    background-color: #455a64;
+    font-size: 15px;
+    font-weight: 300;
+  }
+  
+  .distill-site-nav a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .distill-site-nav a:hover {
+    color: white;
+  }
+  
+  @media print {
+    .distill-site-nav {
+      display: none;
+    }
+  }
+  
+  .distill-site-header {
+  
+  }
+  
+  .distill-site-footer {
+  
+  }
+  
+  
+  /* Site Header */
+  
+  .distill-site-header {
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 3;
+  }
+  
+  .distill-site-header .nav-left {
+    display: inline-block;
+    margin-left: 8px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header .nav-left {
+      margin-left: 0;
+    }
+  }
+  
+  
+  .distill-site-header .nav-right {
+    float: right;
+    margin-right: 8px;
+  }
+  
+  .distill-site-header a,
+  .distill-site-header .title {
+    display: inline-block;
+    text-align: center;
+    padding: 14px 10px 14px 10px;
+  }
+  
+  .distill-site-header .title {
+    font-size: 18px;
+  }
+  
+  .distill-site-header .logo {
+    padding: 0;
+  }
+  
+  .distill-site-header .logo img {
+    display: none;
+    max-height: 20px;
+    width: auto;
+    margin-bottom: -4px;
+  }
+  
+  .distill-site-header .nav-image img {
+    max-height: 18px;
+    width: auto;
+    display: inline-block;
+    margin-bottom: -3px;
+  }
+  
+  
+  
+  @media screen and (min-width: 1000px) {
+    .distill-site-header .logo img {
+      display: inline-block;
+    }
+    .distill-site-header .nav-left {
+      margin-left: 20px;
+    }
+    .distill-site-header .nav-right {
+      margin-right: 20px;
+    }
+    .distill-site-header .title {
+      padding-left: 12px;
+    }
+  }
+  
+  
+  .distill-site-header .nav-toggle {
+    display: none;
+  }
+  
+  .nav-dropdown {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .nav-dropdown .nav-dropbtn {
+    border: none;
+    outline: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 16px 10px;
+    background-color: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+    margin-top: 1px;
+    z-index: 2;
+  }
+  
+  .nav-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 200px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+    z-index: 1;
+    margin-top: 2px;
+    white-space: nowrap;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  
+  .nav-dropdown-content hr {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-dropdown-active {
+    display: block;
+  }
+  
+  .nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
+    color: black;
+    padding: 6px 24px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+  }
+  
+  .nav-dropdown-content .nav-dropdown-header {
+    display: block;
+    padding: 5px 24px;
+    padding-bottom: 0;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #999999;
+    white-space: nowrap;
+  }
+  
+  .nav-dropdown:hover .nav-dropbtn {
+    color: white;
+  }
+  
+  .nav-dropdown-content a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .nav-right .nav-dropdown-content {
+    margin-left: -45%;
+    right: 0;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
+    .distill-site-header a.nav-toggle {
+      float: right;
+      display: block;
+    }
+    .distill-site-header .title {
+      margin-left: 0;
+    }
+    .distill-site-header .nav-right {
+      margin-right: 0;
+    }
+    .distill-site-header {
+      overflow: hidden;
+    }
+    .nav-right .nav-dropdown-content {
+      margin-left: 0;
+    }
+  }
+  
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header.responsive {position: relative;}
+    .distill-site-header.responsive a.nav-toggle {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    .distill-site-header.responsive a,
+    .distill-site-header.responsive .nav-dropdown {
+      display: block;
+      text-align: left;
+    }
+    .distill-site-header.responsive .nav-left,
+    .distill-site-header.responsive .nav-right {
+      width: 100%;
+    }
+    .distill-site-header.responsive .nav-dropdown {float: none;}
+    .distill-site-header.responsive .nav-dropdown-content {position: relative;}
+    .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+  }
+  
+  /* Site Footer */
+  
+  .distill-site-footer {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 3;
+    margin-top: 30px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    text-align: center;
+  }
+  
+  /* Headroom */
+  
+  d-title {
+    padding-top: 6rem;
+  }
+  
+  @media print {
+    d-title {
+      padding-top: 4rem;
+    }
+  }
+  
+  .headroom {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  
+  .headroom--transition {
+    transition: all .4s ease-in-out;
+  }
+  
+  .headroom--unpinned {
+    top: -100px;
+  }
+  
+  .headroom--pinned {
+    top: 0;
+  }
+  
+  </style>
+  
+  <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
+  <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
+  <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
+  <!--/radix_placeholder_navigation_in_header-->
+  <!--radix_placeholder_distill-->
+  
+  <style type="text/css">
+  
+  body {
+    background-color: white;
+  }
+  
+  .pandoc-table {
+    width: 100%;
+  }
+  
+  .pandoc-table>caption {
+    margin-bottom: 10px;
+  }
+  
+  .pandoc-table th:not([align]) {
+    text-align: left;
+  }
+  
+  .pagedtable-footer {
+    font-size: 15px;
+  }
+  
+  .html-widget {
+    margin-bottom: 2.0em;
+  }
+  
+  .l-screen-inset {
+    padding-right: 16px;
+  }
+  
+  .l-screen .caption {
+    margin-left: 10px;
+  }
+  
+  .shaded {
+    background: rgb(247, 247, 247);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .html-widget {
+    margin-bottom: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .shaded-content {
+    background: white;
+  }
+  
+  .text-output {
+    margin-top: 0;
+    line-height: 1.5em;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+  
+  d-article {
+    padding-bottom: 30px;
+  }
+  
+  d-appendix {
+    padding-top: 30px;
+  }
+  
+  d-article>p>img {
+    width: 100%;
+  }
+  
+  d-article iframe {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.0em;
+    width: 100%;
+  }
+  
+  figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  /* CSS for table of contents */
+  
+  .d-toc {
+    color: rgba(0,0,0,0.8);
+    font-size: 0.8em;
+    line-height: 1em;
+  }
+  
+  .d-toc-header {
+    font-size: 0.6rem;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 1.3em;
+  }
+  
+  .d-toc a {
+    border-bottom: none;
+  }
+  
+  .d-toc ul {
+    padding-left: 0;
+  }
+  
+  .d-toc li>ul {
+    padding-top: 0.8em;
+    padding-left: 16px;
+    margin-bottom: 0.6em;
+  }
+  
+  .d-toc ul,
+  .d-toc li {
+    list-style-type: none;
+  }
+  
+  .d-toc li {
+    margin-bottom: 0.9em;
+  }
+  
+  .d-toc-separator {
+    margin-top: 20px;
+    margin-bottom: 2em;
+  }
+  
+  .d-article-with-toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  
+  
+  
+  /* Tweak code blocks (note that this CSS is repeated above in an injection
+     into the d-code shadow dom) */
+  
+  d-code {
+    overflow-x: auto !important;
+  }
+  
+  pre.d-code code.d-code {
+    padding-left: 10px;
+    font-size: 12px;
+    border-left: 2px solid rgba(0,0,0,0.1);
+  }
+  
+  pre.text-output {
+  
+    font-size: 12px;
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  @media(min-width: 768px) {
+  
+  d-code {
+    overflow-x: visible !important;
+  }
+  
+  pre.d-code code.d-code  {
+      padding-left: 18px;
+      font-size: 14px;
+  }
+  pre.text-output {
+    font-size: 14px;
+  }
+  }
+  
+  /* Figure */
+  
+  .figure {
+    position: relative;
+    margin-bottom: 2.5em;
+    margin-top: 1.5em;
+  }
+  
+  .figure img {
+    width: 100%;
+  }
+  
+  .figure .caption {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+    line-height: 1.5em;
+  }
+  
+  .figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  .figure .caption a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .figure .caption b,
+  .figure .caption strong, {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 1.0);
+  }
+  
+  
+  
+  /* Tweak 1000px media break to show more text */
+  
+  @media(min-width: 1000px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 16px;
+    }
+  
+    .grid {
+      grid-column-gap: 16px;
+    }
+  
+    d-article {
+      font-size: 1.06rem;
+      line-height: 1.7em;
+    }
+    figure .caption, .figure .caption, figure figcaption {
+      font-size: 13px;
+    }
+  }
+  
+  @media(min-width: 1180px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 32px;
+    }
+  
+    .grid {
+      grid-column-gap: 32px;
+    }
+  }
+  
+  
+  /* Get the citation styles for the appendix (not auto-injected on render since
+     we do our own rendering of the citation appendix) */
+  
+  d-appendix .citation-appendix,
+  .d-appendix .citation-appendix {
+    font-size: 11px;
+    line-height: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 18px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px 18px;
+    border-radius: 3px;
+    color: rgba(150, 150, 150, 1);
+    overflow: hidden;
+    margin-top: -12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  
+  /* Social footer */
+  
+  .social_footer {
+    margin-top: 30px;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.67);
+  }
+  
+  .disqus-comments {
+    margin-right: 30px;
+  }
+  
+  .disqus-comment-count {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+  }
+  
+  #disqus_thread {
+    margin-top: 30px;
+  }
+  
+  .article-sharing a {
+    border-bottom: none;
+    margin-right: 8px;
+  }
+  
+  .article-sharing a:hover {
+    border-bottom: none;
+  }
+  
+  .sidebar-section.subscribe {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+  
+  .subscribe p {
+    margin-bottom: 0.5em;
+  }
+  
+  
+  .article-footer .subscribe {
+    font-size: 15px;
+    margin-top: 45px;
+  }
+  
+  
+  /* Improve display for browsers without grid (IE/Edge <= 15) */
+  
+  .downlevel {
+    line-height: 1.6em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+  }
+  
+  .downlevel .d-title {
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .downlevel .d-title h1 {
+    font-size: 50px;
+    font-weight: 700;
+    line-height: 1.1em;
+    margin: 0 0 0.5rem;
+  }
+  
+  .downlevel .d-title p {
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1.55em;
+    margin-top: 0;
+  }
+  
+  .downlevel .d-byline {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.8em;
+  }
+  
+  .downlevel .section-separator {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .downlevel .d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+  
+  
+  .downlevel .d-appendix {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.5);
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+  
+  .downlevel .footnotes ol {
+    padding-left: 13px;
+  }
+  
+  .downlevel .base-grid,
+  .downlevel .distill-header,
+  .downlevel .d-title,
+  .downlevel .d-abstract,
+  .downlevel .d-article,
+  .downlevel .d-appendix,
+  .downlevel .distill-appendix,
+  .downlevel .d-byline,
+  .downlevel .d-footnote-list,
+  .downlevel .d-citation-list,
+  .downlevel .distill-footer,
+  .downlevel .appendix-bottom,
+  .downlevel .posts-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  
+  @media(min-width: 768px) {
+    .downlevel .base-grid,
+    .downlevel .distill-header,
+    .downlevel .d-title,
+    .downlevel .d-abstract,
+    .downlevel .d-article,
+    .downlevel .d-appendix,
+    .downlevel .distill-appendix,
+    .downlevel .d-byline,
+    .downlevel .d-footnote-list,
+    .downlevel .d-citation-list,
+    .downlevel .distill-footer,
+    .downlevel .appendix-bottom,
+    .downlevel .posts-container {
+    padding-left: 150px;
+    padding-right: 150px;
+    max-width: 900px;
+  }
+  }
+  
+  .downlevel pre code {
+    display: block;
+    border-left: 2px solid rgba(0, 0, 0, .1);
+    padding: 0 0 0 20px;
+    font-size: 14px;
+  }
+  
+  .downlevel code, .downlevel pre {
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  </style>
+  
+  <script type="application/javascript">
+  
+  function is_downlevel_browser() {
+    if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
+                                   window.navigator.userAgent)) {
+      return true;
+    } else {
+      return window.load_distill_framework === undefined;
+    }
+  }
+  
+  // show body when load is complete
+  function on_load_complete() {
+  
+    // set body to visible
+    document.body.style.visibility = 'visible';
+  
+    // force redraw for leaflet widgets
+    if (window.HTMLWidgets) {
+      var maps = window.HTMLWidgets.findAll(".leaflet");
+      $.each(maps, function(i, el) {
+        var map = this.getMap();
+        map.invalidateSize();
+        map.eachLayer(function(layer) {
+          if (layer instanceof L.TileLayer)
+            layer.redraw();
+        });
+      });
+    }
+  
+    // trigger 'shown' so htmlwidgets resize
+    $('d-article').trigger('shown');
+  }
+  
+  function init_distill() {
+  
+    init_common();
+  
+    // create front matter
+    var front_matter = $('<d-front-matter></d-front-matter>');
+    $('#distill-front-matter').wrap(front_matter);
+  
+    // create d-title
+    $('.d-title').changeElementType('d-title');
+  
+    // create d-byline
+    var byline = $('<d-byline></d-byline>');
+    $('.d-byline').replaceWith(byline);
+  
+    // create d-article
+    var article = $('<d-article></d-article>');
+    $('.d-article').wrap(article).children().unwrap();
+  
+    // move posts container into article
+    $('.posts-container').appendTo($('d-article'));
+  
+    // create d-appendix
+    $('.d-appendix').changeElementType('d-appendix');
+  
+    // create d-bibliography
+    var bibliography = $('<d-bibliography></d-bibliography>');
+    $('#distill-bibliography').wrap(bibliography);
+  
+    // flag indicating that we have appendix items
+    var appendix = $('.appendix-bottom').children('h3').length > 0;
+  
+    // replace citations with <d-cite>
+    $('.citation').each(function(i, val) {
+      appendix = true;
+      var cites = $(this).attr('data-cites').split(" ");
+      var dt_cite = $('<d-cite></d-cite>');
+      dt_cite.attr('key', cites.join());
+      $(this).replaceWith(dt_cite);
+    });
+    // remove refs
+    $('#refs').remove();
+  
+    // replace footnotes with <d-footnote>
+    $('.footnote-ref').each(function(i, val) {
+      appendix = true;
+      var href = $(this).attr('href');
+      var id = href.replace('#', '');
+      var fn = $('#' + id);
+      var fn_p = $('#' + id + '>p');
+      fn_p.find('.footnote-back').remove();
+      var text = fn_p.html();
+      var dtfn = $('<d-footnote></d-footnote>');
+      dtfn.html(text);
+      $(this).replaceWith(dtfn);
+    });
+    // remove footnotes
+    $('.footnotes').remove();
+  
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      var id = $(this).attr('id');
+      $('.d-toc a[href="#' + id + '"]').parent().remove();
+      appendix = true;
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
+    });
+  
+    // show d-appendix if we have appendix content
+    $("d-appendix").css('display', appendix ? 'grid' : 'none');
+  
+    // replace code blocks with d-code
+    $('pre>code').each(function(i, val) {
+      var code = $(this);
+      var pre = code.parent();
+      var clz = "";
+      var language = pre.attr('class');
+      if (language) {
+        // map unknown languages to "clike" (without this they just dissapear)
+        if ($.inArray(language, ["bash", "clike", "css", "go", "html",
+                                 "javascript", "js", "julia", "lua", "markdown",
+                                 "markup", "mathml", "python", "svg", "xml"]) == -1)
+          language = "clike";
+        language = ' language="' + language + '"';
+        var dt_code = $('<d-code block' + language + clz + '></d-code>');
+        dt_code.text(code.text());
+        pre.replaceWith(dt_code);
+      } else {
+        code.addClass('text-output').unwrap().changeElementType('pre');
+      }
+    });
+  
+    // localize layout chunks to just output
+    $('.layout-chunk').each(function(i, val) {
+  
+      // capture layout
+      var layout = $(this).attr('data-layout');
+  
+      // apply layout to markdown level block elements
+      var elements = $(this).children().not('d-code, pre.text-output, script');
+      elements.each(function(i, el) {
+        var layout_div = $('<div class="' + layout + '"></div>');
+        if (layout_div.hasClass('shaded')) {
+          var shaded_content = $('<div class="shaded-content"></div>');
+          $(this).wrap(shaded_content);
+          $(this).parent().wrap(layout_div);
+        } else {
+          $(this).wrap(layout_div);
+        }
+      });
+  
+  
+      // unwrap the layout-chunk div
+      $(this).children().unwrap();
+    });
+  
+    // load distill framework
+    load_distill_framework();
+  
+    // wait for window.distillRunlevel == 4 to do post processing
+    function distill_post_process() {
+  
+      if (!window.distillRunlevel || window.distillRunlevel < 4)
+        return;
+  
+      // hide author/affiliations entirely if we have no authors
+      var front_matter = JSON.parse($("#distill-front-matter").html());
+      var have_authors = front_matter.authors && front_matter.authors.length > 0;
+      if (!have_authors)
+        $('d-byline').addClass('hidden');
+  
+      // table of contents
+      if (have_authors) // adjust border if we are in authors
+        $('.d-toc').parent().addClass('d-article-with-toc');
+  
+      // strip links that point to #
+      $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
+  
+      // hide elements of author/affiliations grid that have no value
+      function hide_byline_column(caption) {
+        $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
+      }
+  
+      // affiliations
+      var have_affiliations = false;
+      for (var i = 0; i<front_matter.authors.length; ++i) {
+        var author = front_matter.authors[i];
+        if (author.affiliation !== "&nbsp;") {
+          have_affiliations = true;
+          break;
+        }
+      }
+      if (!have_affiliations)
+        $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
+  
+      // published date
+      if (!front_matter.publishedDate)
+        hide_byline_column("Published");
+  
+      // document object identifier
+      var doi = $('d-byline').find('h3:contains("DOI")');
+      var doi_p = doi.next().empty();
+      if (!front_matter.doi) {
+        // if we have a citation and valid citationText then link to that
+        if ($('#citation').length > 0 && front_matter.citationText) {
+          doi.html('Citation');
+          $('<a href="#citation"></a>')
+            .text(front_matter.citationText)
+            .appendTo(doi_p);
+        } else {
+          hide_byline_column("DOI");
+        }
+      } else {
+        $('<a></a>')
+           .attr('href', "https://doi.org/" + front_matter.doi)
+           .html(front_matter.doi)
+           .appendTo(doi_p);
+      }
+  
+       // change plural form of authors/affiliations
+      if (front_matter.authors.length === 1) {
+        var grid = $('.authors-affiliations');
+        grid.children('h3:contains("Authors")').text('Author');
+        grid.children('h3:contains("Affiliations")').text('Affiliation');
+      }
+  
+      // inject pre code styles (can't do this with a global stylesheet b/c a shadow root is used)
+      $('d-code').each(function(i, val) {
+        var style = document.createElement('style');
+        style.innerHTML = 'pre code { padding-left: 10px; font-size: 12px; border-left: 2px solid rgba(0,0,0,0.1); } ' +
+                          '@media(min-width: 768px) { pre code { padding-left: 18px; font-size: 14px; } }';
+        if (this.shadowRoot)
+          this.shadowRoot.appendChild(style);
+      });
+  
+      // move appendix-bottom entries to the bottom
+      $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
+      $('.appendix-bottom').remove();
+  
+      // clear polling timer
+      clearInterval(tid);
+  
+      // show body now that everything is ready
+      on_load_complete();
+    }
+  
+    var tid = setInterval(distill_post_process, 50);
+    distill_post_process();
+  
+  }
+  
+  function init_downlevel() {
+  
+    init_common();
+  
+     // insert hr after d-title
+    $('.d-title').after($('<hr class="section-separator"/>'));
+  
+    // check if we have authors
+    var front_matter = JSON.parse($("#distill-front-matter").html());
+    var have_authors = front_matter.authors && front_matter.authors.length > 0;
+  
+    // manage byline/border
+    if (!have_authors)
+      $('.d-byline').remove();
+    $('.d-byline').after($('<hr class="section-separator"/>'));
+    $('.d-byline a').remove();
+  
+    // remove toc
+    $('.d-toc-header').remove();
+    $('.d-toc').remove();
+    $('.d-toc-separator').remove();
+  
+    // move appendix elements
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
+    });
+  
+  
+    // inject headers into references and footnotes
+    var refs_header = $('<h3></h3>');
+    refs_header.text('References');
+    $('#refs').prepend(refs_header);
+  
+    var footnotes_header = $('<h3></h3');
+    footnotes_header.text('Footnotes');
+    $('.footnotes').children('hr').first().replaceWith(footnotes_header);
+  
+    // move appendix-bottom entries to the bottom
+    $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
+    $('.appendix-bottom').remove();
+  
+    // remove appendix if it's empty
+    if ($('.d-appendix').children().length === 0)
+      $('.d-appendix').remove();
+  
+    // prepend separator above appendix
+    $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
+  
+    // trim code
+    $('pre>code').each(function(i, val) {
+      $(this).html($.trim($(this).html()));
+    });
+  
+    // move posts-container right before article
+    $('.posts-container').insertBefore($('.d-article'));
+  
+    $('body').addClass('downlevel');
+  
+    on_load_complete();
+  }
+  
+  
+  function init_common() {
+  
+    // jquery plugin to change element types
+    (function($) {
+      $.fn.changeElementType = function(newType) {
+        var attrs = {};
+  
+        $.each(this[0].attributes, function(idx, attr) {
+          attrs[attr.nodeName] = attr.nodeValue;
+        });
+  
+        this.replaceWith(function() {
+          return $("<" + newType + "/>", attrs).append($(this).contents());
+        });
+      };
+    })(jQuery);
+  
+    // prevent underline for linked images
+    $('a > img').parent().css({'border-bottom' : 'none'});
+  
+    // mark non-body figures created by knitr chunks as 100% width
+    $('.layout-chunk').each(function(i, val) {
+      var figures = $(this).find('img, .html-widget');
+      if ($(this).attr('data-layout') !== "l-body") {
+        figures.css('width', '100%');
+      } else {
+        figures.css('max-width', '100%');
+        figures.filter("[width]").each(function(i, val) {
+          var fig = $(this);
+          fig.css('width', fig.attr('width') + 'px');
+        });
+  
+      }
+    });
+  
+    // auto-append index.html to post-preview links in file: protocol
+    // and in rstudio ide preview
+    $('.post-preview').each(function(i, val) {
+      if (window.location.protocol === "file:")
+        $(this).attr('href', $(this).attr('href') + "index.html");
+    });
+  
+    // get rid of index.html references in header
+    if (window.location.protocol !== "file:") {
+      $('.distill-site-header a[href]').each(function(i,val) {
+        $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
+      });
+    }
+  
+    // add class to pandoc style tables
+    $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
+    $('.kable-table').children('table').addClass('pandoc-table');
+  
+    // add figcaption style to table captions
+    $('caption').parent('table').addClass("figcaption");
+  
+    // initialize posts list
+    if (window.init_posts_list)
+      window.init_posts_list();
+  
+    // implmement disqus comment link
+    $('.disqus-comment-count').click(function() {
+      window.headroom_prevent_pin = true;
+      $('#disqus_thread').toggleClass('hidden');
+      if (!$('#disqus_thread').hasClass('hidden')) {
+        var offset = $(this).offset();
+        $(window).resize();
+        $('html, body').animate({
+          scrollTop: offset.top - 35
+        });
+      }
+    });
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    if (is_downlevel_browser())
+      init_downlevel();
+    else
+      window.addEventListener('WebComponentsReady', init_distill);
+  });
+  
+  </script>
+  
+  <!--/radix_placeholder_distill-->
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
+  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
+  <!--radix_placeholder_site_in_header-->
+  <style type="text/css">
+  .distill-site-nav {
+    color: rgba(255, 255, 255, 0.8);
+    background-color: #000000;
+      font-size: 15px;
+    font-weight: 300;
+  }
+  
+  .distill-site-nav a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .distill-site-nav a:hover {
+    color: white;
+    text-decoration:underline;
+  }
+  
+  .distill-site-header {
+  }
+  
+  .distill-site-footer {
+  }
+  
+  @media print {
+    .distill-site-nav {
+      display: none;
+    }
+  }
+  
+  .l-body {
+    display: none;
+  }
+  
+  @media screen and (min-width: 768px) {
+    .l-body {display: inline;}
+  }
+  
+  </style>
+  <!--/radix_placeholder_site_in_header-->
+
+  <link rel="stylesheet" href="styles.css" type="text/css"/>
+
+</head>
+
+<body>
+
+<!--radix_placeholder_front_matter-->
+
+<script id="distill-front-matter" type="text/json">
+{"title":"Trajectory inference","authors":[{"author":"Kent Riemondy","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2019-08-14T00:00:00.000-06:00","citationText":"Riemondy, 2019"}
+</script>
+
+<!--/radix_placeholder_front_matter-->
+<!--radix_placeholder_navigation_before_body-->
+<header class="header header--fixed" role="banner">
+<nav class="distill-site-nav distill-site-header">
+<div class="nav-left">
+<a href="index.html" class="title">Single-cell RNA-seq Workshop</a>
+<a href="1_intro.html">Introduction</a>
+<a href="2_filtering_QC.html">Quality Control</a>
+<a href="3_norm_viz_clustering.html">Clustering</a>
+<a href="4_markers.html">Cell Type Annotation</a>
+<a href="5_pseudotime.html">Pseudotime</a>
+<a href="6_alignment.html">Dataset Alignment</a>
+<a href="7_multimodal.html">Multi-modal Data</a>
+</div>
+<div class="nav-right">
+<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
+</div>
+</nav>
+</header>
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="d-title">
+<h1>Trajectory inference</h1>
+
+</div>
+
+<div class="d-byline">
+  
+  Kent Riemondy
+  
+<br/>2019-08-14
+</div>
+
+<div class="d-article">
+<h2 id="trajectory-inference-aka-pseudotime">Trajectory inference, aka pseudotime*</h2>
+<p>Assumes that cells are sampled during various stages of a transition from a cell type or state to another type or state. By identifying trajectories that connect cells based on similarilty in gene expression, one can gain insights into lineage relationships and developmental trajectories. Often called pseudotime, but doesn’t have to relate to cells in different times in a process (could be spatial differences).</p>
+<p>Analysis of discrete clusters can hide interesting continous behaviors in cell populations. By ordering cells based on up an expression trajectory one can uncover novel patterns of gene expression.</p>
+<ul>
+<li>pseudo-science?</li>
+</ul>
+<h2 id="there-are-many-methods">There are many methods</h2>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+knitr::include_graphics(&quot;img/dynverse.webp&quot;)</code></pre>
+<p><img src="img/dynverse.webp" style="display: block; margin: auto;" /></p>
+</div>
+<p>Check out the <a href="https://dynverse.org/"><code>dynverse</code></a> for help with algorithm selection. They benchmarked &gt; 60 methods, and offer some tools to run multiple algorithms on the same data.</p>
+<h2 id="simplest-method-pca">Simplest method (PCA)</h2>
+<p>In some datasets, particularly developmental datasets it is often the case that a principal component may separate out cells based on known developmental time. This can be used a “pseudotime” metric, which is simply the PC1 scores for each cell. As an example, scRNA-seq analyses of <a href="http://dx.doi.org/10.1038/nature22796">liver development</a> and <a href="http://dx.doi.org/10.1016/j.cmet.2017.04.014">Beta-cell maturation</a> used PC1 to examine pseudotime.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(Seurat)
+library(tidyverse)
+library(Matrix)
+library(slingshot)
+library(monocle3)
+library(SingleCellExperiment)
+library(RColorBrewer)
+library(gam) #install.packages(&quot;gam&quot;)
+library(cowplot)
+
+theme_set(theme_cowplot())</code></pre>
+</div>
+<p>For this first analysis we will use a dataset of mouse early embryogenesis that was curated into a SingleCellExperiment object from here <a href="https://hemberg-lab.github.io/scRNA.seq.datasets/" class="uri">https://hemberg-lab.github.io/scRNA.seq.datasets/</a>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# read in data
+sce &lt;- readRDS(url(&quot;https://scrnaseq-public-datasets.s3.amazonaws.com/scater-objects/deng-reads.rds&quot;))
+
+# convert SingleCellExperiment to Seurat
+# already log normalized
+sobj &lt;- as.Seurat(sce)
+sobj &lt;- FindVariableFeatures(sobj)
+sobj &lt;- ScaleData(sobj)
+sobj &lt;- RunPCA(sobj, verbose = FALSE)
+
+Idents(sobj) &lt;- &quot;cell_type1&quot;
+DimPlot(sobj, reduction = &quot;pca&quot;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-2-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Next we will plot out the PC1 scores for each cell type (developmental stage), using the meta data stored in the <code>cell_type</code> column of <code>meta.data</code>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+plt_dat &lt;- FetchData(sobj, c(&quot;PC_1&quot;, &quot;cell_type1&quot;))
+
+# reorder cell_type based on known developmental time
+cell_type &lt;- factor(plt_dat$cell_type1,
+                            levels = c(&quot;zygote&quot;,
+                                       &quot;2cell&quot;,
+                                       &quot;4cell&quot;,
+                                       &quot;8cell&quot;,
+                                       &quot;16cell&quot;,
+                                       &quot;blast&quot;))
+plt_dat$cell_type &lt;- cell_type
+
+ggplot(plt_dat, aes(cell_type, PC_1)) +
+  geom_jitter(aes(color = cell_type)) +
+  labs(y = &quot;PC1 (aka pseudotime)&quot;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-3-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>EXERCISE: Identify genes that are highly correlated (positive or negative) with PC1 using a seurat function. Then plot the expression of some of these genes against Pseudotime (“PC1” x-axis, gene expression y-axis), using either built in seurat plotting functions or ggplot2.</p>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<p>We can overlay the pseudotime scores onto a projection by storing them as a meta.data column.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+sobj &lt;- RunUMAP(sobj, dims = 1:15)
+
+# get PC1 values and rank to generate a &quot;pseudotime&quot;
+ptime &lt;- FetchData(sobj, &quot;PC_1&quot;)
+ptime$ptime &lt;- rank(ptime$PC_1)
+
+# add to metadata
+sobj &lt;- AddMetaData(sobj, 
+                    ptime$ptime, 
+                    col.name = &quot;Pseudotime&quot;)
+
+FeaturePlot(sobj, &quot;Pseudotime&quot;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-5-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+DimPlot(sobj, 
+        group.by  = &quot;cell_type1&quot;, 
+        reduction = &quot;umap&quot;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-5-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="destiny">Destiny</h2>
+<p>Non-linear dynamics are not always captured by PCA, an alternative approach uses non-linear transformations, such as diffusion maps (or ICA, or others).</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/dpt.jpg" style="display: block; margin: auto;" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(destiny)
+
+logcounts &lt;- GetAssayData(sobj, &quot;data&quot;)
+
+# transpose matrix (genes as columns, cells as rows)
+input_matrix &lt;- t(logcounts[VariableFeatures(sobj), ])
+
+dm &lt;- DiffusionMap(input_matrix)
+
+plot(dm, 1:2, col = sobj$cell_type1)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-7-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Next we calculate diffusion pseudotime using <code>DPT</code>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+dpt &lt;- DPT(dm, tips = 268)
+plot(dpt, 1:2)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-8-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+tmp &lt;- data.frame(DC1 = dm$DC1,
+                  DC2 = dm$DC2,
+                  timepoint = cell_type,
+                  dpt = dpt$DPT1)
+
+ggplot(tmp, aes(x = DC1, 
+                y = DC2, 
+                colour = timepoint)) +
+    geom_point() + scale_color_brewer(palette = &quot;Paired&quot;) + 
+    xlab(&quot;Diffusion component 1&quot;) + 
+    ylab(&quot;Diffusion component 2&quot;) +
+    theme_classic()</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-8-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ggplot(tmp, aes(timepoint, dpt, 
+                colour = timepoint)) +
+  geom_point() + 
+  geom_jitter() +
+  scale_color_brewer(palette = &quot;Paired&quot;) </code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-9-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>PCA and diffusion maps can be good for simple trajectories or pathway activation systems e.g. T-cell activation, drug pertubation, single cell type responses.</p>
+<h2 id="slingshot">Slingshot</h2>
+<p>For more complex trajectories, simply using a single PC or a diffusion componenet may not be sufficient. Systems with bi or tri-furcating trajectories won’t be well fit within a single dimension.</p>
+<p>For this next analysis we will use a dataset taken from a single cell RNA-seq study of <a href="https://doi.org/10.1002/hep.29353">hepatocyte development</a>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+dl_url &lt;- &quot;https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/GSE90047_TPMS.tsv.gz&quot;
+
+mat &lt;- read_tsv(dl_url) %&gt;% 
+  as.data.frame()
+
+# set rownnames on matrix
+rownames(mat) &lt;- mat$gene
+mat[, 1] &lt;- NULL
+
+# convert to sparseMatrix
+mat &lt;- as(as.matrix(mat), &quot;sparseMatrix&quot;)
+
+# generate metadata from cell names
+mdata &lt;- tibble(cell = colnames(mat)) %&gt;% 
+  separate(cell, c(&quot;timepoint&quot;, &quot;other&quot;, &quot;num&quot;), 
+           sep = &quot;_&quot;, remove = FALSE) %&gt;% 
+  tibble::column_to_rownames(&quot;cell&quot;)
+
+
+so &lt;- CreateSeuratObject(mat, meta.data = mdata)
+
+# Normalize data by log transforming raw TPMs
+log_mat &lt;- log1p(GetAssayData(so, &quot;data&quot;))
+so &lt;- SetAssayData(so, &quot;data&quot;, new.data = log_mat) </code></pre>
+</div>
+<p>EXERCISE: Process this data through clustering and UMAP projections using <code>Seurat</code> (using defaults should be fine). Plot PC1 and PC2 in a <code>DimPlot</code></p>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-11-1.png" width="624" style="display: block; margin: auto;" /><img src="5_trajectories_files/figure-html5/unnamed-chunk-11-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p><a href="https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4772-0">Slingshot</a> is a <a href="https://bioconductor.org/packages/release/bioc/html/slingshot.html">Bioconductor package</a> that draws curved trajectories through a low dimensional embedding to infer developmental dynamics. It provides functionality for computing pseudotimes through multiple trajectories.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/slingshot.png" width="952" style="display: block; margin: auto;" /></p>
+</div>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+#convert to SingleCellExperiment
+sce &lt;- as.SingleCellExperiment(so)
+
+#subset to only a few PCA dimensions
+reducedDim(sce) &lt;- reducedDim(sce)[, 1:10]
+
+sce &lt;- suppressWarnings(slingshot(
+  sce,
+  reducedDim = &#39;PCA&#39;,
+  clusterLabels = &#39;seurat_clusters&#39;,
+  start.clus = &quot;4&quot;
+))
+
+# extract info about pseudotimes from sce
+slo &lt;- SlingshotDataSet(sce)
+
+slo</code></pre>
+<pre><code>
+#&gt; class: SlingshotDataSet 
+#&gt; 
+#&gt;  Samples Dimensions
+#&gt;      447         10
+#&gt; 
+#&gt; lineages: 3 
+#&gt; Lineage1: 4  2  6  1  3  
+#&gt; Lineage2: 4  2  6  1  0  
+#&gt; Lineage3: 4  2  6  1  5  
+#&gt; 
+#&gt; curves: 3 
+#&gt; Curve1: Length: 82.364   Samples: 305.31
+#&gt; Curve2: Length: 122.06   Samples: 310.18
+#&gt; Curve3: Length: 84.424   Samples: 267.11</code></pre>
+</div>
+<p>slingshot provides some minimal plotting utilities in base R plotting.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Plot clusters with lineages overlayed
+plot(reducedDims(sce)$PCA, col = brewer.pal(9,&#39;Set1&#39;)[sce$seurat_clusters], pch=16)
+lines(SlingshotDataSet(sce), lwd=2, col=&#39;black&#39;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-14-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+# Plot pseudotime for a lineage
+# get colors for pseudotime from lineage 1
+colors &lt;- colorRampPalette(brewer.pal(11,&#39;Spectral&#39;)[-6])(100)
+plotcol &lt;- colors[cut(sce$slingPseudotime_2, breaks=100)]
+
+plot(reducedDims(sce)$PCA, col = plotcol, pch=16)
+lines(SlingshotDataSet(sce), lwd=2, col=&#39;black&#39;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-14-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Here’s some code to help with plotting these data in ggplot2.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+#&#39; function to add curve data to SingleCellObject metadata
+add_curves &lt;- function(sce, lineage = 2){
+  curve_data &lt;- slingCurves(sce)[[lineage]]
+  curve_pos &lt;- curve_data$s[curve_data$ord, 1:2]
+  
+  sce[[paste0(&quot;curve&quot;, lineage, &quot;_x&quot;)]] &lt;- curve_pos[, 1]
+  sce[[paste0(&quot;curve&quot;, lineage, &quot;_y&quot;)]] &lt;- curve_pos[, 2]
+  sce
+}
+
+#&#39; function to extract out metadata and reduced dimension data for plotting
+get_plotting_data &lt;- function(sce, reduction = &quot;PCA&quot;){
+  pcs &lt;- reducedDims(sce)[[reduction]][, 1:2]
+  mdata &lt;- colData(sce) %&gt;% 
+    as.data.frame() 
+  df &lt;- cbind(mdata, pcs)
+  df
+}
+
+
+sce &lt;- add_curves(sce, lineage = 1)
+sce &lt;- add_curves(sce, lineage = 2)
+plot_df &lt;- get_plotting_data(sce)
+
+
+ggplot(plot_df, aes(PC_1, PC_2)) +
+  geom_point(aes(color = slingPseudotime_2)) +
+  geom_point(aes(curve1_x, curve1_y)) +
+  geom_point(aes(curve2_x, curve2_y)) 
+
+ggplot(plot_df, aes(PC_1, PC_2)) +
+  geom_point(aes(color = timepoint)) +
+  geom_point(aes(curve1_x, curve1_y)) +
+  geom_point(aes(curve2_x, curve2_y)) </code></pre>
+</div>
+<h3 id="plotting-slingshot-pseudotime-onto-umap">plotting slingshot pseudotime onto UMAP</h3>
+<p>The lineage trees are generated in the same dimensionality as the input data. To visualize the pseudotime estimates in UMAP space we can add these to the meta.data slot of the seurat object.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so$pseudotime1 &lt;- sce$slingPseudotime_1
+so$pseudotime2 &lt;- sce$slingPseudotime_2
+FeaturePlot(so, c(&quot;pseudotime1&quot;, &quot;pseudotime2&quot;))</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-16-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="identifying-differentially-expressed-genes-along-a-trajectory">Identifying differentially expressed genes along a trajectory</h2>
+<p>We can use a <code>GAM</code> (or other models) to compare pseudotimes to gene expression values to identify genes that vary significantly with pseudotime. Using a GAM can uncover non-linear expression patterns (i.e. not just up or down). See this <a href="https://multithreaded.stitchfix.com/blog/2015/07/30/gam/">blog</a> for a nice description.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# select the ptime values 
+ptime &lt;- sce$slingPseudotime_2
+
+# get cells in that lineage
+lineage_cells &lt;- colnames(sce)[!is.na(ptime)]
+
+# remove values for cells not in the lineage
+ptime &lt;- ptime[!is.na(ptime)]
+
+# just test variable genes to save some time
+genes_to_test &lt;- VariableFeatures(so)[1:1000]
+
+# get log normalized data to test
+cnts &lt;- logcounts(sce)[genes_to_test, lineage_cells]
+
+
+# fit a GAM with a loess term for pseudotime
+gam.pval &lt;- apply(cnts, 1, function(z){
+    d &lt;- data.frame(z = z, 
+                    ptime = ptime)
+    tmp &lt;- suppressWarnings(gam(z ~ lo(ptime), data=d))
+    p &lt;- summary(tmp)[4][[1]][1, 5]
+    p
+})
+
+# adjust pvalues 
+res &lt;- tibble(
+  id = names(gam.pval),
+  pvals = gam.pval,
+  qval = p.adjust(gam.pval, method = &quot;fdr&quot;)) %&gt;% 
+  arrange(qval)
+
+head(res)</code></pre>
+<pre><code>
+#&gt; # A tibble: 6 x 3
+#&gt;   id                pvals      qval
+#&gt;   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 Tinagl1       8.73e-151 8.72e-148
+#&gt; 2 Spon1         2.61e-150 1.31e-147
+#&gt; 3 Pdzk1ip1      8.84e-145 2.94e-142
+#&gt; 4 Gc            2.58e-139 6.45e-137
+#&gt; 5 1700011H14Rik 1.67e-127 3.35e-125
+#&gt; 6 Adamts1       6.46e-127 1.08e-124</code></pre>
+</div>
+<p>Finally make a heatmap to plot out these genes that vary over pseudotime.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# get log normalized counts 
+to_plot &lt;- as.matrix(logcounts(sce)[res$id[1:100], lineage_cells])
+
+# arrange cells by pseudotime
+ptime_order &lt;- colnames(to_plot)[order(ptime)]
+
+# add useful annotations
+annotations &lt;- colData(sce)[lineage_cells, 
+                            c(&quot;slingPseudotime_2&quot;, 
+                            &quot;seurat_clusters&quot;, 
+                            &quot;timepoint&quot;)] %&gt;% 
+  as.data.frame()
+
+ha &lt;- HeatmapAnnotation(df = annotations)
+
+Heatmap(to_plot,
+        column_order = ptime_order,
+        show_column_names = FALSE,
+        show_row_names = FALSE,
+        top_annotation = ha)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-18-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="extremely-perhaps-overly-complex-monocle3">Extremely (perhaps overly) complex, monocle3:</h2>
+<p><a href="https://cole-trapnell-lab.github.io/monocle3/">monocle3</a> is the newest release of the monocle package from Cole Trapnell’s lab. It can handle million cell scale datasets and highly complex trajectories.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+expression_matrix &lt;- readRDS(url(&quot;http://staff.washington.edu/hpliner/data/packer_embryo_expression.rds&quot;))
+cell_metadata &lt;- readRDS(url(&quot;http://staff.washington.edu/hpliner/data/packer_embryo_colData.rds&quot;))
+gene_annotation &lt;- readRDS(url(&quot;http://staff.washington.edu/hpliner/data/packer_embryo_rowData.rds&quot;))
+
+cds &lt;- new_cell_data_set(expression_matrix,
+                         cell_metadata = cell_metadata,
+                         gene_metadata = gene_annotation)</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# subset to 2000 cells
+set.seed(42)
+ids &lt;- sample(colnames(cds), 2000)
+cds &lt;- cds[, ids]</code></pre>
+</div>
+<p>monocle3 relies on performing some steps that are also performed by Seurat. For this reason it doesn’t play very well with Seurat, so we follow their preprocessing steps to normalize, run PCA, and run UMAP.</p>
+<p>We will use example data from the monocle3 tutorial. Note that the <code>preprocess_cds</code> function can take covariates to regress out. The variables shown here were used for background RNA removal in the original publication.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# run normalization and PCA
+cds &lt;- preprocess_cds(cds, 
+                      num_dim = 100,
+                      residual_model_formula_str = &quot;~ bg.300.loading + bg.400.loading + bg.500.1.loading + bg.500.2.loading + bg.r17.loading + bg.b01.loading + bg.b02.loading&quot;)
+
+# run UMAP
+cds &lt;- reduce_dimension(cds)
+
+plot_cells(cds, 
+           label_groups_by_cluster=FALSE,  
+           color_cells_by = &quot;cell.type&quot;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-21-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+# cluster cells using similar algorithm to seurat
+cds &lt;- cluster_cells(cds)
+
+plot_cells(cds, color_cells_by = &quot;partition&quot;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-21-2.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+plot_cells(cds, color_cells_by = &quot;cluster&quot;)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-21-3.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>We will next generate a graph that weaves through the data. This algorithm is related to the approach used in the python package <code>PAGA</code> that we will discuss later.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+cds &lt;- learn_graph(cds)</code></pre>
+<pre><code>
+#&gt; 
+  |                                                                  
+  |                                                            |   0%
+  |                                                                  
+  |============================================================| 100%</code></pre>
+<pre class="r"><code>
+plot_cells(cds,
+           color_cells_by = &quot;cell.type&quot;,
+           label_groups_by_cluster = FALSE,
+           label_leaves = FALSE,
+           label_branch_points = FALSE)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-22-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+plot_cells(cds,
+           color_cells_by = &quot;embryo.time.bin&quot;,
+           label_cell_groups = FALSE,
+           label_leaves = TRUE,
+           label_branch_points = TRUE,
+           graph_label_size = 1.5)</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-22-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Next we will select the root cells to compute pseudotimes. monocle3 provides an interactive shiny interface to select cells.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+cds &lt;- order_cells(cds)
+
+plot_cells(cds,
+           color_cells_by = &quot;pseudotime&quot;,
+           label_cell_groups=FALSE,
+           label_leaves=FALSE,
+           label_branch_points=FALSE,
+           graph_label_size=1.5)</code></pre>
+</div>
+<p>We can test for genes that are significantly coclustered using the <code>graph_test</code>. This can identify genes that change along a trajectory.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+de_genes = graph_test(cds,
+                      neighbor_graph = &quot;principal_graph&quot;,
+                      cores = 4)
+                               
+de_genes = row.names(subset(de_genes, q_value &lt; 0.05))
+
+plot_cells(cds, genes=de_genes[1:4],
+           show_trajectory_graph=FALSE,
+           label_cell_groups=FALSE,
+           label_leaves=FALSE)</code></pre>
+</div>
+<p>To more specifically examine a single lineage or branch, we can subset the data interactively and recompute differential expression.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+cds_subset &lt;- choose_cells(cds)
+
+de_genes &lt;- graph_test(cds_subset, cores = 4)
+de_ids &lt;- rownames(subset(de_genes, q_value &lt; 0.05))
+
+plot_cells(cds_subset,
+           genes = de_ids[1:6],
+           label_cell_groups=FALSE,
+           show_trajectory_graph=FALSE)</code></pre>
+</div>
+<h2 id="paga">PAGA</h2>
+<p><a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1663-x">PAGA</a> is a python module available in the python counterpart to seurat known as <code>scanpy</code>. <code>PAGA</code> provides both a very nice visualization technique, and a method for trajectory analysis.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/paga.webp" style="display: block; margin: auto;" /></p>
+</div>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/paga_graph.png" width="2073" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="how-to-deal-with-multiple-timepoints">How to deal with multiple timepoints</h2>
+<p><a href="https://github.com/farrellja/URD">URD</a> <a href="https://github.com/wagnerde/STITCH">STITCH</a> <a href="https://broadinstitute.github.io/wot/">Waddington-OT</a></p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/urd.jpg" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="rna-velocity">RNA velocity</h2>
+<p>Has a python and R package implementation for performing analysis. Requires processing bam file to quantitate unspliced and spliced mRNAs per cell.</p>
+<p><a href="http://velocyto.org/" class="uri">http://velocyto.org/</a></p>
+<p><a href="https://github.com/velocyto-team/velocyto.R" class="uri">https://github.com/velocyto-team/velocyto.R</a></p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/rna_velo_motivation.jpg" style="display: block; margin: auto;" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/rna_velo.jpg" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="recommendations">Recommendations:</h2>
+<ol type="1">
+<li><p>Limit analysis to relevant cell populations (i.e. don’t try to infer trajectories where you know they don’t exist)</p></li>
+<li><p>Start with simple methods and trajectories.</p></li>
+<li><p>Complement pseudotime trajectories with RNA velocity analyses to provide directionality and orthogonal validation.</p></li>
+</ol>
+<h2 id="credits">Credits:</h2>
+<p>Much of this material was either copied or motivated by the <code>slingshot</code>, <code>destiny</code>, and <code>monocle3</code> vignettes.</p>
+<!--radix_placeholder_article_footer-->
+<!--/radix_placeholder_article_footer-->
+</div>
+
+<div class="d-appendix">
+</div>
+
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_appendices-->
+<div class="appendix-bottom">
+<h3 id="updates-and-corrections">Corrections</h3>
+<p>If you see mistakes or want to suggest changes, please <a href="https://github.com/rnabioco/cellar/issues/new">create an issue</a> on the source repository.</p>
+</div>
+<!--/radix_placeholder_appendices-->
+<!--radix_placeholder_navigation_after_body-->
+<!--/radix_placeholder_navigation_after_body-->
+
+</body>
+
+</html>
