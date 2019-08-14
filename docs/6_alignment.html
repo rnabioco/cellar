@@ -1357,7 +1357,7 @@
 <h1 id="single-cell-dataset-alignment-and-batch-correction">Single cell dataset alignment and batch correction</h1>
 <ul>
 <li>Inter-sample variation can complicate the analysis of single cell data.</li>
-<li>This variation can include batch effects, technology-specific biases, experimental conditions, etc.</li>
+<li>This variation can include experimental or sequencing batch effects, technology-specific biases, experimental conditions, etc.</li>
 <li>Robust methods are available to align datasets from different platforms, experimental conditions, individuals and even species.</li>
 </ul>
 <h2 id="packages-covered">Packages covered:</h2>
@@ -1366,8 +1366,8 @@
 <li>Seurat (<a href="https://satijalab.org/seurat/v3.0/integration.html" class="uri">https://satijalab.org/seurat/v3.0/integration.html</a>)</li>
 <li>scAlign (<a href="https://github.com/quon-titative-biology/scAlign" class="uri">https://github.com/quon-titative-biology/scAlign</a>)</li>
 </ol>
-<h2 id="load-the-seurat-pancreatic-islet-datasets">Load the Seurat pancreatic islet dataset(s)</h2>
-<p>This object contains human pancreatic islet cell data from four single cell sequencing technologies, CelSeq (GSE81076), CelSeq2 (GSE85241), Fluidigm C1 (GSE86469), and SMART-Seq2 (E-MTAB-5061). Basic normalization has been performed, as described earlier in this workshop. The UMAP projection below illustrates the challenge: despite containing the same cell populations, the cells are separated not only by cell type (1st plot), but also by technology (2nd plot).</p>
+<h2 id="an-example-four-pancreatic-islet-datasets">An example: Four pancreatic islet datasets</h2>
+<p>The code below downloads a Seurat object that contains human pancreatic islet cell data from four single cell sequencing technologies, CelSeq (GSE81076), CelSeq2 (GSE85241), Fluidigm C1 (GSE86469), and SMART-Seq2 (E-MTAB-5061). Basic QC and normalization has been performed, as described earlier in this workshop. The UMAP projections below illustrates the challenge: despite containing the same cell populations, the cells are separated not only by cell type (1st plot), but also by technology (2nd plot).</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 so &lt;- readRDS(gzcon(url(&quot;https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/pancreas.Rds&quot;)))
@@ -1379,12 +1379,14 @@ pre_tech_plot &lt;- DimPlot(so,
                          reduction = &quot;umap&quot;,
                          group.by = &quot;tech&quot;)
 
-plot_grid(pre_cell_plot, pre_tech_plot, nrow = 2)</code></pre>
+plot_grid(pre_cell_plot,
+          pre_tech_plot,
+          nrow = 2)</code></pre>
 <p><img src="6_alignment_files/figure-html5/pancreas_data-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="quick-and-flexible-harmony">Quick and Flexible: Harmony</h2>
 <p><img src="https://github.com/immunogenomics/harmony/raw/master/vignettes/main.jpg" /></p>
-<p>Harmony works by weakly clustering cells and then calculating - and iteratively refining - a dataset correction factor for each cluster. This works well for most datasets. Notably, harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the <code>raw.data</code>, <code>data</code> and <code>scale.data</code> slots are unmodified).</p>
+<p>Harmony works by weakly clustering cells and then calculating - and iteratively refining - a dataset correction factor for each cluster. Note that Harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the <code>raw.data</code>, <code>data</code> and <code>scale.data</code> slots are unmodified). This works well for most datasets, but can be be insufficient for downstream differential expression analyses in extremely divergent samples.</p>
 <h3 id="running-harmony-on-a-seurat-object">Running harmony on a Seurat object</h3>
 <p>Harmony provides a wrapper function (<code>RunHarmony()</code>) that can take Seurat (v2 or v3) or SingleCellExperiment objects directly. Here, we run harmony with the default parameters and generate a plot to confirm convergence. <code>RunHarmony()</code> returns an object with a new dimensionality reduction - named harmony - that can be used for downstream projections and clustering.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1403,14 +1405,20 @@ so@reductions$harmony</code></pre>
 #&gt;  Jackstraw run: FALSE 
 #&gt;  Computed using assay: RNA</code></pre>
 </div>
-<p>We can use plot this new reduction directly, or use it to generate new UMAPs.</p>
+<p>We can plot this new reduction directly, or use it to generate new UMAPs.</p>
 <p>Plotting the first two harmony dimensions directly already reveals the value of this approach - the cells are now spatially clustered by cell type, rather than by technology:</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-harmony_cell_plot &lt;- DimPlot(so, reduction = &quot;harmony&quot;, group.by = &quot;celltype&quot;)
-harmony_tech_plot &lt;- DimPlot(so, reduction = &quot;harmony&quot;, group.by = &quot;tech&quot;)
+harmony_cell_plot &lt;- DimPlot(so,
+                             reduction = &quot;harmony&quot;,
+                             group.by = &quot;celltype&quot;)
+harmony_tech_plot &lt;- DimPlot(so,
+                             reduction = &quot;harmony&quot;,
+                             group.by = &quot;tech&quot;)
 
-plot_grid(harmony_cell_plot, harmony_tech_plot, nrow = 2)</code></pre>
+plot_grid(harmony_cell_plot,
+          harmony_tech_plot,
+          nrow = 2)</code></pre>
 <p><img src="6_alignment_files/figure-html5/harmony_plots-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
 <p>We can also generate UMAP projections from the harmony reductions.</p>
@@ -1422,60 +1430,76 @@ so &lt;- RunUMAP(so,
               dims = 1:20,
               reduction.name = &quot;harmony_umap&quot;)
 
-h_umap_cell_plot &lt;- DimPlot(so, reduction = &quot;harmony_umap&quot;, group.by = &quot;celltype&quot;, label = T, repel = T)
-h_umap_tech_plot &lt;- DimPlot(so, reduction = &quot;harmony_umap&quot;, group.by = &quot;tech&quot;)
+h_umap_cell_plot &lt;- DimPlot(so,
+                            reduction = &quot;harmony_umap&quot;,
+                            group.by = &quot;celltype&quot;,
+                            label = T,
+                            repel = T)
+h_umap_tech_plot &lt;- DimPlot(so,
+                            reduction = &quot;harmony_umap&quot;,
+                            group.by = &quot;tech&quot;)
 
-plot_grid(h_umap_cell_plot, h_umap_tech_plot, nrow = 2)</code></pre>
+plot_grid(h_umap_cell_plot,
+          h_umap_tech_plot,
+          nrow = 2)</code></pre>
 <p><img src="6_alignment_files/figure-html5/harmony_umap-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
-<p>This is a simplified example where we already have independent clustering in all four samples. In a production analysis, you will likely want to cluster the cells using the harmony alignment:</p>
+<p>In this example, we already have labeled clusters in all four samples to simplify alignment quality assessment. In a production analysis, you will likely want to cluster the aligned cells using the harmony alignment. This is accomplished by providing <code>reduction = "harmony"</code> to <code>FindNeighbors()</code>.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-so &lt;- FindNeighbors(so, reduction = &quot;harmony&quot;, dims = 1:20)
-so &lt;- FindClusters(so, resolution = 0.5)</code></pre>
+so &lt;- FindNeighbors(so,
+                    reduction = &quot;harmony&quot;,
+                    dims = 1:20)
+
+so &lt;- FindClusters(so,
+                   resolution = 0.5)</code></pre>
 </div>
-<p>Harmony is also highly tunable. Additional co-variates can be included and the strength of alignment can be tuned for each co-variate using the theta argument.</p>
+<p>Harmony is also highly tunable. Additional co-variates can be included and the strength of alignment can be tuned for each co-variate using the theta argument. Higher theta values result in more aggressive correction factors and, consequently, more aggressive dataset integration.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 so &lt;- RunHarmony(so,
                  group.by.vars = c(&quot;tech&quot;, ...), # can be any metadata column
                  theta = c(3,4)) # default theta = 2; higher value = more agressive integration</code></pre>
 </div>
-<h2 id="built-in-but-more-complex-to-run-seurat-v3-integration">Built-in, but more complex to run: Seurat v3 Integration</h2>
+<h2 id="built-in-but-more-complex-to-run-seurat-v3-integration">Built-in, but more complex to run: Seurat (v3) Integration</h2>
 <p><img src="https://satijalab.org/img/vignette_images/anchorsb_2018.png" data-align="center" /></p>
-<p>Seurat’s built-in integration works by identifying ‘anchors’ between pairs of datasets. These anchors represent pairwise correspondences between individual cells (one in each dataset) that originate from the same biological state. These ‘anchors’ are then used to harmonize the datasets. Unlike Harmony, Seruat’s integration approach does calculate corrected expression values.</p>
+<p>Seurat’s built-in integration works by identifying ‘anchors’ between pairs of datasets. These anchors represent pairwise correspondences between individual cells (one in each dataset) that originate from the same biological state. These ‘anchors’ are then used to harmonize the datasets. Unlike Harmony, Seruat’s integration approach <em>does</em> calculate corrected expression values.</p>
 <h3 id="running-seurat-v3-integration">Running Seurat v3 Integration</h3>
-<p>To construct a reference, we will identify ‘anchors’ between the individual datasets. First, we split the combined object into a list, with each dataset as an element.</p>
+<p>Adapted from the Seurat ‘standard workflow’ integration vignette.</p>
+<p>To construct a reference, we first identify ‘anchors’ between the individual datasets. Unlike Harmony, Seurat requires that the datasets be in separate Seurat objects, so we split the object into a list of Seurat objects by technology used.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 so.list &lt;- SplitObject(so, split.by = &quot;tech&quot;)</code></pre>
 </div>
-<p>Prior to finding anchors, we perform standard preprocessing (log-normalization), and identify variable features individually for each.</p>
+<p>Next, we perform standard preprocessing (log-normalization) on each individual object, and identify variable features in each.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 seurat.preprocess &lt;- function(so){
-  so_tmp &lt;- NormalizeData(so, verbose = FALSE)
-  so_tmp &lt;- FindVariableFeatures(so_tmp, selection.method = &quot;vst&quot;, 
-        nfeatures = 2000, verbose = FALSE)
+  so_tmp &lt;- NormalizeData(so,
+                          verbose = FALSE)
+  so_tmp &lt;- FindVariableFeatures(so_tmp, 
+                                 selection.method = &quot;vst&quot;, 
+        nfeatures = 2000,
+        verbose = FALSE)
   so_tmp
 }
 
 so.list &lt;- map(so.list, ~seurat.preprocess(.x))</code></pre>
 </div>
-<p>Next, we identify anchors using the FindIntegrationAnchors function, which takes a list of Seurat objects as input. Here, we integrate the four objects into a reference.</p>
-<p>We use all default parameters here for identifying anchors, including the ‘dimensionality’ of the dataset (30; feel free to try varying this parameter over a broad range, for example between 10 and 50).</p>
+<p>We will identify anchors using the <code>FindIntegrationAnchors()</code> function, which takes a list of Seurat objects as input. Here, we integrate our four objects into a reference.</p>
+<p>We use all default parameters here, but Seurat integration is very flexible. In a production analysis, it can be useful to vary the ‘dimensionality’ of the dataset (default = ) over a broad range (e.g. 10-50) to determine the optimal anchor parameters. Also, if any dataset contains fewer than 200 cells, k.filter (the number of neighbors to use when filtering anchors) will need to be lowered. As an aside, this integration strategy does not work particularly well with small datasets (too few anchors).</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-reference.list &lt;- so.list[c(&quot;celseq&quot;, &quot;celseq2&quot;, &quot;smartseq2&quot;,&quot;fluidigmc1&quot;)]
-so.anchors &lt;- FindIntegrationAnchors(object.list = reference.list, dims = 1:30)</code></pre>
+so.anchors &lt;- FindIntegrationAnchors(object.list = so.list,
+                                     dims = 1:30, )</code></pre>
 </div>
-<p>We then pass these anchors to the IntegrateData function, which returns a Seurat object.</p>
-<p>The returned object will contain a new Assay, which holds an integrated (or ‘batch-corrected’) expression matrix for all cells, enabling them to be jointly analyzed.</p>
+<p>After identifying anchors, we run the IntegrateData function, which returns a single integrated Seurat object that contains a new Assay (“integrated”), which holds an integrated (‘batch-corrected’) expression matrix for all cells.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-so.integrated &lt;- IntegrateData(anchorset = so.anchors, dims = 1:30)</code></pre>
+so.integrated &lt;- IntegrateData(anchorset = so.anchors,
+                               dims = 1:30)</code></pre>
 </div>
-<p>We can then use this new integrated matrix for downstream analysis and visualization. Here we scale the integrated data, run PCA, and visualize the results with UMAP. The integrated datasets cluster by cell type, instead of by technology.</p>
+<p>We can then use this integrated matrix for downstream analysis and visualization exactly as described earlier in this workshop.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 # switch to integrated assay. The variable features of this assay are automatically
@@ -1483,38 +1507,55 @@ so.integrated &lt;- IntegrateData(anchorset = so.anchors, dims = 1:30)</code></p
 DefaultAssay(so.integrated) &lt;- &quot;integrated&quot;
 
 # Run the standard workflow for visualization and clustering
-so.integrated &lt;- ScaleData(so.integrated, verbose = FALSE)
-so.integrated &lt;- RunPCA(so.integrated, npcs = 30, verbose = FALSE)
-so.integrated &lt;- RunUMAP(so.integrated, reduction = &quot;pca&quot;, dims = 1:30)
-s_umap_cell_plot &lt;- DimPlot(so.integrated, reduction = &quot;umap&quot;, group.by = &quot;celltype&quot;, label = T, repel = T)
-s_umap_tech_plot &lt;- DimPlot(so.integrated, reduction = &quot;umap&quot;, group.by = &quot;tech&quot;)
+so.integrated &lt;- ScaleData(so.integrated,
+                           verbose = FALSE)
+so.integrated &lt;- RunPCA(so.integrated,
+                        npcs = 30,
+                        verbose = FALSE)
+so.integrated &lt;- RunUMAP(so.integrated,
+                         reduction = &quot;pca&quot;,
+                         dims = 1:30)
+s_umap_cell_plot &lt;- DimPlot(so.integrated,
+                            reduction = &quot;umap&quot;,
+                            group.by = &quot;celltype&quot;,
+                            label = T,
+                            repel = T)
+s_umap_tech_plot &lt;- DimPlot(so.integrated,
+                            reduction = &quot;umap&quot;,
+                            group.by = &quot;tech&quot;)
 
-plot_grid(s_umap_cell_plot, s_umap_tech_plot, nrow = 2)</code></pre>
+plot_grid(s_umap_cell_plot,
+          s_umap_tech_plot,
+          nrow = 2)</code></pre>
 <p><img src="6_alignment_files/figure-html5/seurat_plot-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="deep-learning-scalign">Deep learning: scAlign</h2>
-<p>scAlign combines features of Harmony and Seurat with additional functionality that may be useful for some samples. Notably, scAlign can identify rare cell types/states across samples without the need to cluster the cells first.</p>
+<p>scAlign uses a shared deep neural network to project cells into a shared expression or reduction space. This approach combines features of Harmony (new projections without modifying expression data) and Seurat (the ability to generate corrected expression matrices) with additional functionality that may be useful for some samples. Notably, scAlign can identify rare cell types/states across samples without the need to cluster the cells first. scAlign can also make use of existing labelled clusters in the source datasets (“supervised” mode) to improve integration.</p>
 <h3 id="running-scalign-on-a-seurat-object">Running scAlign on a Seurat object</h3>
+<p>Adapted from the scAlign vignettes.</p>
 <p>Starting from the so.list we generated for the Seurat integration, we can jump right into the scAlign workflow.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 scalign.preprocess &lt;- function(so){
     so_tmp &lt;- NormalizeData(so)
-    so_tmp &lt;- ScaleData(so_tmp, features = rownames(so_tmp))
+    so_tmp &lt;- ScaleData(so_tmp,
+                        features = rownames(so_tmp))
     so_tmp &lt;- FindVariableFeatures(so_tmp,
                                    selection.method = &quot;vst&quot;,
                                    nfeatures = 3000)
   so_tmp
 }
 
-so.list &lt;- map(so.list, ~scalign.preprocess(.x))</code></pre>
+so.list &lt;- map(so.list,
+               ~scalign.preprocess(.x))</code></pre>
 </div>
 <p>Next, we can extract a common set of genes across all datasets.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
-genes.use &lt;- unique(unlist(map(so.list, ~.x@assays$RNA@var.features)))</code></pre>
+genes.use &lt;- unique(unlist(map(so.list,
+                               ~.x@assays$RNA@var.features)))</code></pre>
 </div>
-<p>The general design of scAlign makes it agnostic to the input RNA-seq data representation. Thus, the input data can either be gene-level counts, transformations of those gene level counts or a preliminary step of dimensionality reduction such as canonical correlates or principal component scores. Here we convert the previously defined Seurat objects to SingleCellExperiment objects in order to create the combined scAlign object.</p>
+<p>The general design of scAlign makes it agnostic to the input RNA-seq data representation. Thus, the input data can either be gene-level counts, transformations of those gene level counts or a preliminary step of dimensionality reduction such as canonical correlates, principal component scores, or Harmony projections. Here we convert the previously defined Seurat objects to SingleCellExperiment objects in order to create the combined scAlign object.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 so.sce.list = lapply(so.list,
@@ -1524,16 +1565,18 @@ so.sce.list = lapply(so.list,
                                                   colData = seurat.obj@meta.data)
                             })</code></pre>
 </div>
-<p>Next, we build the scAlign combined SCE object and append the results of the Harmony integration. The scAlign vignette uses the Seurat v2 RunMultiCCA reduction here, but the principle is the same. Any shared metric can be used - log-space gene expression, PCA, CCA, etc. We will build two scAlign objects - one with labels (cell type) and one without.</p>
+<p>Next, we build the scAlign combined SCE object and append the results of the Harmony integration. The scAlign vignette uses the Seurat v2 RunMultiCCA reduction here, but the principle is the same (an intermediate dimensionality reduction in a shared projection space). Any shared metric can be used - log-space gene expression, PCA, CCA, etc.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 scAlignPancreas = scAlignCreateObject(sce.objects = so.sce.list,
                                       project.name = &quot;scAlign_Pancreatic_Islet&quot;,
-                                      labels = map(so.sce.list, ~.x@colData$celltype))
+                                      labels = map(so.sce.list,
+                                                   ~.x@colData$celltype))
 
+# the bracketed-subsetting ensures that the cell order is correct in the SCE object
 reducedDim(scAlignPancreas, &quot;Harmony&quot;) = so@reductions$harmony@cell.embeddings[rownames(scAlignPancreas@colData),]</code></pre>
 </div>
-<p>Finally, we align the pancreas islets sequenced across different protocols using the results of RunHarmony as input to scAlign.</p>
+<p>Finally, we align the pancreas islets sequenced across different protocols using the results of RunHarmony as input to scAlign. This should not be run interactively during the workshop, as it is time consuming.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 scAlignPancreas = scAlignMulti(scAlignPancreas,
@@ -1550,20 +1593,31 @@ scAlignPancreas = scAlignMulti(scAlignPancreas,
                         device = &quot;GPU&quot;)
 
 # convert the scAlign ovject to Seurat and run UMAP on the aligned reduction.
-so.sca &lt;- RunUMAP(as.Seurat(scAlignPancreas, counts = NULL), reduction = &quot;ALIGNED-Harmony&quot;, dims = 1:20)
+so.sca &lt;- RunUMAP(as.Seurat(scAlignPancreas,
+                            counts = NULL),
+                  reduction = &quot;ALIGNED-Harmony&quot;,
+                  dims = 1:20)
 
 # save the aligned Seurat object for plotting
 saveRDS(so.sca, &quot;so_sca.Rds&quot;)</code></pre>
 </div>
-<p>scAlign can be run unsupervised, partially supervised, or fully supervised. Here we’re running unsupervised.</p>
+<p>As with Harmony and Seurat, scAlign produces a single, well-aligned projection. This is not a particularly compelling example of scAlign’s output - it’s built on Harmony’s output, after all - but is included primarily to demonstrate the scAlign workflow.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 so.sca &lt;- readRDS(&quot;so_sca.Rds&quot;)
 
-sca_umap_cell_plot &lt;- DimPlot(so.sca, reduction = &quot;umap&quot;, group.by = &quot;celltype&quot;, label = T, repel = T)
-sca_umap_tech_plot &lt;- DimPlot(so.sca, reduction = &quot;umap&quot;, group.by = &quot;tech&quot;)
+sca_umap_cell_plot &lt;- DimPlot(so.sca,
+                              reduction = &quot;umap&quot;,
+                              group.by = &quot;celltype&quot;,
+                              label = T,
+                              repel = T)
+sca_umap_tech_plot &lt;- DimPlot(so.sca,
+                              reduction = &quot;umap&quot;,
+                              group.by = &quot;tech&quot;)
 
-plot_grid(sca_umap_cell_plot, sca_umap_tech_plot, nrow = 2)</code></pre>
+plot_grid(sca_umap_cell_plot,
+          sca_umap_tech_plot,
+          nrow = 2)</code></pre>
 <p><img src="6_alignment_files/figure-html5/scalign_plot-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="comparing-all-three-integration-methods">Comparing all three integration methods</h2>
