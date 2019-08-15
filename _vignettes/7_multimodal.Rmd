@@ -169,6 +169,9 @@ sobj <- sobj %>%
 sobj@meta.data %>%
   head()
 
+# Summarize cell classifications
+table(sobj$HTO_classification.global)
+
 # Create ridge plots showing HTO signal
 sobj %>%
   RidgePlot(
@@ -176,6 +179,9 @@ sobj %>%
     features = rownames(hto_mtx),
     ncol     = 2
   )
+
+
+
 
 
 # sobj@assays$HTO@data %>%
@@ -189,13 +195,6 @@ sobj %>%
 #   cowplot::theme_cowplot() +
 #   labs(x = "counts", y = "number of cells")
 
-# sobj@meta.data %>% 
-#   filter(
-#     hash.ID == "Doublet", 
-#     grepl("HTO29", HTO_classification)
-#   ) %>%
-#   nrow()
-  
 ```
 
 <br>
@@ -217,16 +216,14 @@ sobj %>%
 ```{r echo = FALSE, fig.width = 7, fig.height = 4}
 
 # Calculate doublet rate
-table(sobj$HTO_classification.global)
-
 sobj@meta.data %>%
   group_by(hash.ID) %>% 
   summarize(fract = n() / nrow(.))
 
-
 # Create bar graphs comparing cell count for each sample
 HTO_bars_1 <- sobj@meta.data %>%
   rownames_to_column("cell_id") %>%
+  
   ggplot(aes(hash.ID, fill = hash.ID)) +
   geom_bar() +
   labs(y = "Cell Count") +
@@ -242,6 +239,7 @@ HTO_bars_2 <- sobj@meta.data %>%
   rownames_to_column("cell_id") %>%
   group_by(hash.ID) %>%
   summarize(hash_frac = n() / nrow(.)) %>%
+  
   ggplot(aes("CITE-seq", hash_frac, fill = hash.ID)) +
   geom_bar(stat = "identity", color = "white", size = 0.5) +
   labs(y = "Fraction of Cells") +
