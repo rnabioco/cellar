@@ -134,7 +134,7 @@ As with ALRA, we can access the new assay Seurat plotting function using the "sc
 
 The imputation results are similar to ALRA, but generally more conservative with default values.
 
-```{r screcover_plots, fig.height=24, fig.width=10, eval = F}
+```{r screcover_plots, fig.height=12, fig.width=10}
 robust_scr_plot <- FeaturePlot(so,
                          c("rna_IRX2",
                            "scr_IRX2",
@@ -156,7 +156,7 @@ plot_grid(robust_scr_plot,
 
 This difference highlights the strengths and weaknesses of both approaches - ALRA aggressively imputes expression in closely related cells but leaves most cells untouched, while scRecover imputes expression more conservatively in cells modeled to have experienced dropout of a given gene.
 
-```{r impute_plots, fig.height=12, fig.width=10, eval = F}
+```{r impute_plots, fig.height=12, fig.width=10}
 FeaturePlot(so,
             c("alra_PSIP1",
               "scr_PSIP1",

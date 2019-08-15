@@ -1475,6 +1475,7 @@ weak_scr_plot &lt;- FeaturePlot(so,
 plot_grid(robust_scr_plot,
           weak_scr_plot,
           nrow = 2)</code></pre>
+<p><img src="8_imputation_files/figure-html5/screcover_plots-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
 <p>This difference highlights the strengths and weaknesses of both approaches - ALRA aggressively imputes expression in closely related cells but leaves most cells untouched, while scRecover imputes expression more conservatively in cells modeled to have experienced dropout of a given gene.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1485,6 +1486,7 @@ FeaturePlot(so,
               &quot;alra_MEIS2&quot;,
               &quot;scr_MEIS2&quot;),
             combine = TRUE)</code></pre>
+<p><img src="8_imputation_files/figure-html5/impute_plots-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="imputing-dropouts-via-ensemble-learning-enimpute">Imputing dropouts via ensemble learning: enImpute</h2>
 <p><a href="https://github.com/Zhangxf-ccnu/EnImpute" class="uri">https://github.com/Zhangxf-ccnu/EnImpute</a></p>
