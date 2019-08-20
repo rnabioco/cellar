@@ -41,7 +41,7 @@ After clustering, differential expression testing (DE analysis, similar to bulk 
 library(Seurat)
 library(tidyverse)
 # load data from saved RDS
-sobj <- readRDS("data/filtered_sobj.rds")
+sobj <- readRDS("_vignettes/data/filtered_sobj.rds")
 
 # log normalize
 sobj_l <- NormalizeData(sobj) # <- skip this step if using scran normalization
@@ -56,6 +56,7 @@ sobj_sc <- suppressWarnings(SCTransform(object = sobj, # sctransform has some un
 ```
 
 3. use normalized data for DE (slot is dependent on normalization method, also don't use integrated assay)
+
 ```{r}
 # before normalization, "data" slot is the same as counts
 sobj@assays$RNA@data[101:105,101:105] # raw counts
@@ -73,11 +74,12 @@ sobj_sc@assays$RNA@data[101:105,101:105] # still same as counts, make sure not t
 5. P‐values are inflated, due to the cyclic nature of identifying the same variable genes as markers, which were used for dimension reduction and clustering. However, the ranking of genes based on P‐values is unaffected.
 
 ### Sidebar: How to regress out cell cycle heterogeneity (and do you need to?)
+
 ```{r, fig.height=9}
 # many options to assess cell cycle effects on gene expression
 # 1. ridge plot on key genes (from Seurat2 tutorial)
 RidgePlot(sobj_l,
-          features = c("MKI67", # something with smoothing in the function leaves plots empty if no significant amount of cells express it
+          features = c("MKI67", # smoothing eaves plots empty if no significant amount of cells express it
                        "MCM6",
                        "TOP2A",
                        "PCNA",
@@ -140,16 +142,17 @@ sobj_l <- ScaleData(sobj_l,
 
 ### find all markers for each cluster
 `FindAllMarkers` compares cells in each cluster to all other cells in the dataset. Typically, focus is given to genes upregulated in each cluster, ie markers.
+
 ```{r}
 # load clustered object
-sobj_clusters <- readRDS("data/clustered_sobj.rds")
+sobj_clusters <- readRDS("_vignettes/data/clustered_sobj.rds")
 
 # also check/set ident to the desired comparison
 Idents(sobj_clusters) %>% head()
 Idents(sobj_clusters) <- sobj_clusters@meta.data$clusters
 
 markers_df <- FindAllMarkers(sobj_clusters,
-                             assay = "RNA", # <- would be different for sobj_sc, and intergrated objects would not default to RNA
+                             assay = "RNA", # <- be careful with sobj_sc and intergrated objects
                              slot = "data",
                              only.pos = TRUE)
 markers_df %>% head()
@@ -157,6 +160,7 @@ markers_df %>% head()
 
 ### find DE genes for specific cell groups
 For more control in the comparisons, use `FindMarkers`. Positive average log (natural) fold change represents higher expression of the gene in cells of `ident.1`. pct1 and 2 are percent detected in each ident/population.
+
 ```{r}
 # DE analysis for 2 clusters
 markers_df2 <- FindMarkers(sobj_clusters,
@@ -169,6 +173,7 @@ markers_df2 %>% head()
 ```
 
 `FindMarkers` defaults to the current active ident. To use other value groups, set idents to the intended column, or use the `group.by` argument.
+
 ```{r}
 # compare control vs treated in only cluster 1
 markers_df3 <- FindMarkers(sobj_clusters,
@@ -181,6 +186,7 @@ markers_df3 <- FindMarkers(sobj_clusters,
 ```
 
 For greater control, assign new idents or new columns in metadata, and customize DE analysis pairs.
+
 ```{r}
 # set new idents for more customized comparisons
 Idents(sobj_clusters,
@@ -199,6 +205,7 @@ markers_df4 <- FindMarkers(sobj_clusters,
                            ident.1 = "ZFP36.pos",
                            ident.2 = "ZFP36.neg")
 
+# or something like:
 # Idents(sobj_clusters,
 #        WhichCells(object = sobj_clusters,
 #                   idents = "1",
@@ -207,6 +214,7 @@ markers_df4 <- FindMarkers(sobj_clusters,
 ```
 
 Genes of interest can then be visualized as violin plots or feature plots.
+
 ```{r}
 Idents(sobj_clusters) <- sobj_clusters@meta.data$clusters # plots are grouped by active ident
 VlnPlot(sobj_clusters, "LYZ")
@@ -221,6 +229,7 @@ FeaturePlot(sobj_clusters, "ZFP36", split.by = "orig.ident") # <- split into pan
 Without venturing into the realm of philosphical debates on what a "cell type" constitutes, standard pratice is to use certain gene expression features to classify cells. This is often done manually, by visual inspection of key genes. Automated approaches that utilize a broader range of features are currently being developed.
 
 ### manual check and cluster identity assignment
+
 ```{r, fig.width=6, fig.height=3}
 # from the Seurat pancreas example
 # we now have pan_celseq2, fully annotated in metadata column "celltype", and pan_smartseq2, ready to be annotated
@@ -267,6 +276,7 @@ pan_smartseq2@meta.data %>% head()
 
 ### towards a more automated approach of identity assignment
 1. using `Seurat`, inference from previous seurat object (requires very similar seurat object)
+
 ```{r, fig.width=6, fig.height=3}
 # reset idents of pan_smartseq2
 Idents(pan_smartseq2) <- "cluster.id"
@@ -281,6 +291,7 @@ DimPlot(pan_smartseq2, label = TRUE) + NoLegend()
 ```
 
 2. using `clustifyr`, and marker gene list (requires markers or gene list), using gene list enrichment methods
+
 ```{r}
 # reset idents of pan_smartseq2
 Idents(pan_smartseq2) <- "cluster.id"
@@ -306,12 +317,14 @@ res2 # dataframe of identities
 namedres <- structure(res2$type, names = res2$cluster) # make named vector
 namedres
 
-namedres[as.character(Idents(pan_smartseq2))][1:10] # seurat idents are factors, which may have strange behavior if coerced to numbers/index
+# seurat idents are factors, which may have strange behavior if coerced to numbers/index
+namedres[as.character(Idents(pan_smartseq2))][1:10] 
 pan_smartseq2@meta.data$celltype <- namedres[as.character(Idents(pan_smartseq2))] 
 DimPlot(pan_smartseq2, label = T, group.by = "celltype") + NoLegend()
 ```
 
 3. using `clustifyr`, and transcriptome profiles (from other scRNAseq, bulk RNAseq, or microarray), using ranked correlation of highly variable genes ([scmap](https://github.com/hemberg-lab/scmap) is another similar package)
+
 ```{r}
 # build a reference from expression matrix data
 ref <- average_clusters(mat = pan_celseq2@assays$RNA@data,
@@ -321,7 +334,7 @@ ref <- average_clusters(mat = pan_celseq2@assays$RNA@data,
 res <- clustify(input = pan_smartseq2@assays$RNA@data,
                 ref_mat = ref,
                 metadata = pan_smartseq2@meta.data,
-                query_genes = pan_smartseq2@assays$RNA@var.features, # using Seurat computed variable genes, same as using VariableFeatures()
+                query_genes = pan_smartseq2@assays$RNA@var.features, # using Seurat computed variable genes
                 cluster_col = "seurat_clusters")
 res2 <- cor_to_call(res, threshold = 0.5) # anything below 0.5 correlation are labeled as "unknown"
 res2
@@ -331,9 +344,9 @@ namedres <- structure(res2$type, names = res2$cluster)
 pan_smartseq2@meta.data$celltype <- namedres[as.character(Idents(pan_smartseq2))] 
 DimPlot(pan_smartseq2, label = T, group.by = "celltype") + NoLegend()
 ```
+`clustifyr` also takes seurat objects as input directly, finds various needed data, and output another object with identities assigned.
 
 ```{r}
-# clustifyr also takes seurat objects as input directly, finds various needed data, and output another object with identities assigned
 ref <- seurat_ref(pan_celseq2,
                   cluster_col = "celltype")
 
@@ -352,6 +365,7 @@ Also see more tutorials at [`clustifyr`](https://rnabioco.github.io/clustifyr/),
 
 ### cell type composition
 Insight into different samples can be gained from the proportion of cells that fall into each cell type. Unfortunately, no dedicated tools are available for statistical testing.
+
 ```{r}
 tab1 <- sobj_clusters@meta.data %>% group_by(orig.ident, clusters) %>% tally() # counting up all combinations
 tab1
@@ -364,6 +378,7 @@ tab3
 ```
 
 and save tables to disk with `write_csv`
+
 ```{r,eval=F}
 write_csv(tab3, "data/perc_clusters.csv")
 tab4 <- read_csv("data/perc_clusters.csv")

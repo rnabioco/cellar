@@ -113,7 +113,10 @@ cat(tab)
 variations within 10x system: standard 3', 5' + V(D)J, antibody hashing, CITE-seq, variant-calling (very different sample preps, may require up to 4 library preps per sample)
 
 ### 2. alignment pipelines
-[cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation) performs alignment, filtering, UMI counting, clustering, and gene expression analysis. (alternatives such as [Alevin](https://salmon.readthedocs.io/en/latest/alevin.html), [STARsolo](https://github.com/alexdobin/STAR/releases), [Kallisto](https://www.kallistobus.tools/))
+[cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation) performs alignment, filtering, UMI counting, clustering, and gene expression analysis. 
+
+Alternatives such as [Alevin](https://salmon.readthedocs.io/en/latest/alevin.html), [STARsolo](https://github.com/alexdobin/STAR/releases), [Kallisto](https://www.kallistobus.tools/)
+
 ```{r, engine = 'bash', eval = FALSE, echo = T}
 # in terminal
 cellranger count --id=123 \ 
@@ -126,6 +129,7 @@ cellranger count --id=123 \
 ```
 
 output folder structure
+
 ```{r, echo=T, eval = F}
 KO_1_CDNA
 |-- KO_1_CDNA.mri.tgz
@@ -197,7 +201,7 @@ The total UMI (unique molecular identifier - represent each transcript) of a cel
 
 for a standard 10x scRNAseq run:
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected range of x axis (barcode) : ~ 10^5 (if using ggplot to visualize, might want to filter) 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected range of x axis (barcode) : ~ 10^5 (if using ggplot to visualize, filter) 
   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;expected inflection point of x axis (cell number): ~ # of loaded cells / 2
   
@@ -237,6 +241,7 @@ Seurat also uses some of the grammar, such as `group.by`.
 A large amount of code introduced in this workshop in based on matrix and dataframe manipulation. Therefore some basic understanding of tidyverse/dplyr will be helpful.
 
 Also, "%>%" is used as "pipe", similar to unix `|`.
+
 ```{r, echo = T}
 # we will look at metadata from pbmc_small from Seurat
 library(Seurat)
