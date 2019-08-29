@@ -3,9 +3,8 @@ title: <b style="font-size:45px;">Data Filtering and Quality Control</b>
 author: "Ryan Sheridan"
 date: "August 13<sup>th</sup>, 2019"
 output:
-  html_document:
-    toc: true
-    toc_depth: 1
+  distill::distill_article:
+    toc: false
 ---
 
 ```{r "Load packages", include = FALSE}
@@ -74,21 +73,6 @@ sobj <- pbmc_mtx %>%
 The `Seurat` object is organized into a heirarchy of data structures with the outermost layer including a number of "slots", which can be accessed using the `@` operator.
 
 With `Seurat` v3.0, the `Seurat` object has been modified to allow users to easily store multiple scRNA-seq assays (CITE-seq, cell hashing, etc.) in the same object. The data from each assay is stored as a list in the `assays` slot. To switch between different assays users can change the value stored in the `active.assay` slot. We can also view the current default assay using the `DefaultAssay` function. Many `Seurat` functions also include an `assay` argument that lets users specify the desired assay.
-
-### `Seurat` object structure
-
-* assays
-    * RNA
-        * counts
-        * data
-        * var.features
-    * ADT
-        * counts
-        * data
-        * var.features
-* active.assay
-* active.idents
-* meta.data
 
 ```{r "Handling multiple assays"}
 
@@ -316,12 +300,12 @@ sobj@meta.data %>%
 ```{r echo = FALSE, fig.width = 8, fig.height = 6}
 
 # Using Seurat functions
-sobj %>%
-  VlnPlot(
-    features = c("nCount_RNA", "nFeature_RNA", "percent_mito"),
-    ncol     = 3,
-    pt.size  = 0.25
-  )
+# sobj %>%
+#   VlnPlot(
+#     features = c("nCount_RNA", "nFeature_RNA", "percent_mito"),
+#     ncol     = 3,
+#     pt.size  = 0.25
+#   )
 
 # Using ggplot2
 sobj@meta.data %>%

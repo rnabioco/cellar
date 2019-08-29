@@ -3,9 +3,8 @@ title: <b style="font-size:45px;">Working with Multi-modal Data</b>
 author: "Ryan Sheridan"
 date: "August 15<sup>th</sup>, 2019"
 output:
-  html_document:
-    toc: true
-    toc_depth: 1
+  distill::distill_article:
+    toc: false  
 ---
 
 ```{r "Load packages", include = FALSE}
@@ -17,15 +16,12 @@ library(cowplot)
 knitr::opts_chunk$set(
   message   = FALSE,
   warning   = FALSE,
+  echo      = TRUE,
   comment   = "#>",
   fig.align = "center"
 )
 
 ```
-
-<br>
-
-<br>
 
 ## Experimental design
 
@@ -33,9 +29,9 @@ knitr::opts_chunk$set(
 
 Biolegend is the main company selling CITE-seq and cell hashing antibodies ([TotalSeq](https://www.biolegend.com/en-us/totalseq)). Biolegend reagents are divided into three product lines:
 
-- TotalSeq-A: 3' gene expression, v2 and v3 chemistry
-- TotalSeq-B: 3' gene expression, v3 chemistry
-- TotalSeq-C: 5' gene expression and V(D)J
+* TotalSeq-A: 3' gene expression, v2 and v3 chemistry
+* TotalSeq-B: 3' gene expression, v3 chemistry
+* TotalSeq-C: 5' gene expression and V(D)J
 
 ![](7_multimodal_files2/Totalseq_compatibility_figure_V1.png)
 
@@ -52,10 +48,6 @@ TotalSeq-A reagents use a different PCR handle for CITE-seq and cell hashing ant
 TotalSeq-C reagents use the same PCR handle for CITE-seq and cell hashing antibodies, which means that only a single library will be prepared. However, to ensure that the correct libraries are created the core should be notified of all reagents used for the experiment.
 
 [MULTI-seq](https://www.nature.com/articles/s41592-019-0433-8) uses lipid- and cholesterol-modified oligonucleotides.
-
-<br>
-
-<br>
 
 ## Creating a Seurat object with multiple assays
 
@@ -94,8 +86,6 @@ hto_mtx[, 1:10]
 
 ```
 
-<br>
-
 ### Creating a Seurat object
 
 When adding multiple assays to a Seurat object, we first must identify cell barcodes that are present in all of the datasets. If one of the assays has a different number of cell barcodes Seurat will throw an error.
@@ -126,10 +116,6 @@ sobj
 
 ```
 
-<br>
-
-<br>
-
 ## Demultiplexing hashed samples
 
 ### Normalizing HTO counts
@@ -147,8 +133,6 @@ sobj <- sobj %>%
 
 ```
 
-<br>
-
 ### Sample demultiplexing and identification of doublets
 
 To demultiplex hashed samples, the `HTODemux` function uses the normalized HTO counts for k-medoids clustering. This results in a cluster for each HTO A background signal is then calculated for each HTO using cells that are not present in the HTO-specific cluster. Outlier cells from this background signal are then classified as being "positive" for the HTO.
@@ -157,9 +141,9 @@ Cells that are positive for multiple HTOs are classified as doublets and cells t
 
 The `HTODemux` function automatically adds several columns to the meta.data table. 
 
-- HTO_classification: shows positive HTOs that were identified for the cell
-- HTO_classification.global: singlet classification (singlet, doublet, negative)
-- hash.ID: final HTO assignment including doublet and negative classifications
+* HTO_classification: shows positive HTOs that were identified for the cell
+* HTO_classification.global: singlet classification (singlet, doublet, negative)
+* hash.ID: final HTO assignment including doublet and negative classifications
 
 ```{r "Demultiplex samples", fig.width = 8, fig.height = 6}
 
@@ -184,8 +168,6 @@ sobj %>%
 
 ```
 
-<br>
-
 ### EXERCISE: Compare the number of cells with each hash.ID and calculate the doublet rate
 
 ```{r}
@@ -197,8 +179,6 @@ sobj %>%
 
 
 ```
-
-<br>
 
 ### ANSWER
 
@@ -250,10 +230,6 @@ plot_grid(
 
 ```
 
-<br>
-
-<br>
-
 ## Filtering data and assessing quality
 
 ### Assessing data quality
@@ -278,7 +254,7 @@ sobj %>%
 
 ```
 
-```{r "Create ADT and HTO violin plots", fig.height = 8, fig.width = 4}
+```{r "Create ADT and HTO violin plots", fig.width = 6, fig.height = 4}
 
 # Aim to sequence CITE-seq libraries at 2k-5k reads/cell, cell hashing 1k-2k reads/cell
 
@@ -326,10 +302,6 @@ filt_so@meta.data %>%
 
 ```
 
-<br>
-
-<br>
-
 ## Normalizing gene expression and antibody data
 
 Like the cell hashing data, CITE-seq counts can be normalized by performing a centered log-ratio transformation.
@@ -358,10 +330,6 @@ filt_so <- filt_so %>%
 
 ```
 
-<br>
-
-<br>
-
 ## Clustering cells based on gene expression
 
 ### Perform pricipal component analysis
@@ -387,8 +355,6 @@ plot_grid(
 )
 
 ```
-
-<br>
 
 ### Cluster cells using gene expression data
 
@@ -419,10 +385,6 @@ filt_so %>%
   DimPlot(reduction = "umap")
 
 ```
-
-<br>
-
-<br>
 
 ## Clustering cells based on antibody signal
 
@@ -467,8 +429,6 @@ filt_so <- filt_so %>%
 
 ```
 
-<br>
-
 ### Run UMAP using the antibody signal
 
 ```{r "Run UMAP for antibody data"}
@@ -485,14 +445,12 @@ filt_so <- filt_so %>%
 filt_so %>%
   DimPlot(
     reduction = "adt_umap", 
-    group.by = "sample", 
-    split.by = "sample", 
+    group.by  = "sample",
+    # split.by = "sample",
     ncol = 2
   )
 
 ```
-
-<br>
 
 ### Identify marker proteins
 
@@ -508,10 +466,6 @@ ADT_markers <- filt_so %>%
 ADT_markers
 
 ```
-
-<br>
-
-<br>
 
 ## Visualizing antibody signal
 
@@ -538,8 +492,6 @@ filt_so %>%
 
 ```
 
-<br>
-
 ### Ridge plots
 
 ```{r "Create ridge plots", fig.width = 10, fig.height = 6}
@@ -554,8 +506,6 @@ filt_so %>%
 
 ```
 
-<br>
-
 ### Heatmaps
 
 ```{r "Create heatmaps"}
@@ -569,23 +519,17 @@ filt_so %>%
 
 ```
 
-<br>
-
 ### Violin plots
 
 ```{r "Create violinplots", fig.width = 8, fig.height = 8}
 
 filt_so %>%
   VlnPlot(
-    features = c("adt-CD4", "CD4", "adt-CD19", "CD19"),
+    features = c("adt-CD4", "rna_CD4", "adt-CD19", "rna_CD19"),
     ncol     = 2
   )
 
 ```
-
-<br>
-
-<br>
 
 ## Classifying cells based on antibody signal
 
@@ -622,8 +566,6 @@ labeled_so %>%
 
 ```
 
-<br>
-
 ### Filter cells using CellSelector()
 
 ```{r "Filter using CellSelector()", eval = FALSE}
@@ -653,8 +595,6 @@ labeled_so %>%
 
 ```
 
-<br>
-
 ### EXERCISE: Identify CD4+ and CD8+ cells
 
 ```{r}
@@ -673,8 +613,6 @@ labeled_so %>%
 
 
 ```
-
-<br>
 
 ### ANSWER
 
@@ -717,11 +655,14 @@ labeled_so %>%
 
 ```
 
-<br>
-
-<br>
-
 ## Viewing results with the UCSC Cell Browser
+
+The UCSC [Cell Browser](http://www.genome.ucsc.edu/singlecell.html) allows you to easily explore and share single-cell data. With the Cell Browser you can:
+
+* View t-SNE or UMAP projections
+* Color cells by metadata and gene expression
+* View cluster marker genes
+* Rename clusters and add custom annotations to selected sets of cells
 
 ### Merge gene expression and antibody matrices
 
@@ -741,13 +682,11 @@ merged_so@active.assay <- "RNA"
 
 ```
 
-<br>
-
 ### Create Cell Browser files
 
 ```{r "Create gene expression Cell Browser files", eval = FALSE}
 
-# Create Cell Browser directories
+# Create Cell Browser directories for gene expression data
 dir.create(
   path = "cellbrowser/RNA",
   recursive = T
@@ -778,7 +717,7 @@ merged_so %>%
 
 ```{r "Create ADT Cell Browser files", eval = FALSE}
 
-# Create Cell Browser directories
+# Create Cell Browser directories for antibody data
 dir.create(
   path = "cellbrowser/ADT",
   recursive = T
@@ -813,8 +752,6 @@ merged_so %>%
   )
 
 ```
-
-<br>
 
 ### Build Cell Browser session
 
