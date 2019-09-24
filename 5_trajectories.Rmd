@@ -22,13 +22,12 @@ knitr::opts_chunk$set(
 ```
 
 
-## Trajectory inference, aka pseudotime*
+## Trajectory inference, aka pseudotime
 
 Assumes that cells are sampled during various stages of a transition from a cell type or state to another type or state. By identifying trajectories that connect cells based on similarilty in gene expression, one can gain insights into lineage relationships and developmental trajectories. Often called pseudotime, but doesn't have to relate to cells in different times in a process (could be spatial differences). 
 
 Analysis of discrete clusters can hide interesting continous behaviors in cell populations. By ordering cells based on up an expression trajectory one can uncover novel patterns of gene expression. 
 
-* pseudo-science?
 
 ## There are many methods
 
@@ -56,6 +55,8 @@ library(gam) #install.packages("gam")
 library(cowplot)
 
 theme_set(theme_cowplot())
+
+#BiocManager::install("slingshot")
 ```
 
 For this first analysis we will use a dataset of mouse early embryogenesis that was curated into a SingleCellExperiment object from here
@@ -66,14 +67,17 @@ https://hemberg-lab.github.io/scRNA.seq.datasets/.
 sce <- readRDS(url("https://scrnaseq-public-datasets.s3.amazonaws.com/scater-objects/deng-reads.rds"))
 
 # convert SingleCellExperiment to Seurat
-# already log normalized
-sobj <- as.Seurat(sce)
+
+sobj <- CreateSeuratObject(counts(sce),
+                           meta.data = as.data.frame(colData(sce)))
+sobj <- NormalizeData(sobj)
 sobj <- FindVariableFeatures(sobj)
 sobj <- ScaleData(sobj)
 sobj <- RunPCA(sobj, verbose = FALSE)
 
 Idents(sobj) <- "cell_type1"
 DimPlot(sobj, reduction = "pca")
+
 ```
 
 
@@ -133,6 +137,7 @@ sobj <- AddMetaData(sobj,
                     col.name = "Pseudotime")
 
 FeaturePlot(sobj, "Pseudotime")
+
 DimPlot(sobj, 
         group.by  = "cell_type1", 
         reduction = "umap")
@@ -157,7 +162,8 @@ logcounts <- GetAssayData(sobj, "data")
 # transpose matrix (genes as columns, cells as rows)
 input_matrix <- t(logcounts[VariableFeatures(sobj), ])
 
-dm <- DiffusionMap(input_matrix)
+set.seed(42)
+dm <- DiffusionMap(as.matrix(input_matrix))
 
 plot(dm, 1:2, col = sobj$cell_type1)
 ```
@@ -247,7 +253,13 @@ so <- FindNeighbors(so)
 so <- FindClusters(so, resolution = 1.0, verbose = FALSE)
 
 DimPlot(so, group.by = "timepoint", reduction = "pca")
-DimPlot(so, reduction = "pca")
+
+DimPlot(so, reduction = "pca") +
+  scale_color_brewer(palette = "Set1")
+
+DimPlot(so, group.by = "seurat_clusters", reduction = "umap") 
+
+DimPlot(so, group.by = "timepoint", reduction = "umap") 
 ```
 
 
@@ -297,7 +309,7 @@ lines(SlingshotDataSet(sce), lwd=2, col='black')
 # Plot pseudotime for a lineage
 # get colors for pseudotime from lineage 1
 colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
-plotcol <- colors[cut(sce$slingPseudotime_2, breaks=100)]
+plotcol <- colors[cut(sce$slingPseudotime_3, breaks=100)]
 
 plot(reducedDims(sce)$PCA, col = plotcol, pch=16)
 lines(SlingshotDataSet(sce), lwd=2, col='black')
@@ -353,7 +365,8 @@ The lineage trees are generated in the same dimensionality as the input data. To
 ```{r}
 so$pseudotime1 <- sce$slingPseudotime_1
 so$pseudotime2 <- sce$slingPseudotime_2
-FeaturePlot(so, c("pseudotime1", "pseudotime2"))
+so$pseudotime3 <- sce$slingPseudotime_3
+FeaturePlot(so, c("pseudotime1", "pseudotime2", "pseudotime3"))
 ```
 
 
@@ -402,6 +415,8 @@ head(res)
 Finally make a heatmap to plot out these genes that vary over pseudotime.
 
 ```{r, fig.height = 6}
+library(ComplexHeatmap)
+#BiocManager::install("ComplexHeatmap")
 
 # get log normalized counts 
 to_plot <- as.matrix(logcounts(sce)[res$id[1:100], lineage_cells])
@@ -569,7 +584,6 @@ knitr::include_graphics("img/urd.jpg")
 Has a python and R package implementation for performing analysis. Requires processing bam file to quantitate unspliced and spliced mRNAs per cell. 
 
 http://velocyto.org/
-
 https://github.com/velocyto-team/velocyto.R
 
 ```{r, echo = FALSE}

@@ -25,8 +25,8 @@
   <link rel="icon" type="image/png" href="img/logo.png"/>
   
   <!--  https://schema.org/Article -->
-  <meta property="article:published" itemprop="datePublished" content="2019-08-14"/>
-  <meta property="article:created" itemprop="dateCreated" content="2019-08-14"/>
+  <meta property="article:published" itemprop="datePublished" content="2019-09-24"/>
+  <meta property="article:created" itemprop="dateCreated" content="2019-09-24"/>
   <meta name="article:author" content="Kent Riemondy"/>
   
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
@@ -44,7 +44,7 @@
   <!--radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Trajectory inference"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]}]}]},{"type":"character","attributes":{},"value":["2019-08-14"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_depth","self_contained","highlight"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[1]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["tango"]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Trajectory inference"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]}]}]},{"type":"character","attributes":{},"value":["2019-09-24"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_depth","self_contained","highlight"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[1]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["tango"]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -1315,7 +1315,7 @@
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Trajectory inference","authors":[{"author":"Kent Riemondy","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2019-08-14T00:00:00.000-06:00","citationText":"Riemondy, 2019"}
+{"title":"Trajectory inference","authors":[{"author":"Kent Riemondy","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2019-09-24T00:00:00.000-06:00","citationText":"Riemondy, 2019"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1328,7 +1328,7 @@
 <a href="2_filtering_QC.html">Quality Control</a>
 <a href="3_norm_viz_clustering.html">Clustering</a>
 <a href="4_markers.html">Cell Type Annotation</a>
-<a href="5_pseudotime.html">Pseudotime</a>
+<a href="5_trajectories.html">Pseudotime</a>
 <a href="6_alignment.html">Dataset Alignment</a>
 <a href="7_multimodal.html">Multi-modal Data</a>
 </div>
@@ -1350,16 +1350,13 @@
   
   Kent Riemondy
   
-<br/>2019-08-14
+<br/>2019-09-24
 </div>
 
 <div class="d-article">
-<h2 id="trajectory-inference-aka-pseudotime">Trajectory inference, aka pseudotime*</h2>
+<h2 id="trajectory-inference-aka-pseudotime">Trajectory inference, aka pseudotime</h2>
 <p>Assumes that cells are sampled during various stages of a transition from a cell type or state to another type or state. By identifying trajectories that connect cells based on similarilty in gene expression, one can gain insights into lineage relationships and developmental trajectories. Often called pseudotime, but doesn’t have to relate to cells in different times in a process (could be spatial differences).</p>
 <p>Analysis of discrete clusters can hide interesting continous behaviors in cell populations. By ordering cells based on up an expression trajectory one can uncover novel patterns of gene expression.</p>
-<ul>
-<li>pseudo-science?</li>
-</ul>
 <h2 id="there-are-many-methods">There are many methods</h2>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
@@ -1381,7 +1378,9 @@ library(RColorBrewer)
 library(gam) #install.packages(&quot;gam&quot;)
 library(cowplot)
 
-theme_set(theme_cowplot())</code></pre>
+theme_set(theme_cowplot())
+
+#BiocManager::install(&quot;slingshot&quot;)</code></pre>
 </div>
 <p>For this first analysis we will use a dataset of mouse early embryogenesis that was curated into a SingleCellExperiment object from here <a href="https://hemberg-lab.github.io/scRNA.seq.datasets/" class="uri">https://hemberg-lab.github.io/scRNA.seq.datasets/</a>.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1390,15 +1389,17 @@ theme_set(theme_cowplot())</code></pre>
 sce &lt;- readRDS(url(&quot;https://scrnaseq-public-datasets.s3.amazonaws.com/scater-objects/deng-reads.rds&quot;))
 
 # convert SingleCellExperiment to Seurat
-# already log normalized
-sobj &lt;- as.Seurat(sce)
+
+sobj &lt;- CreateSeuratObject(counts(sce),
+                           meta.data = as.data.frame(colData(sce)))
+sobj &lt;- NormalizeData(sobj)
 sobj &lt;- FindVariableFeatures(sobj)
 sobj &lt;- ScaleData(sobj)
 sobj &lt;- RunPCA(sobj, verbose = FALSE)
 
 Idents(sobj) &lt;- &quot;cell_type1&quot;
 DimPlot(sobj, reduction = &quot;pca&quot;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-2-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-16-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>Next we will plot out the PC1 scores for each cell type (developmental stage), using the meta data stored in the <code>cell_type</code> column of <code>meta.data</code>.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1418,7 +1419,7 @@ plt_dat$cell_type &lt;- cell_type
 ggplot(plt_dat, aes(cell_type, PC_1)) +
   geom_jitter(aes(color = cell_type)) +
   labs(y = &quot;PC1 (aka pseudotime)&quot;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-3-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-17-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>EXERCISE: Identify genes that are highly correlated (positive or negative) with PC1 using a seurat function. Then plot the expression of some of these genes against Pseudotime (“PC1” x-axis, gene expression y-axis), using either built in seurat plotting functions or ggplot2.</p>
 <p><br></p>
@@ -1441,12 +1442,12 @@ sobj &lt;- AddMetaData(sobj,
                     col.name = &quot;Pseudotime&quot;)
 
 FeaturePlot(sobj, &quot;Pseudotime&quot;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-5-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-19-1.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>
 DimPlot(sobj, 
         group.by  = &quot;cell_type1&quot;, 
         reduction = &quot;umap&quot;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-5-2.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-19-2.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="destiny">Destiny</h2>
 <p>Non-linear dynamics are not always captured by PCA, an alternative approach uses non-linear transformations, such as diffusion maps (or ICA, or others).</p>
@@ -1462,17 +1463,18 @@ logcounts &lt;- GetAssayData(sobj, &quot;data&quot;)
 # transpose matrix (genes as columns, cells as rows)
 input_matrix &lt;- t(logcounts[VariableFeatures(sobj), ])
 
-dm &lt;- DiffusionMap(input_matrix)
+set.seed(42)
+dm &lt;- DiffusionMap(as.matrix(input_matrix))
 
 plot(dm, 1:2, col = sobj$cell_type1)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-7-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-21-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>Next we calculate diffusion pseudotime using <code>DPT</code>.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 dpt &lt;- DPT(dm, tips = 268)
 plot(dpt, 1:2)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-8-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-22-1.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>
 tmp &lt;- data.frame(DC1 = dm$DC1,
                   DC2 = dm$DC2,
@@ -1486,7 +1488,7 @@ ggplot(tmp, aes(x = DC1,
     xlab(&quot;Diffusion component 1&quot;) + 
     ylab(&quot;Diffusion component 2&quot;) +
     theme_classic()</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-8-2.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-22-2.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
@@ -1495,7 +1497,7 @@ ggplot(tmp, aes(timepoint, dpt,
   geom_point() + 
   geom_jitter() +
   scale_color_brewer(palette = &quot;Paired&quot;) </code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-9-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-23-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>PCA and diffusion maps can be good for simple trajectories or pathway activation systems e.g. T-cell activation, drug pertubation, single cell type responses.</p>
 <h2 id="slingshot">Slingshot</h2>
@@ -1532,7 +1534,7 @@ so &lt;- SetAssayData(so, &quot;data&quot;, new.data = log_mat) </code></pre>
 <p><br></p>
 <p><br></p>
 <div class="layout-chunk" data-layout="l-body">
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-11-1.png" width="624" style="display: block; margin: auto;" /><img src="5_trajectories_files/figure-html5/unnamed-chunk-11-2.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-25-1.png" width="624" style="display: block; margin: auto;" /><img src="5_trajectories_files/figure-html5/unnamed-chunk-25-2.png" width="624" style="display: block; margin: auto;" /><img src="5_trajectories_files/figure-html5/unnamed-chunk-25-3.png" width="624" style="display: block; margin: auto;" /><img src="5_trajectories_files/figure-html5/unnamed-chunk-25-4.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p><a href="https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4772-0">Slingshot</a> is a <a href="https://bioconductor.org/packages/release/bioc/html/slingshot.html">Bioconductor package</a> that draws curved trajectories through a low dimensional embedding to infer developmental dynamics. It provides functionality for computing pseudotimes through multiple trajectories.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1581,16 +1583,16 @@ slo</code></pre>
 # Plot clusters with lineages overlayed
 plot(reducedDims(sce)$PCA, col = brewer.pal(9,&#39;Set1&#39;)[sce$seurat_clusters], pch=16)
 lines(SlingshotDataSet(sce), lwd=2, col=&#39;black&#39;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-14-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-28-1.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>
 # Plot pseudotime for a lineage
 # get colors for pseudotime from lineage 1
 colors &lt;- colorRampPalette(brewer.pal(11,&#39;Spectral&#39;)[-6])(100)
-plotcol &lt;- colors[cut(sce$slingPseudotime_2, breaks=100)]
+plotcol &lt;- colors[cut(sce$slingPseudotime_3, breaks=100)]
 
 plot(reducedDims(sce)$PCA, col = plotcol, pch=16)
 lines(SlingshotDataSet(sce), lwd=2, col=&#39;black&#39;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-14-2.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-28-2.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>Here’s some code to help with plotting these data in ggplot2.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1636,8 +1638,9 @@ ggplot(plot_df, aes(PC_1, PC_2)) +
 <pre class="r"><code>
 so$pseudotime1 &lt;- sce$slingPseudotime_1
 so$pseudotime2 &lt;- sce$slingPseudotime_2
-FeaturePlot(so, c(&quot;pseudotime1&quot;, &quot;pseudotime2&quot;))</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-16-1.png" width="624" style="display: block; margin: auto;" /></p>
+so$pseudotime3 &lt;- sce$slingPseudotime_3
+FeaturePlot(so, c(&quot;pseudotime1&quot;, &quot;pseudotime2&quot;, &quot;pseudotime3&quot;))</code></pre>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-30-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="identifying-differentially-expressed-genes-along-a-trajectory">Identifying differentially expressed genes along a trajectory</h2>
 <p>We can use a <code>GAM</code> (or other models) to compare pseudotimes to gene expression values to identify genes that vary significantly with pseudotime. Using a GAM can uncover non-linear expression patterns (i.e. not just up or down). See this <a href="https://multithreaded.stitchfix.com/blog/2015/07/30/gam/">blog</a> for a nice description.</p>
@@ -1690,6 +1693,9 @@ head(res)</code></pre>
 <p>Finally make a heatmap to plot out these genes that vary over pseudotime.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
+library(ComplexHeatmap)
+#BiocManager::install(&quot;ComplexHeatmap&quot;)
+
 # get log normalized counts 
 to_plot &lt;- as.matrix(logcounts(sce)[res$id[1:100], lineage_cells])
 
@@ -1710,7 +1716,7 @@ Heatmap(to_plot,
         show_column_names = FALSE,
         show_row_names = FALSE,
         top_annotation = ha)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-18-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-32-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <h2 id="extremely-perhaps-overly-complex-monocle3">Extremely (perhaps overly) complex, monocle3:</h2>
 <p><a href="https://cole-trapnell-lab.github.io/monocle3/">monocle3</a> is the newest release of the monocle package from Cole Trapnell’s lab. It can handle million cell scale datasets and highly complex trajectories.</p>
@@ -1746,16 +1752,16 @@ cds &lt;- reduce_dimension(cds)
 plot_cells(cds, 
            label_groups_by_cluster=FALSE,  
            color_cells_by = &quot;cell.type&quot;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-21-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-35-1.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>
 # cluster cells using similar algorithm to seurat
 cds &lt;- cluster_cells(cds)
 
 plot_cells(cds, color_cells_by = &quot;partition&quot;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-21-2.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-35-2.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>
 plot_cells(cds, color_cells_by = &quot;cluster&quot;)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-21-3.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-35-3.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>We will next generate a graph that weaves through the data. This algorithm is related to the approach used in the python package <code>PAGA</code> that we will discuss later.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1773,7 +1779,7 @@ plot_cells(cds,
            label_groups_by_cluster = FALSE,
            label_leaves = FALSE,
            label_branch_points = FALSE)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-22-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-36-1.png" width="624" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>
 plot_cells(cds,
            color_cells_by = &quot;embryo.time.bin&quot;,
@@ -1781,7 +1787,7 @@ plot_cells(cds,
            label_leaves = TRUE,
            label_branch_points = TRUE,
            graph_label_size = 1.5)</code></pre>
-<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-22-2.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="5_trajectories_files/figure-html5/unnamed-chunk-36-2.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>Next we will select the root cells to compute pseudotimes. monocle3 provides an interactive shiny interface to select cells.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -1839,8 +1845,7 @@ plot_cells(cds_subset,
 </div>
 <h2 id="rna-velocity">RNA velocity</h2>
 <p>Has a python and R package implementation for performing analysis. Requires processing bam file to quantitate unspliced and spliced mRNAs per cell.</p>
-<p><a href="http://velocyto.org/" class="uri">http://velocyto.org/</a></p>
-<p><a href="https://github.com/velocyto-team/velocyto.R" class="uri">https://github.com/velocyto-team/velocyto.R</a></p>
+<p><a href="http://velocyto.org/" class="uri">http://velocyto.org/</a> <a href="https://github.com/velocyto-team/velocyto.R" class="uri">https://github.com/velocyto-team/velocyto.R</a></p>
 <div class="layout-chunk" data-layout="l-body">
 <p><img src="img/rna_velo_motivation.jpg" style="display: block; margin: auto;" /></p>
 </div>
