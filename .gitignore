@@ -11,4 +11,5 @@ index.md
 *.xls*
 *.gz
 *.pdf
-
+data
+*/data
