@@ -735,6 +735,16 @@
   }
   
   
+  .sidebar-section.custom {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+  
+  .custom p {
+    margin-bottom: 0.5em;
+  }
+  
+  
   /* Improve display for browsers without grid (IE/Edge <= 15) */
   
   .downlevel {
@@ -1394,7 +1404,7 @@
 </ul>
 <h2 id="limitations-of-scrnaseq">limitations of scRNAseq</h2>
 <figure>
-<img src="1_intro_files2/cd4vs8.png" alt="from seurat pbmc example" width="600" /><figcaption>from seurat pbmc example</figcaption>
+<img src="1_intro_files2/cd4vs8.png" width="600" alt="" /><figcaption>from seurat pbmc example</figcaption>
 </figure>
 <ol type="1">
 <li><p>dropout effect, only a small portion of the mRNAs from each cell is captured (see: GFP and other supposed markers)</p></li>
@@ -1405,7 +1415,7 @@
 </ol>
 <h2 id="experimental-design-informatics-corrections">experimental design &gt;&gt; informatics corrections</h2>
 <figure>
-<img src="1_intro_files2/10xV3_model.png" alt="cell isolation process for 10x" width="400" /><figcaption>cell isolation process for 10x</figcaption>
+<img src="1_intro_files2/10xV3_model.png" width="400" alt="" /><figcaption>cell isolation process for 10x</figcaption>
 </figure>
 <ol type="1">
 <li><p>too few or too many cells - 1000 cell lower limit for capture, and waste of money</p></li>
@@ -1417,7 +1427,7 @@
         (try: <a href="https://github.com/constantAmateur/SoupX">SoupX</a>)</p></li>
 </ol>
 <figure>
-<img src="1_intro_files2/contaminant.png" alt="example data with lysed red blood cells" width="600" /><figcaption>example data with lysed red blood cells</figcaption>
+<img src="1_intro_files2/contaminant.png" width="600" alt="" /><figcaption>example data with lysed red blood cells</figcaption>
 </figure>
 <ol start="5" type="1">
 <li><p>different sex of mice in samples - makes sample comparisons harder<br />
@@ -1558,11 +1568,11 @@ KO_1_CDNA
 </ol>
 <h2 id="reading-and-making-umi-barcode-elbow-plots">reading and making UMI-barcode elbow plots</h2>
 <figure>
-<img src="1_intro_files2/10xV3_seq.png" alt="model of final 10x library" width="600" /><figcaption>model of final 10x library</figcaption>
+<img src="1_intro_files2/10xV3_seq.png" width="600" alt="" /><figcaption>model of final 10x library</figcaption>
 </figure>
 <p>The total UMI (unique molecular identifier - represent each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but will also be useful in other situations like hashing and CITE-seq.</p>
 <figure>
-<img src="1_intro_files2/elbowcomp.png" alt="example of good and bad data" width="400" /><figcaption>example of good and bad data</figcaption>
+<img src="1_intro_files2/elbowcomp.png" width="400" alt="" /><figcaption>example of good and bad data</figcaption>
 </figure>
 <p>for a standard 10x scRNAseq run:</p>
 <p>        expected range of x axis (barcode) : ~ 10^5 (if using ggplot to visualize, filter)</p>

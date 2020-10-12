@@ -1,0 +1,393 @@
+---
+title: <b style="font-size:45px;">Cluster Markers and Cell Type Assignment</b></b>
+author: "Rui Fu"
+date: "August 14<sup>th</sup>, 2019"
+output:
+  html_document:
+    toc: true
+    toc_depth: 1
+    self_contained: true
+---
+
+```{r "knitr options", echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE,
+  echo = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width=6, 
+  fig.height=3
+)
+```
+
+The RMD file to follow along: https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/4_markers.Rmd
+
+## finding markers and differential expression analysis
+After clustering, differential expression testing (DE analysis, similar to bulk RNA seq) finds gene signatures of each cluster/cell population, to give more insights into biology.
+
+### many proposed methods  
+(for Seurat, we recommend default "wilcox" or "t", good balances between speed and  accuracy)
+
+![Soneson and Robinson, 2018](4_markers_files2/detests.jpg){width=600px}
+
+### important considerations
+1. keep things simple first and look at the results (try not aligning, not regressing) 
+
+2. determine what variables to regress out (batch, nCount_RNA, percent_mito, cell cycle, if needed) during scaling (note this only affects dimension reduction and clustering)
+
+```{r}
+library(Seurat)
+library(tidyverse)
+# load data from saved RDS
+sobj <- readRDS("_vignettes/data/filtered_sobj.rds")
+
+# log normalize
+sobj_l <- NormalizeData(sobj) # <- skip this step if using scran normalization
+sobj_l <- ScaleData(sobj_l,
+                    vars.to.regress = c("nCount_RNA",
+                                        "percent_mito"))
+
+# alternatively, sctransform is a one step normalization and scaling process
+sobj_sc <- suppressWarnings(SCTransform(object = sobj, # sctransform has some unhelpful warnings 
+                                        vars.to.regress = c("percent_mito"), # already corrects for transcript number
+                                        verbose = FALSE))
+```
+
+3. use normalized data for DE (slot is dependent on normalization method, also don't use integrated assay)
+
+```{r}
+# before normalization, "data" slot is the same as counts
+sobj@assays$RNA@data[101:105,101:105] # raw counts
+
+# after log normalization, results are stored in "data" slot
+sobj_l@assays$RNA@data[101:105,101:105] # normalized
+
+# after sctransform, results are stored in new assay "SCT"
+sobj_sc@assays$SCT@data[101:105,101:105] # normalized
+sobj_sc@assays$RNA@data[101:105,101:105] # still same as counts, make sure not to use this!
+```
+
+4. Note that marker genes found is very dependent on clustering and the compared populations
+
+5. P‐values are inflated, due to the cyclic nature of identifying the same variable genes as markers, which were used for dimension reduction and clustering. However, the ranking of genes based on P‐values is unaffected.
+
+### Sidebar: How to regress out cell cycle heterogeneity (and do you need to?)
+
+```{r, fig.height=9}
+# many options to assess cell cycle effects on gene expression
+# 1. ridge plot on key genes (from Seurat2 tutorial)
+RidgePlot(sobj_l,
+          features = c("MKI67", # smoothing eaves plots empty if no significant amount of cells express it
+                       "MCM6",
+                       "TOP2A",
+                       "PCNA",
+                       "ZFP36"), # how actual robust gene expression should look
+          ncol = 2)
+# see https://satijalab.org/seurat/v3.0/cell_cycle_vignette.html for a case where some cells are actively cycling
+```
+
+```{r}
+# 2. assess phase and PCA
+# Seurat stores a list of cell cycle specific genes for humans
+s.genes <- Seurat::cc.genes$s.genes # obviously unsuitable for nonhuman
+g2m.genes <- Seurat::cc.genes$g2m.genes
+
+s.genes
+g2m.genes
+
+# score and phase call is added to metadata
+sobj_l <- CellCycleScoring(sobj_l, 
+                           s.features = s.genes,
+                           g2m.features = g2m.genes,
+                           set.ident = FALSE)
+sobj_l@meta.data %>% head()
+
+# check PCA to see if cell cycle has strong effects
+sobj_l <- FindVariableFeatures(sobj_l)
+sobj_l <- RunPCA(sobj_l, verbose = FALSE, npcs = 10)
+DimPlot(sobj_l, group.by = "Phase") # again, in this case, cell cycle does not have strong effects
+```
+
+```{r}
+# 3. look for cell cycle-specific genes as main drivers of PCA
+topPCAgenes <- apply(
+  sobj_l@reductions$pca@feature.loadings, # contribution of each gene to each PC is stored here
+  MARGIN = 2, 
+  FUN = function(x) names(sort(abs(x), decreasing = TRUE)[1:10]) # finds the most important genes in each PC
+  )
+
+topPCAgenes
+
+topPCAgenes %>%
+  as.vector() %>%
+  intersect(c(s.genes, g2m.genes)) # see how many S and G2M genes intersect with that list
+
+# or just check top variable genes
+```
+
+```{r, eval = F}
+# if needed, regress out cell cycle effects
+sobj_l <- ScaleData(sobj_l,
+                    vars.to.regress = c("nCount_RNA", "percent_mito", "S.Score", "G2M.Score"))
+
+# alternatively, leave the difference of cycling vs noncycling in place, only regress out phases in actively cycling cells
+sobj_l$CC.Difference <- sobj_l$S.Score - sobj_l$G2M.Score
+sobj_l <- ScaleData(sobj_l,
+                    vars.to.regress = c("nCount_RNA",
+                                        "percent_mito",
+                                        "CC.Difference"))
+```
+
+### find all markers for each cluster
+`FindAllMarkers` compares cells in each cluster to all other cells in the dataset. Typically, focus is given to genes upregulated in each cluster, ie markers.
+
+```{r}
+# load clustered object
+sobj_clusters <- readRDS("_vignettes/data/clustered_sobj.rds")
+
+# also check/set ident to the desired comparison
+Idents(sobj_clusters) %>% head()
+Idents(sobj_clusters) <- sobj_clusters@meta.data$clusters
+
+markers_df <- FindAllMarkers(sobj_clusters,
+                             assay = "RNA", # <- be careful with sobj_sc and intergrated objects
+                             slot = "data",
+                             only.pos = TRUE)
+markers_df %>% head()
+```
+
+### find DE genes for specific cell groups
+For more control in the comparisons, use `FindMarkers`. Positive average log (natural) fold change represents higher expression of the gene in cells of `ident.1`. pct1 and 2 are percent detected in each ident/population.
+
+```{r}
+# DE analysis for 2 clusters
+markers_df2 <- FindMarkers(sobj_clusters,
+                           assay = "RNA",
+                           slot = "data",
+                           ident.1 = "1",
+                           ident.2 = "2",
+                           test.use = "t")
+markers_df2 %>% head()
+```
+
+`FindMarkers` defaults to the current active ident. To use other value groups, set idents to the intended column, or use the `group.by` argument.
+
+```{r}
+# compare control vs treated in only cluster 1
+markers_df3 <- FindMarkers(sobj_clusters,
+                           assay = "RNA",
+                           slot = "data",
+                           subset.ident = "1", # <- if needed, subset on current ident first, then switch idents
+                           group.by = "orig.ident", # <- grouping cells by this metadata column
+                           ident.1 = "control",
+                           ident.2 = "treated")
+```
+
+For greater control, assign new idents or new columns in metadata, and customize DE analysis pairs.
+
+```{r}
+# set new idents for more customized comparisons
+Idents(sobj_clusters,
+       WhichCells(object = sobj_clusters,
+                  idents = "1",
+                  expression = ZFP36 >= 1, # would usually do this for transgenes etc
+                  slot = 'data')) <- 'ZFP36.pos'
+Idents(sobj_clusters,
+       WhichCells(object = sobj_clusters,
+                  idents = "1",
+                  expression = ZFP36 < 1,
+                  slot = 'data')) <- 'ZFP36.neg'
+Idents(sobj_clusters) %>% head() # note that with this method, some cell idents might not be changed
+
+markers_df4 <- FindMarkers(sobj_clusters,
+                           ident.1 = "ZFP36.pos",
+                           ident.2 = "ZFP36.neg")
+
+# or something like:
+# Idents(sobj_clusters,
+#        WhichCells(object = sobj_clusters,
+#                   idents = "1",
+#                   expression = sizeFactors >= 1, # would usually do this for transgenes etc
+#                   slot = 'data')) <- 'cluster1_large'
+```
+
+Genes of interest can then be visualized as violin plots or feature plots.
+
+```{r}
+Idents(sobj_clusters) <- sobj_clusters@meta.data$clusters # plots are grouped by active ident
+VlnPlot(sobj_clusters, "LYZ")
+VlnPlot(sobj_clusters, c("ZFP36", "ZFP36L2")) # can be a vector of gene names
+
+FeaturePlot(sobj_clusters, "LYZ")
+FeaturePlot(sobj_clusters, c("ZFP36", "ZFP36L2")) # can be a vector of gene names
+FeaturePlot(sobj_clusters, "ZFP36", split.by = "orig.ident") # <- split into panels based on metadata column
+```
+
+## cluster identities
+Without venturing into the realm of philosphical debates on what a "cell type" constitutes, standard pratice is to use certain gene expression features to classify cells. This is often done manually, by visual inspection of key genes. Automated approaches that utilize a broader range of features are currently being developed.
+
+### manual check and cluster identity assignment
+
+```{r, fig.width=6, fig.height=3}
+# from the Seurat pancreas example
+# we now have pan_celseq2, fully annotated in metadata column "celltype", and pan_smartseq2, ready to be annotated
+data_url = "https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"
+pan_celseq2 <- readRDS(url(file.path(data_url, "pan_celseq2.rds")))
+pan_celseq2@meta.data %>% head()
+pan_smartseq2 <- readRDS(url(file.path(data_url, "pan_smartseq2.rds")))
+pan_smartseq2@meta.data %>% head()
+a <- DimPlot(pan_smartseq2, label = TRUE) + NoLegend()
+a
+
+FeaturePlot(pan_smartseq2, c("IRX2","GC")) # marker genes for alpha
+FeaturePlot(pan_smartseq2, c("IAPP","MAFA")) # marker genes for beta
+FeaturePlot(pan_smartseq2, c("HHEX","LEPR")) # marker genes for delta
+
+# optional, save the cluster numbers as "cluster.id"
+pan_smartseq2 <- StashIdent(object = pan_smartseq2, save.name = "cluster.id") # or use AddMetaData
+
+# Use RenameIdents to remap the idents from the current IDs to the new IDs 
+pan_smartseq2 <- RenameIdents(pan_smartseq2,
+                              "0" = "alpha",
+                              "1" = "alpha",
+                              "2" = "alpha",
+                              "3" = "alpha",
+                              "7" = "alpha",
+                              "9" = "alpha",
+                              "11" = "alpha", 
+                              "5" = "beta",
+                              "6" = "beta",
+                              "8" = "beta",
+                              "10" = "beta",
+                              "4" = "delta")
+
+# Plot UMAP with new cluster IDs
+b <- DimPlot(object = pan_smartseq2,
+        label = TRUE) + NoLegend()
+b
+
+cowplot::plot_grid(a,b)
+
+pan_smartseq2 <- StashIdent(object = pan_smartseq2, save.name = "cluster_name")
+pan_smartseq2@meta.data %>% head()
+```
+
+### towards a more automated approach of identity assignment
+1. using `Seurat`, inference from previous seurat object (requires very similar seurat object)
+
+```{r, fig.width=6, fig.height=3}
+# reset idents of pan_smartseq2
+Idents(pan_smartseq2) <- "cluster.id"
+
+pancreas <- FindTransferAnchors(reference = pan_celseq2, query = pan_smartseq2, 
+    dims = 1:30)
+predictions <- TransferData(anchorset = pancreas, refdata = pan_celseq2$celltype, 
+    dims = 1:30)
+pan_smartseq2 <- AddMetaData(pan_smartseq2, metadata = predictions)
+Idents(pan_smartseq2) <- "predicted.id"
+DimPlot(pan_smartseq2, label = TRUE) + NoLegend()
+```
+
+2. using `clustifyr`, and marker gene list (requires markers or gene list), using gene list enrichment methods
+
+```{r}
+# reset idents of pan_smartseq2
+Idents(pan_smartseq2) <- "cluster.id"
+
+# manually enter gene list
+library(clustifyr)
+beta <- c("IAPP","MAFA")
+alpha <- c("IRX2","GC")
+delta <- c("HHEX","LEPR")
+genelist <- data.frame(alpha, beta, delta)
+genelist
+
+res <- clustify_lists(input = pan_smartseq2@assays$RNA@data,
+                      marker = genelist,
+                      cluster_info = pan_smartseq2@meta.data$seurat_clusters,
+                      method = "jaccard") # calculate jaccard index
+
+res # a matrix of scores
+
+res2 <- cor_to_call(res, threshold = 0.5) # take the highest, and if lower than cutoff, assign "unknown")
+res2 # dataframe of identities
+
+namedres <- structure(res2$type, names = res2$cluster) # make named vector
+namedres
+
+# seurat idents are factors, which may have strange behavior if coerced to numbers/index
+namedres[as.character(Idents(pan_smartseq2))][1:10] 
+pan_smartseq2@meta.data$celltype <- namedres[as.character(Idents(pan_smartseq2))] 
+DimPlot(pan_smartseq2, label = T, group.by = "celltype") + NoLegend()
+```
+
+3. using `clustifyr`, and transcriptome profiles (from other scRNAseq, bulk RNAseq, or microarray), using ranked correlation of highly variable genes ([scmap](https://github.com/hemberg-lab/scmap) is another similar package)
+
+```{r}
+# build a reference from expression matrix data
+ref <- average_clusters(mat = pan_celseq2@assays$RNA@data,
+                        cluster_info = pan_celseq2@meta.data,
+                        cluster_col = "celltype")
+
+res <- clustify(input = pan_smartseq2@assays$RNA@data,
+                ref_mat = ref,
+                metadata = pan_smartseq2@meta.data,
+                query_genes = pan_smartseq2@assays$RNA@var.features, # using Seurat computed variable genes
+                cluster_col = "seurat_clusters")
+res2 <- cor_to_call(res, threshold = 0.5) # anything below 0.5 correlation are labeled as "unknown"
+res2
+
+# same as last section
+namedres <- structure(res2$type, names = res2$cluster) 
+pan_smartseq2@meta.data$celltype <- namedres[as.character(Idents(pan_smartseq2))] 
+DimPlot(pan_smartseq2, label = T, group.by = "celltype") + NoLegend()
+```
+`clustifyr` also takes seurat objects as input directly, finds various needed data, and output another object with identities assigned.
+
+```{r}
+ref <- seurat_ref(pan_celseq2,
+                  cluster_col = "celltype")
+
+res <- clustify(input = pan_smartseq2,
+                ref_mat = ref,
+                cluster_col = "seurat_clusters",
+                seurat_out = TRUE)
+
+res
+
+# look at UMAP
+DimPlot(res, label = TRUE, group.by = "type") + NoLegend() # saved in "type" metadata column
+```
+
+Also see more tutorials at [`clustifyr`](https://rnabioco.github.io/clustifyr/), and prebuilt references from large scRNAseq/bulk RNAseq/microarray datasets at package [`clustifyrdata`](https://github.com/rnabioco/clustifyrdata).
+
+### cell type composition
+Insight into different samples can be gained from the proportion of cells that fall into each cell type. Unfortunately, no dedicated tools are available for statistical testing.
+
+```{r}
+tab1 <- sobj_clusters@meta.data %>% group_by(orig.ident, clusters) %>% tally() # counting up all combinations
+tab1
+tab2 <- tab1 %>% spread(key = clusters, value = n) # spread out into "wide" form
+tab2
+tab3 <- tab1 %>% group_by(orig.ident) %>%
+  mutate(n = n/sum(n)) %>% # convert counts to proportions first
+  spread(key = clusters, value = n) 
+tab3
+```
+
+and save tables to disk with `write_csv`
+
+```{r,eval=F}
+write_csv(tab3, "data/perc_clusters.csv")
+tab4 <- read_csv("data/perc_clusters.csv")
+```
+
+
+## other things to do with marker genes 
+1. gene list to pathway activity score, via [`AUCell`](https://github.com/aertslab/AUCell)
+
+2. if TF expression is too low, consider [`SCENIC`](https://github.com/aertslab/SCENIC) for TF activity inference
+
+3. standard GO term enrichment tools [`gProfiler2`](https://biit.cs.ut.ee/gprofiler/page/r), [`enrichR`](https://github.com/wjawaid/enrichR), [`fgsea`](https://github.com/ctlab/fgsea]), etc etc

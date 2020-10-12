@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="generator" content="distill" />
+
+  <style type="text/css">
+  /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
+  body {
+    visibility: hidden;
+  }
+  </style>
+
+ <!--radix_placeholder_import_source-->
+ <!--/radix_placeholder_import_source-->
+
+  <!--radix_placeholder_meta_tags-->
+  <title>Single-cell RNA-seq Workshop: &lt;b style="font-size:45px;"&gt;Normalization, Dimensionality Reduction and clustering&lt;/b&gt;</title>
+  
+  
+  <link rel="icon" type="image/png" href="img/logo.png"/>
+  
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2019-08-14"/>
+  <meta property="article:created" itemprop="dateCreated" content="2019-08-14"/>
+  <meta name="article:author" content="Kent Riemondy"/>
+  
+  <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
+  <meta property="og:title" content="Single-cell RNA-seq Workshop: &lt;b style=&quot;font-size:45px;&quot;&gt;Normalization, Dimensionality Reduction and clustering&lt;/b&gt;"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:site_name" content="Single-cell RNA-seq Workshop"/>
+  
+  <!--  https://dev.twitter.com/cards/types/summary -->
+  <meta property="twitter:card" content="summary"/>
+  <meta property="twitter:title" content="Single-cell RNA-seq Workshop: &lt;b style=&quot;font-size:45px;&quot;&gt;Normalization, Dimensionality Reduction and clustering&lt;/b&gt;"/>
+  <meta property="twitter:site" content="@rnabioco"/>
+  
+  <!--/radix_placeholder_meta_tags-->
+  <!--radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-rmarkdown-metadata">
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["<b style=\"font-size:45px;\">Normalization, Dimensionality Reduction and clustering<\/b>"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]}]}]},{"type":"character","attributes":{},"value":["August 14<sup>th<\/sup>, 2019"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_depth","self_contained","highlight"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[1]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["tango"]}]}]}]}
+  </script>
+  <!--/radix_placeholder_rmarkdown_metadata-->
+  <!--radix_placeholder_navigation_in_header-->
+  
+  <script type="application/javascript">
+  
+    window.headroom_prevent_pin = false;
+  
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+  
+      // initialize headroom for banner
+      var header = $('header').get(0);
+      var headerHeight = header.offsetHeight;
+      var headroom = new Headroom(header, {
+        onPin : function() {
+          if (window.headroom_prevent_pin) {
+            window.headroom_prevent_pin = false;
+            headroom.unpin();
+          }
+        }
+      });
+      headroom.init();
+      if(window.location.hash)
+        headroom.unpin();
+      $(header).addClass('headroom--transition');
+  
+      // offset scroll location for banner on hash change
+      // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
+      window.addEventListener("hashchange", function(event) {
+        window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
+      });
+  
+      // responsive menu
+      $('.distill-site-header').each(function(i, val) {
+        var topnav = $(this);
+        var toggle = topnav.find('.nav-toggle');
+        toggle.on('click', function() {
+          topnav.toggleClass('responsive');
+        });
+      });
+  
+      // nav dropdowns
+      $('.nav-dropbtn').click(function(e) {
+        $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
+        $(this).parent().siblings('.nav-dropdown')
+           .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
+      });
+      $("body").click(function(e){
+        $('.nav-dropdown-content').removeClass('nav-dropdown-active');
+      });
+      $(".nav-dropdown").click(function(e){
+        e.stopPropagation();
+      });
+    });
+  </script>
+  
+  <style type="text/css">
+  
+  /* Theme (user-documented overrideables for nav appearance) */
+  
+  .distill-site-nav {
+    color: rgba(255, 255, 255, 0.8);
+    background-color: #455a64;
+    font-size: 15px;
+    font-weight: 300;
+  }
+  
+  .distill-site-nav a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .distill-site-nav a:hover {
+    color: white;
+  }
+  
+  @media print {
+    .distill-site-nav {
+      display: none;
+    }
+  }
+  
+  .distill-site-header {
+  
+  }
+  
+  .distill-site-footer {
+  
+  }
+  
+  
+  /* Site Header */
+  
+  .distill-site-header {
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 3;
+  }
+  
+  .distill-site-header .nav-left {
+    display: inline-block;
+    margin-left: 8px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header .nav-left {
+      margin-left: 0;
+    }
+  }
+  
+  
+  .distill-site-header .nav-right {
+    float: right;
+    margin-right: 8px;
+  }
+  
+  .distill-site-header a,
+  .distill-site-header .title {
+    display: inline-block;
+    text-align: center;
+    padding: 14px 10px 14px 10px;
+  }
+  
+  .distill-site-header .title {
+    font-size: 18px;
+  }
+  
+  .distill-site-header .logo {
+    padding: 0;
+  }
+  
+  .distill-site-header .logo img {
+    display: none;
+    max-height: 20px;
+    width: auto;
+    margin-bottom: -4px;
+  }
+  
+  .distill-site-header .nav-image img {
+    max-height: 18px;
+    width: auto;
+    display: inline-block;
+    margin-bottom: -3px;
+  }
+  
+  
+  
+  @media screen and (min-width: 1000px) {
+    .distill-site-header .logo img {
+      display: inline-block;
+    }
+    .distill-site-header .nav-left {
+      margin-left: 20px;
+    }
+    .distill-site-header .nav-right {
+      margin-right: 20px;
+    }
+    .distill-site-header .title {
+      padding-left: 12px;
+    }
+  }
+  
+  
+  .distill-site-header .nav-toggle {
+    display: none;
+  }
+  
+  .nav-dropdown {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .nav-dropdown .nav-dropbtn {
+    border: none;
+    outline: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 16px 10px;
+    background-color: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+    margin-top: 1px;
+    z-index: 2;
+  }
+  
+  .nav-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 200px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+    z-index: 1;
+    margin-top: 2px;
+    white-space: nowrap;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  
+  .nav-dropdown-content hr {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-dropdown-active {
+    display: block;
+  }
+  
+  .nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
+    color: black;
+    padding: 6px 24px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+  }
+  
+  .nav-dropdown-content .nav-dropdown-header {
+    display: block;
+    padding: 5px 24px;
+    padding-bottom: 0;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #999999;
+    white-space: nowrap;
+  }
+  
+  .nav-dropdown:hover .nav-dropbtn {
+    color: white;
+  }
+  
+  .nav-dropdown-content a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .nav-right .nav-dropdown-content {
+    margin-left: -45%;
+    right: 0;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
+    .distill-site-header a.nav-toggle {
+      float: right;
+      display: block;
+    }
+    .distill-site-header .title {
+      margin-left: 0;
+    }
+    .distill-site-header .nav-right {
+      margin-right: 0;
+    }
+    .distill-site-header {
+      overflow: hidden;
+    }
+    .nav-right .nav-dropdown-content {
+      margin-left: 0;
+    }
+  }
+  
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header.responsive {position: relative;}
+    .distill-site-header.responsive a.nav-toggle {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    .distill-site-header.responsive a,
+    .distill-site-header.responsive .nav-dropdown {
+      display: block;
+      text-align: left;
+    }
+    .distill-site-header.responsive .nav-left,
+    .distill-site-header.responsive .nav-right {
+      width: 100%;
+    }
+    .distill-site-header.responsive .nav-dropdown {float: none;}
+    .distill-site-header.responsive .nav-dropdown-content {position: relative;}
+    .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+  }
+  
+  /* Site Footer */
+  
+  .distill-site-footer {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 3;
+    margin-top: 30px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    text-align: center;
+  }
+  
+  /* Headroom */
+  
+  d-title {
+    padding-top: 6rem;
+  }
+  
+  @media print {
+    d-title {
+      padding-top: 4rem;
+    }
+  }
+  
+  .headroom {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  
+  .headroom--transition {
+    transition: all .4s ease-in-out;
+  }
+  
+  .headroom--unpinned {
+    top: -100px;
+  }
+  
+  .headroom--pinned {
+    top: 0;
+  }
+  
+  </style>
+  
+  <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
+  <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
+  <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
+  <!--/radix_placeholder_navigation_in_header-->
+  <!--radix_placeholder_distill-->
+  
+  <style type="text/css">
+  
+  body {
+    background-color: white;
+  }
+  
+  .pandoc-table {
+    width: 100%;
+  }
+  
+  .pandoc-table>caption {
+    margin-bottom: 10px;
+  }
+  
+  .pandoc-table th:not([align]) {
+    text-align: left;
+  }
+  
+  .pagedtable-footer {
+    font-size: 15px;
+  }
+  
+  .html-widget {
+    margin-bottom: 2.0em;
+  }
+  
+  .l-screen-inset {
+    padding-right: 16px;
+  }
+  
+  .l-screen .caption {
+    margin-left: 10px;
+  }
+  
+  .shaded {
+    background: rgb(247, 247, 247);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .html-widget {
+    margin-bottom: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .shaded-content {
+    background: white;
+  }
+  
+  .text-output {
+    margin-top: 0;
+    line-height: 1.5em;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+  
+  d-article {
+    padding-bottom: 30px;
+  }
+  
+  d-appendix {
+    padding-top: 30px;
+  }
+  
+  d-article>p>img {
+    width: 100%;
+  }
+  
+  d-article iframe {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.0em;
+    width: 100%;
+  }
+  
+  figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  /* CSS for table of contents */
+  
+  .d-toc {
+    color: rgba(0,0,0,0.8);
+    font-size: 0.8em;
+    line-height: 1em;
+  }
+  
+  .d-toc-header {
+    font-size: 0.6rem;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 1.3em;
+  }
+  
+  .d-toc a {
+    border-bottom: none;
+  }
+  
+  .d-toc ul {
+    padding-left: 0;
+  }
+  
+  .d-toc li>ul {
+    padding-top: 0.8em;
+    padding-left: 16px;
+    margin-bottom: 0.6em;
+  }
+  
+  .d-toc ul,
+  .d-toc li {
+    list-style-type: none;
+  }
+  
+  .d-toc li {
+    margin-bottom: 0.9em;
+  }
+  
+  .d-toc-separator {
+    margin-top: 20px;
+    margin-bottom: 2em;
+  }
+  
+  .d-article-with-toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  
+  
+  
+  /* Tweak code blocks (note that this CSS is repeated above in an injection
+     into the d-code shadow dom) */
+  
+  d-code {
+    overflow-x: auto !important;
+  }
+  
+  pre.d-code code.d-code {
+    padding-left: 10px;
+    font-size: 12px;
+    border-left: 2px solid rgba(0,0,0,0.1);
+  }
+  
+  pre.text-output {
+  
+    font-size: 12px;
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  @media(min-width: 768px) {
+  
+  d-code {
+    overflow-x: visible !important;
+  }
+  
+  pre.d-code code.d-code  {
+      padding-left: 18px;
+      font-size: 14px;
+  }
+  pre.text-output {
+    font-size: 14px;
+  }
+  }
+  
+  /* Figure */
+  
+  .figure {
+    position: relative;
+    margin-bottom: 2.5em;
+    margin-top: 1.5em;
+  }
+  
+  .figure img {
+    width: 100%;
+  }
+  
+  .figure .caption {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+    line-height: 1.5em;
+  }
+  
+  .figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  .figure .caption a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .figure .caption b,
+  .figure .caption strong, {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 1.0);
+  }
+  
+  
+  
+  /* Tweak 1000px media break to show more text */
+  
+  @media(min-width: 1000px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 16px;
+    }
+  
+    .grid {
+      grid-column-gap: 16px;
+    }
+  
+    d-article {
+      font-size: 1.06rem;
+      line-height: 1.7em;
+    }
+    figure .caption, .figure .caption, figure figcaption {
+      font-size: 13px;
+    }
+  }
+  
+  @media(min-width: 1180px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 32px;
+    }
+  
+    .grid {
+      grid-column-gap: 32px;
+    }
+  }
+  
+  
+  /* Get the citation styles for the appendix (not auto-injected on render since
+     we do our own rendering of the citation appendix) */
+  
+  d-appendix .citation-appendix,
+  .d-appendix .citation-appendix {
+    font-size: 11px;
+    line-height: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 18px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px 18px;
+    border-radius: 3px;
+    color: rgba(150, 150, 150, 1);
+    overflow: hidden;
+    margin-top: -12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  
+  /* Social footer */
+  
+  .social_footer {
+    margin-top: 30px;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.67);
+  }
+  
+  .disqus-comments {
+    margin-right: 30px;
+  }
+  
+  .disqus-comment-count {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+  }
+  
+  #disqus_thread {
+    margin-top: 30px;
+  }
+  
+  .article-sharing a {
+    border-bottom: none;
+    margin-right: 8px;
+  }
+  
+  .article-sharing a:hover {
+    border-bottom: none;
+  }
+  
+  .sidebar-section.subscribe {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+  
+  .subscribe p {
+    margin-bottom: 0.5em;
+  }
+  
+  
+  .article-footer .subscribe {
+    font-size: 15px;
+    margin-top: 45px;
+  }
+  
+  
+  /* Improve display for browsers without grid (IE/Edge <= 15) */
+  
+  .downlevel {
+    line-height: 1.6em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+  }
+  
+  .downlevel .d-title {
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .downlevel .d-title h1 {
+    font-size: 50px;
+    font-weight: 700;
+    line-height: 1.1em;
+    margin: 0 0 0.5rem;
+  }
+  
+  .downlevel .d-title p {
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1.55em;
+    margin-top: 0;
+  }
+  
+  .downlevel .d-byline {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.8em;
+  }
+  
+  .downlevel .section-separator {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .downlevel .d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+  
+  
+  .downlevel .d-appendix {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.5);
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+  
+  .downlevel .footnotes ol {
+    padding-left: 13px;
+  }
+  
+  .downlevel .base-grid,
+  .downlevel .distill-header,
+  .downlevel .d-title,
+  .downlevel .d-abstract,
+  .downlevel .d-article,
+  .downlevel .d-appendix,
+  .downlevel .distill-appendix,
+  .downlevel .d-byline,
+  .downlevel .d-footnote-list,
+  .downlevel .d-citation-list,
+  .downlevel .distill-footer,
+  .downlevel .appendix-bottom,
+  .downlevel .posts-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  
+  @media(min-width: 768px) {
+    .downlevel .base-grid,
+    .downlevel .distill-header,
+    .downlevel .d-title,
+    .downlevel .d-abstract,
+    .downlevel .d-article,
+    .downlevel .d-appendix,
+    .downlevel .distill-appendix,
+    .downlevel .d-byline,
+    .downlevel .d-footnote-list,
+    .downlevel .d-citation-list,
+    .downlevel .distill-footer,
+    .downlevel .appendix-bottom,
+    .downlevel .posts-container {
+    padding-left: 150px;
+    padding-right: 150px;
+    max-width: 900px;
+  }
+  }
+  
+  .downlevel pre code {
+    display: block;
+    border-left: 2px solid rgba(0, 0, 0, .1);
+    padding: 0 0 0 20px;
+    font-size: 14px;
+  }
+  
+  .downlevel code, .downlevel pre {
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  </style>
+  
+  <script type="application/javascript">
+  
+  function is_downlevel_browser() {
+    if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
+                                   window.navigator.userAgent)) {
+      return true;
+    } else {
+      return window.load_distill_framework === undefined;
+    }
+  }
+  
+  // show body when load is complete
+  function on_load_complete() {
+  
+    // set body to visible
+    document.body.style.visibility = 'visible';
+  
+    // force redraw for leaflet widgets
+    if (window.HTMLWidgets) {
+      var maps = window.HTMLWidgets.findAll(".leaflet");
+      $.each(maps, function(i, el) {
+        var map = this.getMap();
+        map.invalidateSize();
+        map.eachLayer(function(layer) {
+          if (layer instanceof L.TileLayer)
+            layer.redraw();
+        });
+      });
+    }
+  
+    // trigger 'shown' so htmlwidgets resize
+    $('d-article').trigger('shown');
+  }
+  
+  function init_distill() {
+  
+    init_common();
+  
+    // create front matter
+    var front_matter = $('<d-front-matter></d-front-matter>');
+    $('#distill-front-matter').wrap(front_matter);
+  
+    // create d-title
+    $('.d-title').changeElementType('d-title');
+  
+    // create d-byline
+    var byline = $('<d-byline></d-byline>');
+    $('.d-byline').replaceWith(byline);
+  
+    // create d-article
+    var article = $('<d-article></d-article>');
+    $('.d-article').wrap(article).children().unwrap();
+  
+    // move posts container into article
+    $('.posts-container').appendTo($('d-article'));
+  
+    // create d-appendix
+    $('.d-appendix').changeElementType('d-appendix');
+  
+    // create d-bibliography
+    var bibliography = $('<d-bibliography></d-bibliography>');
+    $('#distill-bibliography').wrap(bibliography);
+  
+    // flag indicating that we have appendix items
+    var appendix = $('.appendix-bottom').children('h3').length > 0;
+  
+    // replace citations with <d-cite>
+    $('.citation').each(function(i, val) {
+      appendix = true;
+      var cites = $(this).attr('data-cites').split(" ");
+      var dt_cite = $('<d-cite></d-cite>');
+      dt_cite.attr('key', cites.join());
+      $(this).replaceWith(dt_cite);
+    });
+    // remove refs
+    $('#refs').remove();
+  
+    // replace footnotes with <d-footnote>
+    $('.footnote-ref').each(function(i, val) {
+      appendix = true;
+      var href = $(this).attr('href');
+      var id = href.replace('#', '');
+      var fn = $('#' + id);
+      var fn_p = $('#' + id + '>p');
+      fn_p.find('.footnote-back').remove();
+      var text = fn_p.html();
+      var dtfn = $('<d-footnote></d-footnote>');
+      dtfn.html(text);
+      $(this).replaceWith(dtfn);
+    });
+    // remove footnotes
+    $('.footnotes').remove();
+  
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      var id = $(this).attr('id');
+      $('.d-toc a[href="#' + id + '"]').parent().remove();
+      appendix = true;
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
+    });
+  
+    // show d-appendix if we have appendix content
+    $("d-appendix").css('display', appendix ? 'grid' : 'none');
+  
+    // replace code blocks with d-code
+    $('pre>code').each(function(i, val) {
+      var code = $(this);
+      var pre = code.parent();
+      var clz = "";
+      var language = pre.attr('class');
+      if (language) {
+        // map unknown languages to "clike" (without this they just dissapear)
+        if ($.inArray(language, ["bash", "clike", "css", "go", "html",
+                                 "javascript", "js", "julia", "lua", "markdown",
+                                 "markup", "mathml", "python", "svg", "xml"]) == -1)
+          language = "clike";
+        language = ' language="' + language + '"';
+        var dt_code = $('<d-code block' + language + clz + '></d-code>');
+        dt_code.text(code.text());
+        pre.replaceWith(dt_code);
+      } else {
+        code.addClass('text-output').unwrap().changeElementType('pre');
+      }
+    });
+  
+    // localize layout chunks to just output
+    $('.layout-chunk').each(function(i, val) {
+  
+      // capture layout
+      var layout = $(this).attr('data-layout');
+  
+      // apply layout to markdown level block elements
+      var elements = $(this).children().not('d-code, pre.text-output, script');
+      elements.each(function(i, el) {
+        var layout_div = $('<div class="' + layout + '"></div>');
+        if (layout_div.hasClass('shaded')) {
+          var shaded_content = $('<div class="shaded-content"></div>');
+          $(this).wrap(shaded_content);
+          $(this).parent().wrap(layout_div);
+        } else {
+          $(this).wrap(layout_div);
+        }
+      });
+  
+  
+      // unwrap the layout-chunk div
+      $(this).children().unwrap();
+    });
+  
+    // load distill framework
+    load_distill_framework();
+  
+    // wait for window.distillRunlevel == 4 to do post processing
+    function distill_post_process() {
+  
+      if (!window.distillRunlevel || window.distillRunlevel < 4)
+        return;
+  
+      // hide author/affiliations entirely if we have no authors
+      var front_matter = JSON.parse($("#distill-front-matter").html());
+      var have_authors = front_matter.authors && front_matter.authors.length > 0;
+      if (!have_authors)
+        $('d-byline').addClass('hidden');
+  
+      // table of contents
+      if (have_authors) // adjust border if we are in authors
+        $('.d-toc').parent().addClass('d-article-with-toc');
+  
+      // strip links that point to #
+      $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
+  
+      // hide elements of author/affiliations grid that have no value
+      function hide_byline_column(caption) {
+        $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
+      }
+  
+      // affiliations
+      var have_affiliations = false;
+      for (var i = 0; i<front_matter.authors.length; ++i) {
+        var author = front_matter.authors[i];
+        if (author.affiliation !== "&nbsp;") {
+          have_affiliations = true;
+          break;
+        }
+      }
+      if (!have_affiliations)
+        $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
+  
+      // published date
+      if (!front_matter.publishedDate)
+        hide_byline_column("Published");
+  
+      // document object identifier
+      var doi = $('d-byline').find('h3:contains("DOI")');
+      var doi_p = doi.next().empty();
+      if (!front_matter.doi) {
+        // if we have a citation and valid citationText then link to that
+        if ($('#citation').length > 0 && front_matter.citationText) {
+          doi.html('Citation');
+          $('<a href="#citation"></a>')
+            .text(front_matter.citationText)
+            .appendTo(doi_p);
+        } else {
+          hide_byline_column("DOI");
+        }
+      } else {
+        $('<a></a>')
+           .attr('href', "https://doi.org/" + front_matter.doi)
+           .html(front_matter.doi)
+           .appendTo(doi_p);
+      }
+  
+       // change plural form of authors/affiliations
+      if (front_matter.authors.length === 1) {
+        var grid = $('.authors-affiliations');
+        grid.children('h3:contains("Authors")').text('Author');
+        grid.children('h3:contains("Affiliations")').text('Affiliation');
+      }
+  
+      // inject pre code styles (can't do this with a global stylesheet b/c a shadow root is used)
+      $('d-code').each(function(i, val) {
+        var style = document.createElement('style');
+        style.innerHTML = 'pre code { padding-left: 10px; font-size: 12px; border-left: 2px solid rgba(0,0,0,0.1); } ' +
+                          '@media(min-width: 768px) { pre code { padding-left: 18px; font-size: 14px; } }';
+        if (this.shadowRoot)
+          this.shadowRoot.appendChild(style);
+      });
+  
+      // move appendix-bottom entries to the bottom
+      $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
+      $('.appendix-bottom').remove();
+  
+      // clear polling timer
+      clearInterval(tid);
+  
+      // show body now that everything is ready
+      on_load_complete();
+    }
+  
+    var tid = setInterval(distill_post_process, 50);
+    distill_post_process();
+  
+  }
+  
+  function init_downlevel() {
+  
+    init_common();
+  
+     // insert hr after d-title
+    $('.d-title').after($('<hr class="section-separator"/>'));
+  
+    // check if we have authors
+    var front_matter = JSON.parse($("#distill-front-matter").html());
+    var have_authors = front_matter.authors && front_matter.authors.length > 0;
+  
+    // manage byline/border
+    if (!have_authors)
+      $('.d-byline').remove();
+    $('.d-byline').after($('<hr class="section-separator"/>'));
+    $('.d-byline a').remove();
+  
+    // remove toc
+    $('.d-toc-header').remove();
+    $('.d-toc').remove();
+    $('.d-toc-separator').remove();
+  
+    // move appendix elements
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
+    });
+  
+  
+    // inject headers into references and footnotes
+    var refs_header = $('<h3></h3>');
+    refs_header.text('References');
+    $('#refs').prepend(refs_header);
+  
+    var footnotes_header = $('<h3></h3');
+    footnotes_header.text('Footnotes');
+    $('.footnotes').children('hr').first().replaceWith(footnotes_header);
+  
+    // move appendix-bottom entries to the bottom
+    $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
+    $('.appendix-bottom').remove();
+  
+    // remove appendix if it's empty
+    if ($('.d-appendix').children().length === 0)
+      $('.d-appendix').remove();
+  
+    // prepend separator above appendix
+    $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
+  
+    // trim code
+    $('pre>code').each(function(i, val) {
+      $(this).html($.trim($(this).html()));
+    });
+  
+    // move posts-container right before article
+    $('.posts-container').insertBefore($('.d-article'));
+  
+    $('body').addClass('downlevel');
+  
+    on_load_complete();
+  }
+  
+  
+  function init_common() {
+  
+    // jquery plugin to change element types
+    (function($) {
+      $.fn.changeElementType = function(newType) {
+        var attrs = {};
+  
+        $.each(this[0].attributes, function(idx, attr) {
+          attrs[attr.nodeName] = attr.nodeValue;
+        });
+  
+        this.replaceWith(function() {
+          return $("<" + newType + "/>", attrs).append($(this).contents());
+        });
+      };
+    })(jQuery);
+  
+    // prevent underline for linked images
+    $('a > img').parent().css({'border-bottom' : 'none'});
+  
+    // mark non-body figures created by knitr chunks as 100% width
+    $('.layout-chunk').each(function(i, val) {
+      var figures = $(this).find('img, .html-widget');
+      if ($(this).attr('data-layout') !== "l-body") {
+        figures.css('width', '100%');
+      } else {
+        figures.css('max-width', '100%');
+        figures.filter("[width]").each(function(i, val) {
+          var fig = $(this);
+          fig.css('width', fig.attr('width') + 'px');
+        });
+  
+      }
+    });
+  
+    // auto-append index.html to post-preview links in file: protocol
+    // and in rstudio ide preview
+    $('.post-preview').each(function(i, val) {
+      if (window.location.protocol === "file:")
+        $(this).attr('href', $(this).attr('href') + "index.html");
+    });
+  
+    // get rid of index.html references in header
+    if (window.location.protocol !== "file:") {
+      $('.distill-site-header a[href]').each(function(i,val) {
+        $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
+      });
+    }
+  
+    // add class to pandoc style tables
+    $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
+    $('.kable-table').children('table').addClass('pandoc-table');
+  
+    // add figcaption style to table captions
+    $('caption').parent('table').addClass("figcaption");
+  
+    // initialize posts list
+    if (window.init_posts_list)
+      window.init_posts_list();
+  
+    // implmement disqus comment link
+    $('.disqus-comment-count').click(function() {
+      window.headroom_prevent_pin = true;
+      $('#disqus_thread').toggleClass('hidden');
+      if (!$('#disqus_thread').hasClass('hidden')) {
+        var offset = $(this).offset();
+        $(window).resize();
+        $('html, body').animate({
+          scrollTop: offset.top - 35
+        });
+      }
+    });
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    if (is_downlevel_browser())
+      init_downlevel();
+    else
+      window.addEventListener('WebComponentsReady', init_distill);
+  });
+  
+  </script>
+  
+  <!--/radix_placeholder_distill-->
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
+  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
+  <!--radix_placeholder_site_in_header-->
+  <style type="text/css">
+  .distill-site-nav {
+    color: rgba(255, 255, 255, 0.8);
+    background-color: #000000;
+      font-size: 15px;
+    font-weight: 300;
+  }
+  
+  .distill-site-nav a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .distill-site-nav a:hover {
+    color: white;
+    text-decoration:underline;
+  }
+  
+  .distill-site-header {
+  }
+  
+  .distill-site-footer {
+  }
+  
+  @media print {
+    .distill-site-nav {
+      display: none;
+    }
+  }
+  
+  .l-body {
+    display: none;
+  }
+  
+  @media screen and (min-width: 768px) {
+    .l-body {display: inline;}
+  }
+  
+  </style>
+  <!--/radix_placeholder_site_in_header-->
+
+  <link rel="stylesheet" href="styles.css" type="text/css"/>
+
+</head>
+
+<body>
+
+<!--radix_placeholder_front_matter-->
+
+<script id="distill-front-matter" type="text/json">
+{"title":"<b style=\"font-size:45px;\">Normalization, Dimensionality Reduction and clustering<\/b>","authors":[{"author":"Kent Riemondy","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2019-08-14T00:00:00.000-06:00","citationText":"Riemondy, 2019"}
+</script>
+
+<!--/radix_placeholder_front_matter-->
+<!--radix_placeholder_navigation_before_body-->
+<header class="header header--fixed" role="banner">
+<nav class="distill-site-nav distill-site-header">
+<div class="nav-left">
+<a href="index.html" class="title">Single-cell RNA-seq Workshop</a>
+<a href="1_intro.html">Introduction</a>
+<a href="2_filtering_QC.html">Quality Control</a>
+<a href="3_norm_viz_clustering.html">Clustering</a>
+<a href="4_markers.html">Cell Type Annotation</a>
+<a href="5_pseudotime.html">Pseudotime</a>
+<a href="6_alignment.html">Dataset Alignment</a>
+<a href="7_multimodal.html">Multi-modal Data</a>
+</div>
+<div class="nav-right">
+<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
+</div>
+</nav>
+</header>
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="d-title">
+<h1>Normalization, Dimensionality Reduction and clustering</h1>
+
+</div>
+
+<div class="d-byline">
+  
+  Kent Riemondy
+  
+<br/>August 14<sup>th</sup>, 2019
+</div>
+
+<div class="d-article">
+<h2 id="schedule-for-today">Schedule for today</h2>
+<ul>
+<li><p>9:00-10:20 Normalization, clustering, and visualization</p></li>
+<li><p>10:30-11:50 Finding markers and annotating cell types</p></li>
+<li><p>12:00 - 1:00pm Lunch/Break</p></li>
+<li><p>1:00-2:20 Trajectory inference methods</p></li>
+<li><p>2:30-4:00 Dataset alignmnet and batch correction</p></li>
+</ul>
+<h2 id="topics-for-this-session">Topics for this session:</h2>
+<ul>
+<li>Normalization and dimensionality reduction methods</li>
+<li>Discuss visualization strategies well-suited to single cell seq data</li>
+<li>Introduce clustering methods commonly used for single cell data</li>
+</ul>
+<h2 id="common-analysis-paradigm-for-scrna-seq">Common analysis paradigm for scRNA-seq</h2>
+<ol type="1">
+<li>Normalize counts and log transform. Data used for differential gene expression</li>
+<li>Identify subset of informative genes to use for clustering (feature selection)</li>
+<li>Run PCA to reduce the dimensionality of the dataset</li>
+<li>Identify clusters using the PCA reduced data</li>
+<li>Project the data into 2-D using UMAP/tSNE or just PCA to visualize</li>
+<li>Find marker genes enriched in clusters.</li>
+<li>Repeat Steps 4-7 until satisfied with data</li>
+</ol>
+<p>Seurat accomplishes these steps using a succicnt set of functions:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+NormalizeData()
+ScaleData()
+RunPCA()
+RunUMAP()
+FindNeighbors()
+FindClusters()
+FindMarkers()</code></pre>
+</div>
+<h2 id="new-data-slots">New data slots</h2>
+<ol type="1">
+<li><code>@counts</code> &lt;- raw data<br />
+</li>
+<li><code>@data</code> &lt;- log normalized data (used for differential gene expression)</li>
+<li><code>@scale.data</code> &lt;- scaled/regressed data (used for clustering/visualization)</li>
+<li><code>@reductions</code> &lt;- contains tsne/pca/umap matrices</li>
+<li><code>@graphs</code> &lt;- contains KNN and SNN graphs used for clustering</li>
+</ol>
+<h2 id="reloading-saved-objects">Reloading saved objects</h2>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(Seurat)
+library(tidyverse)
+library(cowplot)
+library(Matrix)
+library(ComplexHeatmap)</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so &lt;- readRDS(&quot;data/filtered_sobj.rds&quot;)
+so</code></pre>
+<pre><code>
+#&gt; An object of class Seurat 
+#&gt; 12572 features across 2690 samples within 1 assay 
+#&gt; Active assay: RNA (12572 features)</code></pre>
+</div>
+<h2 id="normalization">Normalization</h2>
+<p>Normalization of the UMI count data is necessary due to the large variability in total counts observed across cells. This variability is generally thought to be due to inefficiencies in library preparation and variable sequencing depths between cells. Without normalization the largest source of variabilty in the data would be due to technical differences rather than the biological differences of interest.</p>
+<h3 id="global-size-factor-approach">Global size factor approach</h3>
+<p>A commonly used approach for normalization of UMI data is a simple scaling normalization similar to the commonly used counts per million normalization methods. UMI counts per cell are scaled to the total # of UMIs per cell and multipled by a constant for ease to prevent small numbers (10,000). The data are then log transformed (wtih a pseudocount) to stabilize the variance. e.g.</p>
+<p><span class="math inline">\(\log((10000 * \frac{x_{i}}{\sum_{x_i}}) + 1)\)</span></p>
+<p>This approach makes the assumption that cells all have the same amount of RNA and that sequencing depth is the reason for the variability. These assumptions aren’t really valid, especially when comparing diverse cell types, however in practice this approach can still provide reasonable results and is the default normalization method used in Seurat.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so &lt;- NormalizeData(so, normalization.method = &quot;LogNormalize&quot;)
+
+# data slot now contains log normalized values
+GetAssayData(so, &quot;data&quot;)[1:10, 1:10]</code></pre>
+<pre><code>
+#&gt; 10 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                                              
+#&gt; AL627309.1    . . . . . .        . .        .        .       
+#&gt; RP11-206L10.2 . . . . . .        . .        .        .       
+#&gt; LINC00115     . . . . . .        . .        .        .       
+#&gt; NOC2L         . . . . . .        . .        1.254193 .       
+#&gt; KLHL17        . . . . . .        . .        .        .       
+#&gt; PLEKHN1       . . . . . .        . .        .        .       
+#&gt; HES4          . . . . . 1.766183 . .        .        .       
+#&gt; ISG15         . . . . . 2.369960 . 1.679169 .        2.836986
+#&gt; AGRN          . . . . . .        . .        .        .       
+#&gt; C1orf159      . . . . . .        . .        .        .</code></pre>
+</div>
+<h3 id="scran">Scran</h3>
+<p>Normalization methods used in bulk RNA-seq data (e.g. DESeq2 size-factors ) are not appropriate due to the large numbers of zeros in the data. However, by pooling similar cells together, one can obtain enough data to estimate a normalization size factor. The Bioconductor package <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/scran/inst/doc/scran.html#1_introduction"><code>scran</code></a> implements such a strategy.</p>
+<p>The basic approach is as follows:</p>
+<ol type="1">
+<li>clusters cells to group cells with similar gene expression</li>
+<li>pool cells within these clusters and calculate size factors</li>
+<li>repeat step 2 with varying sets of cells and pool sizes</li>
+<li>derive cell-specific size factors using linear algebra</li>
+</ol>
+<p>First we need to convert our seurat object to a Bioconductor single cell data structure, the <a href="https://bioconductor.org/packages/devel/bioc/vignettes/SingleCellExperiment/inst/doc/intro.html"><code>SingleCellExperiment</code></a> class. This class is similar to other bioconductor data strucutes (e.g. <code>SummarizedExperiment</code>). Seurat provides a conversion function to convert to an SingleCellExperiment object (and other formats, such as <code>loom</code> and <code>CellDataSet</code>).</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(scran)
+
+# convert to SingleCellExperiment
+sce &lt;- as.SingleCellExperiment(so)
+
+# get raw UMI counts
+counts(sce)[40:50, 40:50]</code></pre>
+<pre><code>
+#&gt; 11 x 11 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                    
+#&gt; GNB1          . . . . . . . . . . .
+#&gt; PRKCZ         . . . . . . . . . . .
+#&gt; RP5-892K4.1   . . . . . . . . . . .
+#&gt; C1orf86       . . . . . . . . . . .
+#&gt; SKI           . . . . . . . . . . .
+#&gt; RER1          1 . 1 1 . . . . 3 . .
+#&gt; PEX10         . . . . . . . . . . .
+#&gt; PANK4         . . . . . . . . . . .
+#&gt; RP3-395M20.12 . . . . . . . . . . .
+#&gt; TNFRSF14      . . . . . 1 . . . . .
+#&gt; RP3-395M20.9  . . . . . . . . . . .</code></pre>
+<pre class="r"><code>
+# get log Normalized counts form Seurat
+logcounts(sce)[40:50, 40:50]</code></pre>
+<pre><code>
+#&gt; 11 x 11 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                                          
+#&gt; GNB1          .        . .        .        . .        . .
+#&gt; PRKCZ         .        . .        .        . .        . .
+#&gt; RP5-892K4.1   .        . .        .        . .        . .
+#&gt; C1orf86       .        . .        .        . .        . .
+#&gt; SKI           .        . .        .        . .        . .
+#&gt; RER1          1.787605 . 1.527969 1.731479 . .        . .
+#&gt; PEX10         .        . .        .        . .        . .
+#&gt; PANK4         .        . .        .        . .        . .
+#&gt; RP3-395M20.12 .        . .        .        . .        . .
+#&gt; TNFRSF14      .        . .        .        . 1.732627 . .
+#&gt; RP3-395M20.9  .        . .        .        . .        . .
+#&gt;                           
+#&gt; GNB1          .        . .
+#&gt; PRKCZ         .        . .
+#&gt; RP5-892K4.1   .        . .
+#&gt; C1orf86       .        . .
+#&gt; SKI           .        . .
+#&gt; RER1          2.711917 . .
+#&gt; PEX10         .        . .
+#&gt; PANK4         .        . .
+#&gt; RP3-395M20.12 .        . .
+#&gt; TNFRSF14      .        . .
+#&gt; RP3-395M20.9  .        . .</code></pre>
+<pre class="r"><code>
+#genes
+rownames(sce)[1:5]</code></pre>
+<pre><code>
+#&gt; [1] &quot;AL627309.1&quot;    &quot;RP11-206L10.2&quot; &quot;LINC00115&quot;    
+#&gt; [4] &quot;NOC2L&quot;         &quot;KLHL17&quot;</code></pre>
+<pre class="r"><code>
+#cells
+colnames(sce)[1:5]</code></pre>
+<pre><code>
+#&gt; [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+#&gt; [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot;</code></pre>
+<pre class="r"><code>
+# get cell metadata
+colData(sce)[1:5, ]</code></pre>
+<pre><code>
+#&gt; DataFrame with 5 rows and 5 columns
+#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt;                    &lt;factor&gt;  &lt;numeric&gt;    &lt;integer&gt;
+#&gt; AAACATACAACCAC-1    control       2419          779
+#&gt; AAACATTGAGCTAC-1    control       4901         1350
+#&gt; AAACGCTGACCAGT-1    control       2174          781
+#&gt; AAACGCTGGTTCTT-1    control       2259          789
+#&gt; AAAGTTTGATCACG-1    control       1265          441
+#&gt;                      percent_mito    ident
+#&gt;                         &lt;numeric&gt; &lt;factor&gt;
+#&gt; AAACATACAACCAC-1 3.01777594047127  control
+#&gt; AAACATTGAGCTAC-1 3.79514384819425  control
+#&gt; AAACGCTGACCAGT-1 3.81784728610856  control
+#&gt; AAACGCTGGTTCTT-1  3.0987162461266  control
+#&gt; AAAGTTTGATCACG-1 3.47826086956522  control</code></pre>
+<pre class="r"><code>
+# get gene metadata
+rowData(sce)[1:5, ]</code></pre>
+<pre><code>
+#&gt; DataFrame with 5 rows and 0 columns</code></pre>
+</div>
+<p>First we’ll cluster the cells. We’ll discuss clustering approachs more in depth later in the tutorial.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# takes a few minutes
+clusters &lt;- quickCluster(sce,
+                         use.ranks = FALSE, # suggested by the authors
+                         min.size = 100) # require at least 100 cells per cluster
+
+table(clusters)
+
+# Calculate size factors per cell
+sce &lt;- computeSumFactors(sce, 
+                         clusters = clusters, 
+                         min.mean = 0.1) # ignore low abundance genes 
+
+summary(sizeFactors(sce))
+
+# apply size factors to generate log normalized data
+sce &lt;- normalize(sce)
+
+logcounts(sce)[40:50, 40:50]</code></pre>
+</div>
+<p>Lastly, we’ll replace the <code>Seurat</code> normalized values with those from <code>scran</code> and store the size-factors in the meta.data</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so[[&quot;RNA&quot;]] &lt;- SetAssayData(so[[&quot;RNA&quot;]],
+                              slot = &quot;data&quot;, 
+                              new.data = logcounts(sce))
+
+so$sizeFactors &lt;- sizeFactors(sce)</code></pre>
+</div>
+<p>Now we that have normalized values we can visualize expression across groups.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+VlnPlot(so, &quot;CD3E&quot;, slot = &quot;counts&quot;)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-6-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+VlnPlot(so, &quot;CD3E&quot;, slot = &quot;data&quot;)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-6-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="identifying-highly-variable-genes-i.e.feature-selection">Identifying highly variable genes (i.e. feature selection)</h2>
+<p>We will next select important features to use for dimensionality reduction, clustering and tSNE/uMAP projection. We can in theory use all ~20K genes in the dataset for these steps, however this is often computationally expensive and unneccesary. Most genes in a dataset are going to be expressed at relatively similar values across different cells, or are going to be so lowly expressed that they contribute more noise than signal to the analysis. For determining the relationships between cells in gene-expression space, we want to focus on gene expression differences that are driven primarily by biological variation rather than technical variation.</p>
+<p>Seurat provides a function to help identify these genes, <code>FindVariableGenes</code>. Ranking genes by their variance alone will bias towards selecting highly expressed genes. To help mitigate this Seurat uses a <code>vst</code> method to identify genes. Briefly, a curve is fit to model the mean and variance for each gene in log space. Variances are then standardized against this model, and ranked. The top 2000 genes with the highest standardized variances are then called as highly variable, by default.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so &lt;- FindVariableFeatures(so,selection.method = &quot;vst&quot;)
+
+VariableFeaturePlot(so) </code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pkg_data-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+so@assays$RNA@var.features[1:10]</code></pre>
+<pre><code>
+#&gt;  [1] &quot;PPBP&quot;   &quot;S100A9&quot; &quot;LYZ&quot;    &quot;IGLL5&quot;  &quot;GNLY&quot;   &quot;FTL&quot;    &quot;PF4&quot;   
+#&gt;  [8] &quot;FTH1&quot;   &quot;FCER1A&quot; &quot;GNG11&quot;</code></pre>
+</div>
+<p>An alternative approach uses the Bioconductor package <a href="https://www.bioconductor.org/packages/release/bioc/html/M3Drop.html"><code>M3Drop</code></a>. This approach does not model the variance in the data, but rather uses the information about dropouts to identify genes that have high variance. Specifically there is a clear relationship between the dropout rate and the abundance of a gene.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+counts &lt;- GetAssayData(so, &quot;counts&quot;)
+
+# dropout rate per gene
+dropout_rate &lt;-  1 - (rowSums(counts &gt; 0) / ncol(counts))
+
+# mean expression
+avg_abundance &lt;- rowMeans(counts)
+
+dropout &lt;- data.frame(
+  abundance = avg_abundance,
+  dropout_rate = dropout_rate
+)
+
+ggplot(dropout, aes(abundance, dropout_rate)) +
+  geom_point() +
+  theme_cowplot() +
+  scale_x_log10() </code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-7-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Note how some genes deviate to the right away from the main distribution. These genes have a higher dropout rate than expected for their abundance.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/M3Drop.png" width="1292" style="display: block; margin: auto;" /></p>
+</div>
+<p>The dropout relationship is used to identify variable genes. If a gene is expressed at a different abundance in cell populations, then it will shift away from the curve. M3Drop uses two functions to fit the data to a model (<code>NBumiFitModel</code>), then find genes that deviate from the model (<code>NBumiFeatureSelectionCombinedDrop</code>).</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(M3Drop)
+
+# input either SingleCellExperiment or counts slot from a Seurat object
+counts &lt;- NBumiConvertData(sce)</code></pre>
+<pre><code>
+#&gt; [1] &quot;Removing  0 undetected genes.&quot;</code></pre>
+<pre class="r"><code>
+# fit to model
+fit &lt;- NBumiFitModel(counts)
+
+# Identify genes with high dropout rate for a given abundance
+drop_hvg &lt;- NBumiFeatureSelectionCombinedDrop(fit, 
+                                              ntop = 2000,
+                                              suppress.plot=FALSE)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-9-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+head(drop_hvg)</code></pre>
+<pre><code>
+#&gt;          Gene effect_size p.value q.value
+#&gt; S100A9 S100A9   0.5800524       0       0
+#&gt; S100A8 S100A8   0.5409420       0       0
+#&gt; CST3     CST3   0.4892915       0       0
+#&gt; NKG7     NKG7   0.4686901       0       0
+#&gt; GNLY     GNLY   0.4442870       0       0
+#&gt; TYROBP TYROBP   0.4419217       0       0</code></pre>
+</div>
+<p>How similar are the two appraoches?</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+shared_hvgs &lt;- intersect(rownames(drop_hvg), VariableFeatures(so))
+
+length(shared_hvgs)</code></pre>
+<pre><code>
+#&gt; [1] 1463</code></pre>
+<pre class="r"><code>
+# set variable feature in seurat object
+VariableFeatures(so) &lt;- shared_hvgs</code></pre>
+</div>
+<p>Do these approaches really extract meaningful genes?</p>
+<p><strong>Exercise: Make a heatmap with the top 50 highly variable genes generated by Seurat and/or M3Drop.</strong></p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(ComplexHeatmap)
+# pseudocode
+Heatmap(input_matrix, show_column_names = FALSE)</code></pre>
+</div>
+<h2 id="scaling">Scaling</h2>
+<p>Next, we will scale the normalized expression values. The scaled values will only be used for dimensionality reduction and clustering, and not differential expression. The purpose of scaling is to set the expression values for each gene onto a similar numeric scale. This avoid issues of have a gene that is highly expressed being given more weight in clustering simply because it has larger numbers. Scaling converts the normalized data into z-scores by default and the values are stored in the <code>scale.data</code> slot.</p>
+<p>Single cell data sets often contain various types of ‘uninteresting’ variation. These can include technical noise, batch effects and confounding biological variation (such as cell cycle stage). We can use modeling to regress these signals out of the analysis using <code>ScaleData</code>. Variables present in the <code>meta.data</code> can be supplied as variables to regress. A linear model is fit between the the supplied variables (i.e <code>nUMI</code>, <code>proportion.mito</code>, etc.) and gene expression value. The residuals from this model are then scaled instead of the normalized gene expression.</p>
+<p>In general we recommend performing exploratory data analysis first without regressing any nuisance variables. Later, if you discover a nuisance variable (i.e. batch or cell cycle), then you can regress it out.</p>
+<p>Note that some workflows( <a href="https://f1000research.com/articles/5-2122/v2"><code>SimpleSingleCell</code></a> and <a href="https://www.embopress.org/doi/10.15252/msb.20188746"><code>Current best practices for single cell analysis</code></a> ) omit this scaling step, as it can upweight the contribution of noisy low-expressed genes. If you want to omit this step simply assign the log-normalized values into the <code>scale.data</code> slot for compatibility with downstream Seurat functionality.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# scale all of the data, useful if you want to make heatmaps later
+so &lt;- ScaleData(object = so, features = rownames(so))
+
+# for large datasets, just scale the variable genes:
+#so &lt;- ScaleData(object = so, 
+#                 features = VariableFeatures(so))</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# get scaled values for top 50 variable genes
+to_plot &lt;- GetAssayData(so, slot = &quot;scale.data&quot;)[VariableFeatures(so)[1:50], ]
+
+Heatmap(as.matrix(to_plot),
+        show_column_names = FALSE)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="performing-dimensionality-reduction-and-clustering-pca">Performing dimensionality reduction and clustering: PCA</h2>
+<p>Heatmaps are useful for visualizing small numbers of genes (10s or 100s), but quickly become impractical for larger single cell datasets due to high dimensionality (1000s of cells X 20000 genes).</p>
+<p>Dimensionality reduction techniques are used in single cell data analysis generally for two purposes:</p>
+<ol type="1">
+<li><p>Provide visualizations in 2 dimensions that convey information about relationships between cells.</p></li>
+<li><p>Reduce the computational burden of working with 20K dimenions to a smaller set of dimensions that capture signal.</p></li>
+</ol>
+<p>By identifying the highly variable genes we’ve already reduced the dimensions from 20K to ~1500. Next we will use <a href="http://setosa.io/ev/principal-component-analysis/">Principal Component Analysis</a> to identify a smaller subset of dimensions (10-100) that will be used for clustering and visualization.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so &lt;- RunPCA(so,
+             features = VariableFeatures(so), 
+             verbose = FALSE, 
+             ndims.print = 0)
+
+DimPlot(so, reduction = &quot;pca&quot;)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pca-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>The <code>RunPCA</code> function will calculate the top 50 principal components using a modified form of PCA (see <code>?irlba</code>) that doesn’t need to compute all of the PCs. By default it will also print the genes most highly associated with each principal component, we will visualize these later. Often these genes will be recognizable as markers of different cell populations and they are also often highly variable genes.</p>
+<p><strong>Note</strong> Some functions in Seurat (<code>RunPCA</code>, <code>RunTSNE</code>, <code>RunUMAP</code>, <code>FindClusters</code>), have a non-deterministic component that will give different results (usually slightly) each run due to a randomization step in the algorithm. However, you can set an integer seed to make the output reproducible. This is useful so that you get the same clustering results if you rerun your analysis code. In many functions seurat has done this for you with the <code>seed.use</code> parameter, set to <code>42</code>. If you set this to NULL you will get a non-deterministic result.</p>
+<h3 id="pca-plots">PCA Plots</h3>
+<p>Shown in the tabs are 2 dimensional plots showing the prinicpal component scores of cells.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+pcs &lt;- list(
+  c(1, 2),
+  c(1, 3),
+  c(1, 4),
+  c(2, 3),
+  c(2, 4),
+  c(3, 4)
+)
+
+
+for(i in seq_along(pcs)){
+  cat(&#39;\n#### &#39;, &#39;PC&#39;, pcs[[i]][1], &#39; vs PC&#39;, pcs[[i]][2], &#39;\n&#39;, sep = &quot;&quot;)
+  p &lt;- DimPlot(so, 
+          dims = pcs[[i]], 
+          reduction = &quot;pca&quot;,
+          cols = RColorBrewer::brewer.pal(10, &quot;Paired&quot;))
+  print(p)
+  cat(&#39;\n&#39;)
+}</code></pre>
+<h4 id="pc1-vs-pc2">PC1 vs PC2</h4>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pc_plots-1.png" width="624" style="display: block; margin: auto;" /></p>
+<h4 id="pc1-vs-pc3">PC1 vs PC3</h4>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pc_plots-2.png" width="624" style="display: block; margin: auto;" /></p>
+<h4 id="pc1-vs-pc4">PC1 vs PC4</h4>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pc_plots-3.png" width="624" style="display: block; margin: auto;" /></p>
+<h4 id="pc2-vs-pc3">PC2 vs PC3</h4>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pc_plots-4.png" width="624" style="display: block; margin: auto;" /></p>
+<h4 id="pc2-vs-pc4">PC2 vs PC4</h4>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pc_plots-5.png" width="624" style="display: block; margin: auto;" /></p>
+<h4 id="pc3-vs-pc4">PC3 vs PC4</h4>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pc_plots-6.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>To see which genes are most strongly associated with the PCs you can use the <code>VizDimLoadings</code> function.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+VizDimLoadings(object = so, dims = 1:3, balanced = TRUE, ncol = 3)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/pca_loadings-1.png" width="864" style="display: block; margin: auto;" /></p>
+</div>
+<p>Finally, we can generate an ‘elbow plot’ of the standard deviation explained by each of the principle components.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+ElbowPlot(so, ndims = 40)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/elbow_plot-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<p>Note that most of the variation in the data is captured in a small number of PCs (&lt; 20)</p>
+<h2 id="dimensionality-reduction">Dimensionality reduction</h2>
+<h3 id="pca">PCA</h3>
+<p>Early single cell studies simply used PCA to visualize single cell data, and by plotting the data in scatterplots reduced the dimensionality of the data to 2D. This is a fine approach for simple datasets, but often there is much more information present in higher principal components.</p>
+<p>We can use PC1 and PC2 to begin to assess the structure of the dataset.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+FeaturePlot(so, 
+            c(&quot;nFeature_RNA&quot;, &quot;nCount_RNA&quot;), 
+            reduction = &quot;pca&quot;)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-13-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+# Color by CD8, marker of CD8 t-cells
+FeaturePlot(so, 
+            &quot;CD8A&quot;, 
+            reduction = &quot;pca&quot;)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-13-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Use wrapper functions for plotting to save some typing.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+plot_pca &lt;- function(sobj, features, ...){
+  FeaturePlot(sobj, 
+            features,
+            reduction = &quot;pca&quot;, 
+            ...)
+}
+
+
+# Color by top genes associated with Pc1 and Pc2
+plot_pca(so, c(&quot;CST3&quot;, &quot;NKG7&quot;)) </code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-14-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+# or use ggplot directly if need more custom viz
+var_df &lt;- FetchData(so, c(&quot;PC_1&quot;, &quot;PC_2&quot;, &quot;CD19&quot;, &quot;CD8A&quot;)) %&gt;% 
+  gather(gene, expr, -PC_1, -PC_2)
+
+ggplot(var_df, aes(PC_1, PC_2)) +
+  geom_point(aes(color = expr)) +
+  scale_color_gradientn(colours = RColorBrewer::brewer.pal(9, &quot;Reds&quot;)) + 
+  facet_grid(~gene) +
+  theme_cowplot()</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-14-2.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Note how other PCs separate different cell populations (PPBP is a marker of megakaryocytes).</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+plot_pca(so, c(&quot;PPBP&quot;, &quot;NKG7&quot;), dims = c(2,3))</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-15-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<h3 id="t-sne">t-SNE</h3>
+<p>The first two dimensions of PCA are not sufficient to capture the variation in these data due to the complexity. However, PCA is useful in identifying a new set of dimensions (10-100) that capture most of the interesting variation in the data. This is useful because now with this reduced dataset we can use newer visualization technique to examine relationships between cells in 2 dimenions.</p>
+<p>t-distributed stochastic neighbor embedding (tSNE) is a popular techinique for visualizing single cell datsets including mass cytometry data. A useful interactive tool to help you understand tSNE and interpret tSNE plots can be found <a href="https://distill.pub/2016/misread-tsne/">here</a>. A more in depth explanation can be found <a href="https://mlexplained.com/2018/09/14/paper-dissected-visualizing-data-using-t-sne-explained/">here</a>.</p>
+<p>Seurat provides a wrapper (<code>RunTSNE</code>) around the <code>Rtsne</code> package that generates the tSNE projection. By default RunTSNE uses the PCA matrix as input for Rtsne. The tSNE data will be stored in the <code>so@reductions$tsne</code> slot.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# specify to use the first 15 principal components
+# takes less than a minute 
+so &lt;- RunTSNE(so, dims = 1:15)
+
+# again make wrapper to plot tsnes easily
+plot_tsne &lt;- function(sobj, features = &quot;&quot;, ...){
+  FeaturePlot(sobj, 
+            features,
+            reduction = &quot;tsne&quot;, 
+            ...)
+}
+
+# use DimPlot for factors, use FeaturePlot for everything else
+DimPlot(so, reduction = &quot;tsne&quot;)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+plot_tsne(so, c(&quot;CD3E&quot;, &quot;PPBP&quot;, &quot;CD79A&quot;, &quot;S100A8&quot;))</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-16-2.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<p>EXERCISE: What effect does including all genes and all PCs (at least 50 PCs) have on the tSNE projection? Do clusters seem separated similarly (look at CD3E, PPBP, CD79A, S100A8 expression)?</p>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<p>EXERCISE: The perplexity paramter is key to producing a good visualization. Generate tSNE plots at a range of perplexities (2, 25, 250). What do you notice about the projections?</p>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<h3 id="umap">UMAP</h3>
+<p><a href="https://umap-learn.readthedocs.io/en/latest/parameters.html"><code>UMAP</code></a> is a newer algorithm for projecting data in 2D (or higher) and has become very popular for single cell visualization. The UMAP algorithm derives from topological methods for data analysis, and is nicely desribed by the authors in the UMAP <a href="https://umap-learn.readthedocs.io/en/latest/how_umap_works.html">documentation</a>.</p>
+<p>Similar to RunTSNE we specify the number of PCA dimensions to pass to RunUMAP.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# specify to use the first 15 prinicpal components
+so &lt;- RunUMAP(so, dims = 1:15)
+
+DimPlot(so, reduction = &quot;umap&quot;)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-19-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+# again make wrapper to plot umaps easily
+plot_umap &lt;- function(sobj, features = &quot;&quot;, ...){
+  FeaturePlot(sobj, 
+            features,
+            reduction = &quot;umap&quot;, 
+            ...)
+}
+
+plot_umap(so, c(&quot;CD3E&quot;, &quot;PPBP&quot;, &quot;CD79A&quot;, &quot;S100A8&quot;))</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-19-2.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<p>EXERCISE: How does the projection change with varying the <code>min_dist</code> parameter, try values 0.05, 0.3, and 0.7?</p>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+d &lt;- c(0.05, 0.3, 0.7)
+
+lapply(d, 
+       function(x) {
+ RunUMAP(object = so, 
+                n.neighbors = 30L, 
+                min.dist= x,
+                dims = 1:20) %&gt;% 
+   DimPlot(., reduction = &quot;umap&quot;)
+}) %&gt;% 
+  plot_grid(plotlist = ., ncol = 3)</code></pre>
+</div>
+<h3 id="diffusion-maps">Diffusion Maps</h3>
+<p><a href="https://academic.oup.com/bioinformatics/article/32/8/1241/1744143">destiny</a> is an R package that implements <a href="https://en.wikipedia.org/wiki/Diffusion_map">diffusion maps</a> for visualization and dimensionality reduction of single cell RNA-seq. This can be a very useful reduction method for datasets with more continuous dynamics.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(destiny)
+
+# expects matrix with cells as rows and genes as columns
+input_data &lt;- t(as.matrix(GetAssayData(so, &quot;data&quot;))[VariableFeatures(so), ])
+                        
+df_map &lt;- DiffusionMap(input_data)
+ 
+palette(cube_helix(6))
+plot(df_map, 1:2, col = so@meta.data$percent_mito)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-21-1.png" width="624" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+# See plotting options
+#?plot.DiffusionMap</code></pre>
+</div>
+<h3 id="force-directed-graphs">Force directed graphs</h3>
+<p>Lastly, another approach for visualization is to plot a nearest neighbor graph directly. There are various plotting approaches available to plot the graph in 2D. These visualizations will maximize the connectedness of the data. See <code>?layout_with_...</code> functions from <code>igraph</code>. There are better tools for these types of visualizations in python (e.g. <code>PAGA</code>).</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/force_directed_graph.png" width="240" style="display: block; margin: auto;" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(igraph)
+
+net &lt;- graph.adjacency(
+          adjmatrix = as.matrix(so@graphs$RNA_snn),
+          mode = &quot;undirected&quot;,
+          weighted = TRUE,
+          diag = FALSE
+        )
+
+
+lo &lt;- layout_with_fr(net)
+
+png(&quot;img/force_directed_graph.png&quot;)
+plot.igraph(net, 
+            layout = lo,  
+            edge.width = E(net)$weight,
+            vertex.label = NA,
+            vertex.color = so$seurat_clusters,
+            vertex.size = 0, 
+            curved = T)
+dev.off()</code></pre>
+</div>
+<h2 id="clustering-single-cell-data">Clustering single cell data</h2>
+<p>The PCA/UMAP/tSNE plots above indicate that there are likely different cell types present in the data as we can see clusters. Next we will formally cluster the dataset to assign cells to clusters. See this recent benchmarking paper for discussion of best clustering methods. <a href="https://f1000research.com/articles/7-1141">Duo et al, 2018 A systematic performance evaluation of clustering methods for single-cell RNA-seq data</a></p>
+<p>Graph based clustering methods are commonly used for single cell data, because they can scale to millions of cells, produce reasonable assignments, and have tunable parameters. The approach that is implemented in Seurat is performed as follows:</p>
+<ol type="1">
+<li>construct a K-nearest (KNN) neighbor matrix.</li>
+<li>calculate shared nearest neighbors (SNN) using the jaccard index.</li>
+<li>use the <a href="https://en.wikipedia.org/wiki/Louvain_modularity">Louvain</a> community detection algorithm to assign clusters.</li>
+</ol>
+<p>This general approach was originally adopted in the single cell community in the PhenoGraph algorithm developed by <a href="https://doi.org/10.1016/j.cell.2015.05.047">Levain et al 2015</a>.</p>
+<p>In Seurat the clustering is done using two functions:<code>FindNeighbors</code> which computes the KNN and SNN graphs, and <code>FindClusters</code> which finds clusters.</p>
+<p><code>FindNeighbors</code> calculates the KNN graph using the PCA matrix as input (or other dimensionality reductions).</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so &lt;- FindNeighbors(so, 
+              reduction = &quot;pca&quot;,
+              dims = 1:15,
+              k.param = 15)
+
+so &lt;- FindClusters(so, resolution = 0.5, verbose = FALSE)
+
+
+so$RNA_snn_res.0.5 %&gt;% head()</code></pre>
+<pre><code>
+#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;                0                2                3                3 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;                2                5 
+#&gt; Levels: 0 1 2 3 4 5 6 7</code></pre>
+<pre class="r"><code>
+so$seurat_clusters %&gt;% head()</code></pre>
+<pre><code>
+#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;                0                2                3                3 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;                2                5 
+#&gt; Levels: 0 1 2 3 4 5 6 7</code></pre>
+</div>
+<p><strong>EXERCISE: Resolution and k.param are key parameters, what effect does varying them have on the clustering? Try a few resolution settings between 0.05 and 1 and k.param settings between 5 to 100.</strong></p>
+<p><br></p>
+<p><br></p>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<h2 id="how-many-clusters">How many clusters?</h2>
+<p>Clustering algorithms produce clusters, even if there isn’t anything meaningfully different between cells. Determining the optimal number of clusters can be tricky and also dependent on the biological question.</p>
+<p>Some guidelines:</p>
+<ol type="1">
+<li><p>Cluster the data into a small number of clusters to identify cell types, then recluster to generate additional clusters to define sub-populations of cell types.</p></li>
+<li><p>To determine if the data is overclustered examine differentially expressed genes between clusters. If the clusters have few or no differentially expressed genes then the data is overclustered. Similar clusters can be merged post-hoc if necessary as sometimes it is difficult to use 1 clustering approach for many diverse cell populations.</p></li>
+</ol>
+<h2 id="assessing-relationships-between-clusters">Assessing relationships between clusters</h2>
+<p>Hierarchical clustering can be used to visualize the relationships between clusters. The average expression of each cluster is computed then the distances between the clusters are used for hierarchical clustering.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+Idents(so) &lt;- &quot;RNA_snn_res.0.5&quot;
+so &lt;- BuildClusterTree(so)
+
+PlotClusterTree(so)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/unnamed-chunk-28-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>The <a href="https://lazappi.github.io/clustree/index.html"><code>clustree</code></a> package provides a nice plotting utility to visualize the relationship of cells at different resolution settings.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(clustree)
+
+clustree(so)</code></pre>
+<p><img src="3_norm_viz_clustering_files/figure-html5/clustree-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Finally let’s define a meta data column as <code>clusters</code> as those generated with a resolution of 0.5 with 30 neighbors.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+so$clusters &lt;- so$RNA_snn_res.0.5</code></pre>
+</div>
+<h2 id="save-object-and-metadata">Save object and metadata</h2>
+<p>It’s always a good idea to store the cell metadata, particularly the clustering and projections, as these may change with reruns of the same data, for example if a package is updated or if the <code>seed.use</code> argument changes.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+dir.create(&quot;data&quot;, showWarnings = FALSE)
+
+saveRDS(so, &quot;data/clustered_sobj.rds&quot;)
+
+to_keep &lt;- c(colnames(so@meta.data), &quot;UMAP_1&quot;, &quot;UMAP_2&quot;)
+
+df_out &lt;- FetchData(so, to_keep) %&gt;% 
+  rownames_to_column(&quot;cell&quot;)
+
+out_name &lt;- paste0(&quot;data/&quot;, Sys.Date(), &quot;_cell_metadata.tsv.gz&quot;)
+
+write_tsv(df_out, out_name)</code></pre>
+</div>
+<!--radix_placeholder_article_footer-->
+<!--/radix_placeholder_article_footer-->
+</div>
+
+<div class="d-appendix">
+</div>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_appendices-->
+<div class="appendix-bottom">
+<h3 id="updates-and-corrections">Corrections</h3>
+<p>If you see mistakes or want to suggest changes, please <a href="https://github.com/rnabioco/cellar/issues/new">create an issue</a> on the source repository.</p>
+</div>
+<!--/radix_placeholder_appendices-->
+<!--radix_placeholder_navigation_after_body-->
+<!--/radix_placeholder_navigation_after_body-->
+
+</body>
+
+</html>

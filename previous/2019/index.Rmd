@@ -1,0 +1,51 @@
+---
+title: "Single-cell RNA-seq Workshop"
+site: distill::distill_website
+preview: img/rbi-twitter-card.png
+output:
+  distill::distill_article:
+    toc: false
+---
+
+```{r setup, include = FALSE, eval = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+source("common.R")
+```
+
+### **August 13th - 15th, 2019 | AMC Health Sciences Library TL2**
+
+Free 3-day workshop covering current methods used to analyze single cell
+RNA-seq data using R/RStudio.
+
+### **Prerequisites**
+
+A basic understanding of the R programming language. Individuals without R experience will be contacted by course organizers to complete remedial online courses. Individuals that have (or will have) their own scRNA-seq data will be given priority.
+
+### **Schedule**
+
+* **Session 1** | August 13<sup>th</sup>, 1:00pm - 4:00pm
+  + [Introduction](1_intro.html)
+  + [Quality control](2_filtering_QC.html)
+    
+* **Session 2** | August 14<sup>th</sup>, 9:00am - 12:00pm
+  + [Clustering](3_norm_viz_clustering.html)
+  + [Cell type annotation](4_markers.html)
+
+* **Session 3** | August 14<sup>th</sup>, 1:00pm - 4:00pm
+  + [Pseudotime](5_trajectories.html)
+  + [Dataset alignment](6_alignment.html)
+
+* **Session 4** | August 15<sup>th</sup>, 9:00am - 12:00pm
+  + [Multi-modal data](7_multimodal.html)
+  + [Imputation methods](8_imputation.html)
+
+* **Session 5** | August 15<sup>th</sup>, 1:00pm - 4:00pm
+  + Working with your own data
+
+
+
+
+
+
