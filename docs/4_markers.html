@@ -110,7 +110,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["<b style=\"font-size:45px;\">Cluster Markers and Cell Type Assignment<\/b><\/b>"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Rui Fu, Kent Riemondy"]}]}]},{"type":"character","attributes":{},"value":["November 11<sup>th<\/sup>, 2020"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["html_document"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc","toc_depth","self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[1]},{"type":"logical","attributes":{},"value":[true]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["<b style=\"font-size:45px;\">Cluster Markers and Cell Type Assignment<\/b><\/b>"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Rui Fu, Kent Riemondy"]}]}]},{"type":"character","attributes":{},"value":["November 11<sup>th<\/sup>, 2020"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2092,15 +2092,12 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 </div>
 
 <div class="d-article">
-<div class="layout-chunk" data-layout="l-body">
-
-</div>
 <h2 id="finding-markers-and-differential-expression-analysis">finding markers and differential expression analysis</h2>
 <p>After clustering, differential expression testing (DE analysis, similar to bulk RNA seq) finds gene signatures of each cluster/cell population, to give more insights into biology.</p>
 <h3 id="many-proposed-methods">many proposed methods</h3>
 <p>(In general, we recommend default “wilcox” or “t”, good balances between speed and accuracy)</p>
 <figure>
-<img src="docs/previous/2019/_vignettes/4_markers_files2/detests.jpg" width="600" alt="" /><figcaption>Soneson and Robinson, 2018</figcaption>
+<img src="4_markers_files/detests.jpg" alt="" /><figcaption>Soneson and Robinson, 2018</figcaption>
 </figure>
 <p>In Seurat, we can use the <code>FindAllMarkers()</code> function, which will perform the <code>wilcox.test()</code> by default . Specifically, the function will iterate through each cluster, comparing the cells in one cluster to the cells in all of the other clusters. The test is run for every gene that is detectable above certain thresholds. The output is then filtered to identify significant genes with a positive fold-change (i.e. higher in abundance the cluster).</p>
 <p>We recommend using the <code>wilcoxauc()</code> function from the <code>presto</code> package (installed from github), which will do the same thing but in a (tiny) fraction of the time, due to implementation with C++ backend.</p>
@@ -2153,8 +2150,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 #&gt; PEX14                 .                .
 #&gt; CASZ1                 .                .</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='co'># after log normalization, results are stored in "data" slot</span>
+<pre><code><span class='co'># after log normalization, results are stored in "data" slot</span>
 <span class='va'>sobj_l</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>RNA</span><span class='op'>@</span><span class='va'>data</span><span class='op'>[</span><span class='fl'>101</span><span class='op'>:</span><span class='fl'>105</span>,<span class='fl'>101</span><span class='op'>:</span><span class='fl'>105</span><span class='op'>]</span> <span class='co'># normalized</span>
 </code></pre>
 </div>
@@ -2172,8 +2168,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 #&gt; PEX14                 .                .
 #&gt; CASZ1                 .                .</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='co'># after sctransform, results are stored in new assay "SCT"</span>
+<pre><code><span class='co'># after sctransform, results are stored in new assay "SCT"</span>
 <span class='va'>sobj_sc</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>SCT</span><span class='op'>@</span><span class='va'>data</span><span class='op'>[</span><span class='fl'>101</span><span class='op'>:</span><span class='fl'>105</span>,<span class='fl'>101</span><span class='op'>:</span><span class='fl'>105</span><span class='op'>]</span> <span class='co'># normalized</span>
 </code></pre>
 </div>
@@ -2314,29 +2309,28 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/VlnPlot.html'>VlnPlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span><span class='op'>)</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/plotting-1.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/VlnPlot.html'>VlnPlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"LYZ"</span>, <span class='st'>"S100A4"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># can be a vector of gene names</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-7-2.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/plotting-2.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code>
-<span class='co'># project on UMAP</span>
+<pre><code><span class='co'># project on UMAP</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span><span class='op'>)</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-7-3.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/plotting-3.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"LYZ"</span>, <span class='st'>"S100A4"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># can be a vector of gene names</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-7-4.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/plotting-4.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span>, split.by <span class='op'>=</span> <span class='st'>"orig.ident"</span><span class='op'>)</span> <span class='co'># &lt;- split into panels based on metadata column</span>
 </code></pre>
 </div>
-<p><img src="4_markers_files/figure-html5/unnamed-chunk-7-5.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="4_markers_files/figure-html5/plotting-5.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="sidebar-how-to-regress-out-cell-cycle-ribosomal-gene-heterogeneity-and-do-you-need-to">Sidebar: How to regress out cell cycle / ribosomal gene heterogeneity (and do you need to?)</h3>
 <div class="layout-chunk" data-layout="l-body">
@@ -2371,8 +2365,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 #&gt; [43] &quot;AURKA&quot;   &quot;PSRC1&quot;   &quot;ANLN&quot;    &quot;LBR&quot;     &quot;CKAP5&quot;   &quot;CENPE&quot;  
 #&gt; [49] &quot;CTCF&quot;    &quot;NEK2&quot;    &quot;G2E3&quot;    &quot;GAS2L3&quot;  &quot;CBX5&quot;    &quot;CENPA&quot;</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='co'># score and phase call is added to metadata</span>
+<pre><code><span class='co'># score and phase call is added to metadata</span>
 <span class='va'>sobj_l</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/CellCycleScoring.html'>CellCycleScoring</a></span><span class='op'>(</span><span class='va'>sobj_l</span>, 
                            s.features <span class='op'>=</span> <span class='va'>s.genes</span>,
                            g2m.features <span class='op'>=</span> <span class='va'>g2m.genes</span>,
@@ -2395,14 +2388,13 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 #&gt; AAAGTTTGATCACG-1  0.09548679 -0.07351012     S
 #&gt; AAATCATGACCACA-1 -0.06976057 -0.01901402    G1</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='co'># check PCA to see if cell cycle has strong effects</span>
+<pre><code><span class='co'># check PCA to see if cell cycle has strong effects</span>
 <span class='va'>sobj_l</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FindVariableFeatures.html'>FindVariableFeatures</a></span><span class='op'>(</span><span class='va'>sobj_l</span><span class='op'>)</span>
 <span class='va'>sobj_l</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/RunPCA.html'>RunPCA</a></span><span class='op'>(</span><span class='va'>sobj_l</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span>, npcs <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>sobj_l</span>, group.by <span class='op'>=</span> <span class='st'>"Phase"</span><span class='op'>)</span> <span class='co'># again, in this case, cell cycle does not have strong effects</span>
 </code></pre>
 </div>
-<p><img src="4_markers_files/figure-html5/unnamed-chunk-8-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="4_markers_files/figure-html5/cell%20cycle-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2439,16 +2431,14 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 #&gt;  [9,] &quot;S100A10&quot; &quot;AKR1C3&quot;  &quot;RP6-91H8.3&quot; &quot;APOBEC3B&quot; &quot;HOPX&quot; 
 #&gt; [10,] &quot;S100B&quot;   &quot;IGFBP7&quot;  &quot;S100A12&quot;    &quot;LYAR&quot;     &quot;CD27&quot;</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='va'>topPCAgenes</span> <span class='op'>%&gt;%</span>
+<pre><code><span class='va'>topPCAgenes</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/r/base/vector.html'>as.vector</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>s.genes</span>, <span class='va'>g2m.genes</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># see how many S and G2M genes intersect with that list</span>
 </code></pre>
 </div>
 <pre><code>#&gt; [1] &quot;PCNA&quot;</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='co'># or just check top variable genes</span>
+<pre><code><span class='co'># or just check top variable genes</span>
 </code></pre>
 </div>
 </div>
@@ -2502,26 +2492,24 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <span class='va'>a</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-10-1.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/manual%20inspection-1.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code>
-<span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>pan_smartseq2</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IRX2"</span>,<span class='st'>"GC"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># marker genes for alpha</span>
+<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>pan_smartseq2</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IRX2"</span>,<span class='st'>"GC"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># marker genes for alpha</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-10-2.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/manual%20inspection-2.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>pan_smartseq2</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"IAPP"</span>,<span class='st'>"MAFA"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># marker genes for beta</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-10-3.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/manual%20inspection-3.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>pan_smartseq2</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"HHEX"</span>,<span class='st'>"LEPR"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># marker genes for delta</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-10-4.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/manual%20inspection-4.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code>
-<span class='co'># optional, save the cluster numbers as "cluster.id"</span>
+<pre><code><span class='co'># optional, save the cluster numbers as "cluster.id"</span>
 <span class='va'>pan_smartseq2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>StashIdent</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>pan_smartseq2</span>, save.name <span class='op'>=</span> <span class='st'>"cluster.id"</span><span class='op'>)</span> <span class='co'># or use AddMetaData</span>
 
 <span class='co'># Use RenameIdents to remap the idents from the current IDs to the new IDs </span>
@@ -2546,10 +2534,9 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <span class='fu'>cowplot</span><span class='fu'>::</span><span class='fu'><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>plot_grid</a></span><span class='op'>(</span><span class='va'>a</span>,<span class='va'>b</span><span class='op'>)</span>
 </code></pre>
 </div>
-<img src="4_markers_files/figure-html5/unnamed-chunk-10-5.png" width="576" style="display: block; margin: auto;" />
+<img src="4_markers_files/figure-html5/manual%20inspection-5.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code>
-<span class='co'># remember to save the new idents into meta.data</span>
+<pre><code><span class='co'># remember to save the new idents into meta.data</span>
 <span class='va'>pan_smartseq2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>StashIdent</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>pan_smartseq2</span>, save.name <span class='op'>=</span> <span class='st'>"cluster_name"</span><span class='op'>)</span>
 <span class='va'>pan_smartseq2</span><span class='op'>@</span><span class='va'>meta.data</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
@@ -2587,7 +2574,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>pan_smartseq2</span>, label <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/SeuratTheme.html'>NoLegend</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="4_markers_files/figure-html5/unnamed-chunk-11-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="4_markers_files/figure-html5/Seurat%20integration-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <ol start="2" type="1">
 <li>using other classification packages such as <code>clustifyr</code>.</li>
@@ -2653,8 +2640,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 11 8          beta  0.781
 #&gt; 12 4          delta 0.793</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='co'># same as last section</span>
+<pre><code><span class='co'># same as last section</span>
 <span class='va'>new_meta</span> <span class='op'>&lt;-</span> <span class='fu'><a href='http://rnabioco.github.io/clustifyr/reference/call_to_metadata.html'>call_to_metadata</a></span><span class='op'>(</span><span class='va'>res2</span>, 
                              metadata <span class='op'>=</span> <span class='va'>pan_smartseq2</span><span class='op'>@</span><span class='va'>meta.data</span>,
                              cluster_col <span class='op'>=</span> <span class='st'>"cluster.id"</span><span class='op'>)</span>
@@ -2662,7 +2648,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>pan_smartseq2</span>, label <span class='op'>=</span> <span class='cn'>T</span>, group.by <span class='op'>=</span> <span class='st'>"type"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/SeuratTheme.html'>NoLegend</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="4_markers_files/figure-html5/unnamed-chunk-12-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="4_markers_files/figure-html5/clustifyr%20annotation-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p><code>clustifyr</code> also takes seurat objects as input directly, finds various needed data, and output another object with identities assigned.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -2674,8 +2660,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <pre><code>#&gt; [1] TRUE</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='http://rnabioco.github.io/clustifyr/reference/clustify.html'>clustify</a></span><span class='op'>(</span>input <span class='op'>=</span> <span class='va'>pan_smartseq2</span>,
+<pre><code><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='http://rnabioco.github.io/clustifyr/reference/clustify.html'>clustify</a></span><span class='op'>(</span>input <span class='op'>=</span> <span class='va'>pan_smartseq2</span>,
                 ref_mat <span class='op'>=</span> <span class='va'>ref2</span>,
                 cluster_col <span class='op'>=</span> <span class='st'>"cluster.id"</span>,
                 seurat_out <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
@@ -2688,12 +2673,11 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 #&gt; Active assay: RNA (34363 features, 2000 variable features)
 #&gt;  2 dimensional reductions calculated: pca, umap</code></pre>
 <div class="sourceCode">
-<pre><code>
-<span class='co'># look at UMAP</span>
+<pre><code><span class='co'># look at UMAP</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>res</span>, label <span class='op'>=</span> <span class='cn'>TRUE</span>, group.by <span class='op'>=</span> <span class='st'>"type"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/SeuratTheme.html'>NoLegend</a></span><span class='op'>(</span><span class='op'>)</span> <span class='co'># saved in "type" metadata column</span>
 </code></pre>
 </div>
-<p><img src="4_markers_files/figure-html5/unnamed-chunk-13-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="4_markers_files/figure-html5/clustifyr%20with%20wrappers-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <p>Also see more tutorials at <a href="https://rnabioco.github.io/clustifyr/"><code>clustifyr</code></a>.</p>
 <h3 id="cell-type-composition">cell type composition</h3>

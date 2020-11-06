@@ -3,22 +3,17 @@ title: <b style="font-size:45px;">Cluster Markers and Cell Type Assignment</b></
 author: "Rui Fu, Kent Riemondy"
 date: "November 11<sup>th</sup>, 2020"
 output:
-  html_document:
-    toc: true
-    toc_depth: 1
-    self_contained: true
+  distill::distill_article:
+    toc: false
 ---
 
-```{r "knitr options", echo = FALSE, message = FALSE, warning = FALSE}
+```{r "settings", include = FALSE}
 knitr::opts_chunk$set(
-  message = FALSE,
-  warning = FALSE,
-  collapse = TRUE,
-  echo = TRUE,
-  comment = "#>",
-  fig.align = "center",
-  fig.width=6, 
-  fig.height=3
+  message   = FALSE,
+  warning   = FALSE,
+  echo      = TRUE,
+  comment   = "#>",
+  fig.align = "center"
 )
 ```
 
@@ -28,7 +23,7 @@ After clustering, differential expression testing (DE analysis, similar to bulk 
 ### many proposed methods  
 (In general, we recommend default "wilcox" or "t", good balances between speed and  accuracy)
 
-![Soneson and Robinson, 2018](/Users/rf/cellar/docs/previous/2019/_vignettes/4_markers_files2/detests.jpg){width=600px}
+![Soneson and Robinson, 2018](4_markers_files/detests.jpg)
 
 In Seurat, we can use the `FindAllMarkers()` function, which will perform the `wilcox.test()` by default . Specifically, the function will iterate through each cluster, comparing the cells in one cluster to the cells in all of the other clusters. The test is run for every gene that is detectable above certain thresholds. The output is then filtered to identify significant genes with a positive fold-change (i.e. higher in abundance the cluster).
 
@@ -41,7 +36,7 @@ We recommend using the `wilcoxauc()` function from the `presto` package (install
 
 A couple more words on preprocessing:
 
-```{r}
+```{r "Load preprocessing data"}
 library(Seurat)
 library(tidyverse)
 # load data from saved RDS
@@ -61,7 +56,7 @@ sobj_sc <- suppressWarnings(SCTransform(object = sobj, # sctransform has some un
 
 3. Use normalized data for DE (slot is dependent on normalization method, also don't use integrated assay)
 
-```{r}
+```{r "explore normalization"}
 # before normalization, "data" slot is the same as counts
 sobj@assays$RNA@data[101:105,101:105] # raw counts
 
@@ -78,7 +73,7 @@ sobj_sc@assays$RNA@data[101:105,101:105] # still same as counts, make sure not t
 ### find all markers for each cluster
 `FindAllMarkers` compares cells in each cluster to all other cells in the dataset. Typically, focus is given to genes upregulated in each cluster, ie markers.
 
-```{r}
+```{r "FindAllMarkers"}
 # load clustered object
 sobj_clusters <- readRDS("/Users/rf/class/scRNAseq/cellar_v2/cellar/_vignettes/data/clustered_sobj.rds")
 
@@ -98,7 +93,7 @@ avg_logFC: expression comparison of the cluster in question (> 0 means higher) v
 
 And the equivalent but faster way using `presto::wilcoxauc`
 
-```{r}
+```{r "using presto instead"}
 library(presto)
 markers <- wilcoxauc(sobj_clusters, "clusters") # compute markers
 markers %>% head()
@@ -107,7 +102,7 @@ markers %>% head()
 ### find DE genes for specific cell groups
 For more control in the comparisons, use `FindMarkers`. Positive average log (natural) fold change represents higher expression of the gene in cells of `ident.1`. pct1 and 2 are percent detected in each ident/population.
 
-```{r}
+```{r "specific DE testing between groups"}
 # DE analysis for 2 clusters
 markers_df2 <- FindMarkers(sobj_clusters,
                            assay = "RNA",
@@ -123,7 +118,7 @@ avg_logFC: expression comparison of ident.1 vs ident.2 (> 0 means higher in iden
 
 `FindMarkers` defaults to the current active ident. To use other value groups, set idents to the intended column, or use the `group.by` argument.
 
-```{r}
+```{r "specific DE testing between groups, more complicated example"}
 # compare control vs treated in only cluster 1
 markers_df3 <- FindMarkers(sobj_clusters,
                            assay = "RNA",
@@ -136,7 +131,7 @@ markers_df3 <- FindMarkers(sobj_clusters,
 
 Genes of interest can then be visualized as violin plots or feature plots.
 
-```{r}
+```{r "plotting"}
 # violin plots
 Idents(sobj_clusters) <- sobj_clusters@meta.data$clusters # plots are grouped by active ident
 VlnPlot(sobj_clusters, "LYZ")
@@ -149,7 +144,7 @@ FeaturePlot(sobj_clusters, "LYZ", split.by = "orig.ident") # <- split into panel
 ```
 ### Sidebar: How to regress out cell cycle / ribosomal gene heterogeneity (and do you need to?)
 
-```{r}
+```{r "cell cycle"}
 # 1. assess phase and PCA
 # Seurat stores a list of cell cycle specific genes for humans
 s.genes <- Seurat::cc.genes$s.genes # obviously unsuitable for nonhuman
@@ -171,7 +166,7 @@ sobj_l <- RunPCA(sobj_l, verbose = FALSE, npcs = 10)
 DimPlot(sobj_l, group.by = "Phase") # again, in this case, cell cycle does not have strong effects
 ```
 
-```{r}
+```{r "PCA genes"}
 # 2. look for cell cycle-specific genes as main drivers of PCA
 topPCAgenes <- apply(
   sobj_l@reductions$pca@feature.loadings, # contribution of each gene to each PC is stored here
@@ -194,7 +189,7 @@ Without venturing into the realm of philosphical debates on what a "cell type" c
 
 ### manual inspection of key genes using expertise in the lab
 
-```{r, fig.width=6, fig.height=3}
+```{r "manual inspection"}
 # from the Seurat pancreas example
 # we now have pan_celseq2, fully annotated in metadata column "celltype", and pan_smartseq2, ready to be annotated
 data_url = "https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"
@@ -242,7 +237,7 @@ pan_smartseq2@meta.data %>% head()
 
 1. using `Seurat`, inference from previous seurat object (requires very similar seurat object), see [Seurat Integration Vignette](https://satijalab.org/seurat/v3.2/integration.html) for more details.
 
-```{r, fig.width=6, fig.height=3}
+```{r "Seurat integration"}
 # reset idents of pan_smartseq2
 Idents(pan_smartseq2) <- "cluster.id"
 
@@ -261,7 +256,7 @@ DimPlot(pan_smartseq2, label = TRUE) + NoLegend()
 
 In order to compare our dataset we need to use a publically available reference dataset. In this example we use the other annotated experiment.Please see [clustifyrdatahub](https://github.com/rnabioco/clustifyrdatahub) for prebuilt general references available.
 
-```{r}
+```{r "clustifyr annotation"}
 library(clustifyr)
 # build a reference from expression matrix data
 ref <- average_clusters(pan_celseq2@assays$RNA@data,
@@ -290,7 +285,7 @@ DimPlot(pan_smartseq2, label = T, group.by = "type") + NoLegend()
 ```
 `clustifyr` also takes seurat objects as input directly, finds various needed data, and output another object with identities assigned.
 
-```{r}
+```{r "clustifyr with wrappers"}
 ref2 <- seurat_ref(pan_celseq2,
                   cluster_col = "celltype")
 identical(ref,ref2) # exactly the same as chunk above
@@ -311,7 +306,7 @@ Also see more tutorials at [`clustifyr`](https://rnabioco.github.io/clustifyr/).
 ### cell type composition
 Insight into different samples can be gained from the proportion of cells that fall into each cell type. Unfortunately, no dedicated tools are available for statistical testing.
 
-```{r}
+```{r "evaluate composition"}
 tab1 <- sobj_clusters@meta.data %>% group_by(orig.ident, clusters) %>% tally() # counting up all combinations
 tab1
 tab2 <- tab1 %>% spread(key = clusters, value = n) # spread out into "wide" form
@@ -324,7 +319,7 @@ tab3
 
 and save tables to disk with `write_csv`
 
-```{r,eval=F}
+```{r "saving files",eval=F}
 write_csv(tab3, "data/perc_clusters.csv")
 tab4 <- read_csv("data/perc_clusters.csv")
 ```
