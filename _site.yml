@@ -9,6 +9,10 @@ navbar:
       href: 1_intro.html
     - text: "Previous-workshops"
       href: previous.html
+    - text: "Data Filtering and Quality Control"
+      href: 2_filtering_QC.html
+    - text: "Cluster Markers and Cell Type Assignment"
+      href: 4_markers.html
 output:
   distill::distill_article:
     css: styles.css
