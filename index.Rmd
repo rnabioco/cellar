@@ -13,17 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### **November 10th - 13th, 2020 **
 
-Free 4-day workshop covering methods used to analyze single cell
-RNA-seq data using R/RStudio.
+4-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio.
 
 ### **Prerequisites**
 
-A basic understanding of the R programming language. Individuals without R experience will be need to complete remedial online courses suggested by instructors. 
+A basic understanding of the R programming language. Individuals without R experience will be need to complete remedial online courses suggested by instructors. See 
 
 ### **Schedule**
 
 * **Session 0** | November 9<sup>th</sup>, 1:00pm - 3:00pm
-  + Course on-boarding session for those with questions on prerequiste material 
+  + Course on-boarding session for those with questions on prerequisite material 
   
 * **Session 1** | November 10<sup>th</sup>, 1:00pm - 3:00pm
   + Introduction and data pre-processing
@@ -41,8 +40,16 @@ A basic understanding of the R programming language. Individuals without R exper
   + Multi-modal data
   + VDJ
 
+### **Instructors**
 
+Please contact us on slack ([RBI-scRNA-seq-workshop](rbiscrnaseqwo-b3y9537.slack.com)) if you have questions. 
 
+- Ryan Sheridan  
+- Caitlin Winkler  
+- Tyler Matheny  
+- Rui Fu  
+- Kent Riemondy  
+- Scott Thompson  
 
 
 
