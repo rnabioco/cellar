@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### **Prerequisites**
 
-A basic understanding of the R programming language. Individuals without R experience will be need to complete remedial online courses suggested by instructors. See 
+A basic understanding of the R programming language. Individuals without R experience will need to complete remedial online courses suggested by instructors. 
 
 ### **Schedule**
 
