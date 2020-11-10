@@ -7,6 +7,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+Recorded lecture: <a href="https://www.dropbox.com/s/2nicui696ypo3c7/zoom_1.mp4?dl=0" > <i class="fa fa-video-camera"></i> </a>
+
+Rmarkdown: <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/prerequisite.Rmd" style="text-decoration: none;"> <i class="fa fa-file-code-o"></i> </a> 
+
+ 
 This Rmarkdown document contains a series of exercises related to some R programming concepts that will be used in the workshop. After writing and executing your code please try to `knit` the Rmarkdown using the `Knit` button. We will review the answers to these questions in the pre-workshop class on Monday. 
 
 1) Use the `library()` function to load the tidyverse package. 

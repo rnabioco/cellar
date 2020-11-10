@@ -1331,6 +1331,14 @@
 <div class="nav-left">
 <a href="index.html" class="title">Single-cell RNA-seq Workshop</a>
 <a href="prerequisite.html">Prerequisite-Material</a>
+<a href="coming_soon.html">Introduction</a>
+<a href="2_filtering_QC.html">Data Filtering and Quality Control</a>
+<a href="coming_soon.html">Clustering and Visualization</a>
+<a href="4_markers.html">Cluster Markers and Cell Type Assignment</a>
+<a href="coming_soon.html">Trajectories</a>
+<a href="coming_soon.html">Alignment</a>
+<a href="coming_soon.html">Multi-modal</a>
+<a href="coming_soon.html">VDJ</a>
 <a href="previous.html">Previous-workshops</a>
 </div>
 <div class="nav-right">
@@ -1349,6 +1357,8 @@
 
 
 <div class="d-article">
+<p>Recorded lecture: <a href="https://www.dropbox.com/s/2nicui696ypo3c7/zoom_1.mp4?dl=0" > <i class="fa fa-video-camera"></i> </a></p>
+<p>Rmarkdown: <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/prerequisite.Rmd" style="text-decoration: none;"> <i class="fa fa-file-code-o"></i> </a></p>
 <p>This Rmarkdown document contains a series of exercises related to some R programming concepts that will be used in the workshop. After writing and executing your code please try to <code>knit</code> the Rmarkdown using the <code>Knit</code> button. We will review the answers to these questions in the pre-workshop class on Monday.</p>
 <ol type="1">
 <li>Use the <code>library()</code> function to load the tidyverse package.</li>
@@ -1364,18 +1374,12 @@ library(tidyverse)</code></pre>
 <pre class="r"><code>
 mtcars[1:5, ]</code></pre>
 <pre><code>
-   mpg cyl disp  hp drat    wt  qsec vs am gear carb new_column
-1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4          1
-2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4          2
-3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1          3
-4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1          4
-5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2          5
-  another_new_column
-1                  1
-2                  2
-3                  3
-4                  4
-5                  5</code></pre>
+                   mpg cyl disp  hp drat    wt  qsec vs am gear carb
+Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
 </div>
 <ol start="3" type="1">
 <li>Assign the <code>mtcars</code> dataset to a new variable. Name the variable whatever you would like. Please print the first 5 rows of the new data.frame.</li>
@@ -1385,18 +1389,12 @@ mtcars[1:5, ]</code></pre>
 new_df &lt;- mtcars
 new_df[1:5, ]</code></pre>
 <pre><code>
-   mpg cyl disp  hp drat    wt  qsec vs am gear carb new_column
-1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4          1
-2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4          2
-3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1          3
-4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1          4
-5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2          5
-  another_new_column
-1                  1
-2                  2
-3                  3
-4                  4
-5                  5</code></pre>
+                   mpg cyl disp  hp drat    wt  qsec vs am gear carb
+Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre>
 </div>
 <ol start="4" type="1">
 <li>Select the <code>mpg</code> column from the <code>mtcars</code> data.frame and print the first 5 values of this vector of <code>mpg</code> values.</li>
@@ -1499,7 +1497,7 @@ mtcars %&gt;% head()</code></pre>
 <pre class="r"><code>
 ggplot(iris, aes(Species, Petal.Length)) + 
   geom_boxplot()</code></pre>
-<p><img src="prerequisite_files/figure-html5/unnamed-chunk-39-1.png" width="624" /></p>
+<p><img src="prerequisite_files/figure-html5/unnamed-chunk-9-1.png" width="624" /></p>
 </div>
 <ol start="10" type="1">
 <li>Most computing systems have a concept of a working directory, which is the directory (e.g. /cloud/project/) where the R process (or other language) is currently associated. This is important because when specifying paths to files (e.g. /cloud/project/example_plot.png), the R process will interpret the path relative to the current working directory. For example if your working directory is <code>/cloud/project</code> then you can specify <code>.Rhistory</code> rather than <code>/cloud/project/.Rhistory</code> to refer to the file.</li>
@@ -1522,7 +1520,7 @@ getwd()</code></pre>
 <pre class="r"><code>
 library(Seurat)
 VlnPlot(object = pbmc_small, features = &#39;LYZ&#39;, split.by = &#39;groups&#39;)</code></pre>
-<p><img src="prerequisite_files/figure-html5/unnamed-chunk-41-1.png" width="624" /></p>
+<p><img src="prerequisite_files/figure-html5/unnamed-chunk-11-1.png" width="624" /></p>
 </div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
