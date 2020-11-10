@@ -7,12 +7,25 @@ navbar:
   left:
     - text: "Prerequisite-Material"
       href: prerequisite.html
-    - text: "Previous-workshops"
-      href: previous.html
+    - text: "Introduction"
+      href: tba.html
     - text: "Data Filtering and Quality Control"
       href: 2_filtering_QC.html
+    - text: "Clustering and Visualization"
+      href: tba.html      
     - text: "Cluster Markers and Cell Type Assignment"
       href: 4_markers.html
+    - text: "Trajectories"
+      href: tba.html 
+    - text: "Alignment"
+      href: tba.html 
+    - text: "Multi-modal"
+      href: tba.html       
+    - text: "VDJ"
+      href: tba.html 
+    - text: "Previous-workshops"
+      href: previous.html
+      
 output:
   distill::distill_article:
     css: styles.css
