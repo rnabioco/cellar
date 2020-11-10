@@ -19,6 +19,14 @@ knitr::opts_chunk$set(
 
 ## Example: peripheral blood mononuclear cell (PBMC) sample data
 
+To follow along on RStudio local: 
+
+1. download [Rmd](https://raw.githubusercontent.com/rnabioco/cellar/master/2_filtering_QC.Rmd)
+
+2. install Seurat `install.packages('Seurat')`
+
+3. download today's example [data](https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/PBMC_cDNA.csv.gz)
+
 ## Creating a Seurat object
 
 Single-cell RNA-seq counts are usually stored as a sparse matrix due to the high percentage of zeros. In a sparse matrix zeros are removed and only non-zero values are stored, which saves memory and speeds up operations.
@@ -44,8 +52,9 @@ pbmc_mtx <- file.path(data_url, "PBMC_cDNA.csv.gz") %>%
   as.sparse()
 
 # Always be careful not to print the entire matrix
+# Don't use head(), since it prints all columns
 # note the "."s
-pbmc_mtx[1:10, 1:5]
+pbmc_mtx[1:10, 1:10]
 
 # See how sparse the data is - calculate fraction of zeros
 n_zeros <- pbmc_mtx[pbmc_mtx == 0] %>%
@@ -62,7 +71,7 @@ The `CreateSeuratObject` function also allows us to perform some initial QC filt
 # Create Seurat object using gene expression data
 sobj <- CreateSeuratObject(
     pbmc_mtx,
-    min.cells = 5  # Remove genes that are detected in < 5 cells
+    min.cells = 5 # Remove genes that are detected in < 5 cells
   )
 
 # Seurat object is a type of S4 object, you may see "S4" in error messages
@@ -75,7 +84,7 @@ isS4(sobj)
 
 The `Seurat` object is organized into a heirarchy of data structures with the outermost layer including a number of "slots", which can be accessed using the `@` operator.
 
-With `Seurat` v3.0, the `Seurat` object allows users to easily store multiple scRNA-seq assays (CITE-seq, cell hashing, etc.) in the same object. The data from each assay is stored as a list in the `assays` slot. To switch between different assays users can change the value stored in the `active.assay` slot. We can also view the current default assay using the `DefaultAssay` function. Many `Seurat` functions also include an `assay` argument that lets users specify the desired assay.
+With `Seurat` v3.0, the `Seurat` object allows users to easily store multiple scRNA-seq assays (CITE-seq, cell hashing, etc) in the same object. The data from each assay is stored as a list in the `assays` slot. To switch between different assays users can change the value stored in the `active.assay` slot. We can also view the current default assay using the `DefaultAssay` function. Many `Seurat` functions also include an `assay` argument that lets users specify the desired assay.
 
 Please note that `Seurat` v2 object structure and functions are quite different. Please see function `UpdateSeuratObject`.
 
@@ -107,7 +116,7 @@ DefaultAssay(sobj) <- "RNA"
 The data from each assay is stored as separate `Assay` objects that are also divided into slots that store the raw and normalized counts along with other downstream results. We can use the `GetAssayData` function to retrieve the raw and normalized counts matrices.
 
 ```{r "Retrieving raw and normalized counts"}
-# Raw counts
+# Raw counts, autocompletion helps a lot
 sobj@assays$RNA@counts[1:5, 1:10] # only printing first 5 rows and first 10 columns
 
 # Using a function to access the same information as above, better option
@@ -180,12 +189,31 @@ FetchData(
   head()
 ```
 
+### Splitting out sample information with tidyverse manipulations
+In the case of this particular dataset, the cell barcodes contain "-1" or "-2" to denote different samples (comes from cellranger aggr). We can split this information out into a new column or overwrite the "orig.ident" column.
+
+```{r "splitting barcodes"}
+# stringr function, also part of tidyverse
+str_remove(Cells(sobj), ".+-")[1:5] # removes everything before and including "-"
+
+sobj@meta.data$orig.ident <- str_remove(Cells(sobj), ".+-")
+
+sobj@meta.data %>%
+  head()
+```
+
 ### Setting cell identities
 
 The cell identities are used by various functions when grouping and plotting cells. When first creating a `Seurat` object, the cell identities will be set to the same values present in the `orig.ident` column in the meta.data table. The current cell identities are stored in the `active.ident` slot and can be accessed using the `Idents` function. Cell identities can be renamed using the `RenameIdents` function. Changing the cell identites will not alter the names stored in the meta.data table or vice versa. To update the meta.data table, we can use the `AddMetaData` function.
 
 ```{r "Setting cell identities"}
-# By default the cell identity is set to the project name
+# By default the cell identity is set to orig.ident
+sobj@active.ident %>%
+  head()
+
+# since we updated orig.ident, we want to update this
+Idents(sobj) <- "orig.ident"
+
 # Levels list all possible identities
 sobj@active.ident %>%
   head()
@@ -198,15 +226,16 @@ Idents(sobj) %>%
 # Many Seurat functions return a Seurat object
 sobj <- RenameIdents(
     sobj,
-    "SeuratProject" = "control"
+    "1" = "control",
+    "2" = "treated"
   )
 
 Idents(sobj) %>%
   head()
 
 # Add cell identities to the meta.data table
-sobj <- sobj %>%
-  AddMetaData(
+sobj <- AddMetaData(
+    sobj,
     metadata = Idents(sobj),
     col.name = "orig.ident"
   )
@@ -224,6 +253,10 @@ The cells and features present in the `Seurat` object can be filtered using the 
 s_cd8 <- subset(sobj, subset = CD8A > 1)
 ncol(s_cd8) # how many cells are left?
 
+
+# Subset based on meta.data columns
+s_feature <- subset(sobj, subset = nFeature_RNA > 250)
+
 # Subset based on cell identity
 s_control <- subset(sobj, idents = "control")
 ncol(s_control)
@@ -237,10 +270,7 @@ s_bar <- subset(sobj, cells = c("AAACGCTGACCAGT-1", "AAATCATGACCACA-1", "TTTCGAA
 colnames(s_bar)
 
 # Subset using multiple criteria
-s_multi <- subset(sobj, CD8A > 1, idents = "control")
-
-# Subset based on meta.data columns
-s_feature <- subset(sobj, nFeature_RNA > 250)
+s_multi <- subset(sobj, subset = CD8A > 1, idents = "control")
 ```
 
 ### Other data slots, currently empty, but will be populated as we process the data.
@@ -278,7 +308,7 @@ sobj@meta.data %>%
   head()
 ```
 
-### EXERCISE: Create violin/box plots comparing cell metrics
+### EXERCISE: Create violin plots comparing cell metrics
 
 ```{r}
 # Create violin plot comparing nCount, nFeature, and percent_mito for each sample
@@ -301,9 +331,10 @@ sobj@meta.data %>%
 #   )
 
 # Using ggplot2
-sobj@meta.data %>%
-  gather(key, value, -orig.ident) %>%
-  ggplot(aes(orig.ident, value, color = orig.ident)) +
+temp_df <- sobj@meta.data %>%
+  gather(key, value, -orig.ident)
+
+ggplot(temp_df, aes(orig.ident, value, color = orig.ident)) +
   geom_violin(size = 2) +
   geom_jitter(size = 0.5, color = "black", alpha = 0.4) +
   facet_wrap(~key, scales = "free") +
@@ -333,8 +364,7 @@ sobj@meta.data %>%
 #   )
 
 # Using ggplot2
-p <- sobj@meta.data %>%
-  ggplot(aes(nCount_RNA, nFeature_RNA, color = orig.ident)) +
+p <- ggplot(sobj@meta.data, aes(nCount_RNA, nFeature_RNA, color = orig.ident)) +
   geom_point() +
   cowplot::theme_cowplot()
 p
@@ -353,14 +383,14 @@ sobj <- sobj %>%
     percent_mito < 10      # Remove cells with > 10% mitochondrial reads
   )
 
+# How many cells were removed?
+ncol(sobj) # originally we had 2700
+
 # Add filtering cutoffs on original scatter plots
 p_cut <- p +
   geom_hline(yintercept = c(250, 2500), linetype = 2)
 
 p_cut
-
-# How many cells were removed?
-ncol(sobj) # originally we had 2700
 ```
 
 ### Saving your Seurat object for future use
@@ -369,9 +399,11 @@ ncol(sobj) # originally we had 2700
 # create data folder
 dir.create("data", showWarnings = FALSE)
 
-# readr version, same as saveRDS
-write_rds(sobj, file = "data/filtered_sobj.rds")
+# or save.image to save entire environment
+# or set RStudio to do this by default <- we don't recommend
+saveRDS(sobj, "data/filtered_sobj.rds")
 
 # for future use, read_rds
-sobj <- read_rds("data/filtered_sobj.rds")
+# zipped, so smaller than the size in your environment
+sobj <- readRDS("data/filtered_sobj.rds")
 ```
