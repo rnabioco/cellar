@@ -41,7 +41,7 @@ After clustering, differential expression testing (DE analysis, similar to bulk 
 ### Many proposed methods  
 (In general, we recommend default "wilcox" or "t", good balances between speed and accuracy)
 
-![Soneson and Robinson, 2018](data/detests.jpg)
+![Soneson and Robinson, 2018](docs/4_markers_files/detests.jpg)
 
 In Seurat, we can use the `FindAllMarkers()` function, which will perform the `wilcox.test()` by default . Specifically, the function will iterate through each cluster, comparing the cells in one cluster to the cells in all of the other clusters. The test is run for every gene that is detectable above certain thresholds. The output is then filtered to identify significant genes with a positive fold-change (i.e. higher in abundance the cluster).
 

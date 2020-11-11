@@ -2113,7 +2113,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <h3 id="many-proposed-methods">Many proposed methods</h3>
 <p>(In general, we recommend default “wilcox” or “t”, good balances between speed and accuracy)</p>
 <figure>
-<img src="data/detests.jpg" alt="" /><figcaption>Soneson and Robinson, 2018</figcaption>
+<img src="docs/4_markers_files/detests.jpg" alt="" /><figcaption>Soneson and Robinson, 2018</figcaption>
 </figure>
 <p>In Seurat, we can use the <code>FindAllMarkers()</code> function, which will perform the <code>wilcox.test()</code> by default . Specifically, the function will iterate through each cluster, comparing the cells in one cluster to the cells in all of the other clusters. The test is run for every gene that is detectable above certain thresholds. The output is then filtered to identify significant genes with a positive fold-change (i.e. higher in abundance the cluster).</p>
 <p>We recommend using the <code>wilcoxauc()</code> function from the <code>presto</code> package (installed from GitHub), which will do the same thing but in a (tiny) fraction of the time, due to implementation with C++ backend.</p>
