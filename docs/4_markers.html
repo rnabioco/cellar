@@ -2096,31 +2096,31 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <div class="d-article">
 <p>To follow along on RStudio local:</p>
 <ol type="1">
-<li><p>download <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/4_markers.Rmd">Rmd</a></p></li>
-<li><p>install presto</p></li>
+<li><p>Download <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/4_markers.Rmd">Rmd</a></p></li>
+<li><p>Install <code>presto</code> and <code>clustifyr</code></p></li>
 </ol>
-<pre><code># from GitHub
+<pre><code># From GitHub
 install.packages(&#39;remotes&#39;)
 remotes::install_github(&quot;https://github.com/immunogenomics/presto&quot;)
 
-# from Bioconductor
+# From Bioconductor
 BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <ol start="3" type="1">
-<li>download today’s example <a href="https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/clustered_sobj.rds">data1</a> <a href="https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/pan_celseq2.rds">data2</a> <a href="https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/pan_smartseq2.rds">data3</a></li>
+<li>Download today’s example <a href="https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/clustered_sobj.rds">data1</a> <a href="https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/pan_celseq2.rds">data2</a> <a href="https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/pan_smartseq2.rds">data3</a></li>
 </ol>
-<h2 id="finding-markers-and-differential-expression-analysis">finding markers and differential expression analysis</h2>
+<h2 id="finding-markers-and-differential-expression-analysis">Finding markers and differential expression analysis</h2>
 <p>After clustering, differential expression testing (DE analysis, similar to bulk RNA-seq) finds gene signatures of each cluster/cell population, to give more insights into biology.</p>
-<h3 id="many-proposed-methods">many proposed methods</h3>
+<h3 id="many-proposed-methods">Many proposed methods</h3>
 <p>(In general, we recommend default “wilcox” or “t”, good balances between speed and accuracy)</p>
 <figure>
-<img src="4_markers_files/detests.jpg" alt="" /><figcaption>Soneson and Robinson, 2018</figcaption>
+<img src="data/detests.jpg" alt="" /><figcaption>Soneson and Robinson, 2018</figcaption>
 </figure>
 <p>In Seurat, we can use the <code>FindAllMarkers()</code> function, which will perform the <code>wilcox.test()</code> by default . Specifically, the function will iterate through each cluster, comparing the cells in one cluster to the cells in all of the other clusters. The test is run for every gene that is detectable above certain thresholds. The output is then filtered to identify significant genes with a positive fold-change (i.e. higher in abundance the cluster).</p>
 <p>We recommend using the <code>wilcoxauc()</code> function from the <code>presto</code> package (installed from GitHub), which will do the same thing but in a (tiny) fraction of the time, due to implementation with C++ backend.</p>
 <h3 id="important-considerations">Important considerations</h3>
 <ol type="1">
 <li><p>Keep things simple first and look at the results (try not integrating, not regressing), look at the output, and determine what variables need to be regressed out (batch, nCount_RNA, percent_mito, cell cycle, etc) during scaling (note this only affects dimension reduction and clustering).</p></li>
-<li><p>Note that the p-values from these tests will be absurdly low (near or at 0). This is in part due to the large number of samples tested (e.g. each cell is considered a sample) but also due to the data being clustered based on the gene expression. Testing for differential expression between clusters will always result in some differntially expressed genes… because that’s what makes them different clusters in the first place, hence the logical is somewhat circular and result in inflated p-values. Nevertheless, we can use the p-values to rank the genes, but you shouldn’t just blindly trust that a p-value &lt; 0.05 is something meaningful in single cell data.</p></li>
+<li><p>Note that the p-values from these tests will be absurdly low (near or at 0). This is in part due to the large number of samples tested (e.g. each cell is considered a sample) but also due to the data being clustered based on the gene expression. Testing for differential expression between clusters will always result in some differentially expressed genes… because that’s what makes them different clusters in the first place, hence the logical is somewhat circular and result in inflated p-values. Nevertheless, we can use the p-values to rank the genes, but you shouldn’t just blindly trust that a p-value &lt; 0.05 is something meaningful in single cell data.</p></li>
 <li><p>Use normalized data for DE (slot is dependent on normalization method, also don’t use integrated assay)</p></li>
 </ol>
 <div class="layout-chunk" data-layout="l-body">
@@ -2128,15 +2128,15 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://satijalab.org/seurat'>Seurat</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
 
-<span class='co'># use tiny example</span>
+<span class='co'># Use tiny example</span>
 <span class='va'>sobj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/CreateSeuratObject.html'>CreateSeuratObject</a></span><span class='op'>(</span><span class='fu'>Seurat</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/Seurat/man/pbmc_small.html'>pbmc_small</a></span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>RNA</span><span class='op'>@</span><span class='va'>counts</span><span class='op'>)</span>
 
-<span class='co'># log normalize</span>
+<span class='co'># Log normalize</span>
 <span class='va'>sobj_l</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/NormalizeData.html'>NormalizeData</a></span><span class='op'>(</span><span class='va'>sobj</span><span class='op'>)</span>
 
 <span class='va'>sobj_l</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/ScaleData.html'>ScaleData</a></span><span class='op'>(</span><span class='va'>sobj_l</span><span class='op'>)</span>
 
-<span class='co'># sctransform</span>
+<span class='co'># SCTransform</span>
 <span class='va'>sobj_sc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/SCTransform.html'>SCTransform</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>sobj</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2158,7 +2158,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># before normalization, "data" slot is the same as counts</span>
+<pre><code><span class='co'># Before normalization, "data" slot is the same as counts</span>
 <span class='va'>sobj</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>RNA</span><span class='op'>@</span><span class='va'>data</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>]</span>
 </code></pre>
 </div>
@@ -2176,7 +2176,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 #&gt; HLA-DRA              1
 #&gt; TCL1A                .</code></pre>
 <div class="sourceCode">
-<pre><code><span class='co'># after log normalization, results are stored in "data" slot</span>
+<pre><code><span class='co'># After log normalization, results are stored in "data" slot</span>
 <span class='va'>sobj_l</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>RNA</span><span class='op'>@</span><span class='va'>data</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>]</span> <span class='co'># normalized</span>
 </code></pre>
 </div>
@@ -2194,7 +2194,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 #&gt; HLA-DRA       4.074201
 #&gt; TCL1A         .</code></pre>
 <div class="sourceCode">
-<pre><code><span class='co'># after sctransform, results are stored in new assay "SCT"</span>
+<pre><code><span class='co'># After sctransform, results are stored in new assay "SCT"</span>
 <span class='va'>sobj_sc</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>SCT</span><span class='op'>@</span><span class='va'>data</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>]</span> <span class='co'># normalized</span>
 </code></pre>
 </div>
@@ -2233,13 +2233,13 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <li>Note that marker genes found is very dependent on clustering and the compared populations.</li>
 </ol>
 <h3 id="find-all-markers-for-each-cluster">Find all markers for each cluster</h3>
-<p><code>FindAllMarkers</code> compares cells in each cluster to all other cells in the dataset. Typically, focus is given to genes upregulated in each cluster, ie markers.</p>
+<p><code>FindAllMarkers</code> compares cells in each cluster to all other cells in the dataset. Typically, focus is given to genes upregulated in each cluster, i.e. markers.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># load clustered object</span>
+<pre><code><span class='co'># Load clustered object</span>
 <span class='va'>sobj_clusters</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='st'>"data/clustered_sobj.rds"</span><span class='op'>)</span>
 
-<span class='co'># also check/set ident to the desired comparison</span>
+<span class='co'># Also check/set ident to the desired comparison</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2267,13 +2267,15 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 #&gt; RPS27 1.100287e-196 0.7788876 0.999 0.990 1.383281e-192       0 RPS27
 #&gt; RPS3  2.473657e-192 0.7175880 1.000 0.991 3.109882e-188       0  RPS3</code></pre>
 </div>
-<p>pct.1: fraction detected in the cluster in question, pct.2: fraction detected in the rest of the cells avg_logFC: expression comparison of the cluster in question (&gt; 0 means higher) vs rest of the cells</p>
+<p>pct.1: fraction detected in the cluster in question, pct.2: fraction detected in the rest of the cells avg_logFC: expression comparison of the cluster in question (natural log, so exp(x) to reverse) vs rest of the cells</p>
 <p>And save tables to disk with <code>write_csv</code>.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre><code><span class='fu'>write_csv</span><span class='op'>(</span><span class='va'>markers_df</span>, <span class='st'>"data/allmarkers.csv"</span><span class='op'>)</span>
 
 <span class='va'>markers_df</span> <span class='op'>&lt;-</span> <span class='fu'>read_csv</span><span class='op'>(</span><span class='st'>"data/allmarkers.csv"</span><span class='op'>)</span>
+
+<span class='va'>markers_df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span> <span class='co'># lost rownames, tidyverse strikes again</span>
 </code></pre>
 </div>
 </div>
@@ -2282,9 +2284,9 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <div class="sourceCode">
 <pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>presto</span><span class='op'>)</span>
 
-<span class='va'>markers_presto</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/presto/man/wilcoxauc.html'>wilcoxauc</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"clusters"</span><span class='op'>)</span> <span class='co'># compute markers</span>
+<span class='va'>markers_presto</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/presto/man/wilcoxauc.html'>wilcoxauc</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"clusters"</span><span class='op'>)</span> <span class='co'># give metadata column name</span>
 
-<span class='va'>markers_presto</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>markers_presto</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span> <span class='co'># also contains negative markers, how would you keep only the positive?</span>
 </code></pre>
 </div>
 <pre><code>#&gt;         feature group     avgExpr         logFC statistic       auc
@@ -2306,7 +2308,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <p>For more control in the comparisons, use <code>FindMarkers</code>.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># DE analysis for 2 clusters</span>
+<pre><code><span class='co'># DE analysis for cluster 1 vs 2</span>
 <span class='va'>markers_df2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FindMarkers.html'>FindMarkers</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>,
                            assay <span class='op'>=</span> <span class='st'>"RNA"</span>,
                            slot <span class='op'>=</span> <span class='st'>"data"</span>,
@@ -2328,7 +2330,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <p><code>FindMarkers</code> defaults to the current active ident. To use other value groups, set idents to the intended column, or use the <code>group.by</code> argument.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># compare control vs treated in only cluster 1</span>
+<pre><code><span class='co'># Compare control vs treated in only cluster 1</span>
 <span class='va'>markers_df3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FindMarkers.html'>FindMarkers</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>,
                            assay <span class='op'>=</span> <span class='st'>"RNA"</span>,
                            slot <span class='op'>=</span> <span class='st'>"data"</span>,
@@ -2342,7 +2344,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <p>Genes of interest can then be visualized as violin plots or feature plots.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># violin plots</span>
+<pre><code><span class='co'># Violin plots</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/VlnPlot.html'>VlnPlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2353,26 +2355,31 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 </div>
 <img src="4_markers_files/figure-html5/plotting-2.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code><span class='co'># project on UMAP</span>
-<span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span><span class='op'>)</span>
+<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/VlnPlot.html'>VlnPlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span>, split.by <span class='op'>=</span> <span class='st'>"orig.ident"</span>, split.plot <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </code></pre>
 </div>
 <img src="4_markers_files/figure-html5/plotting-3.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"LYZ"</span>, <span class='st'>"S100A4"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># can be a vector of gene names</span>
+<pre><code><span class='co'># Project on UMAP</span>
+<span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span><span class='op'>)</span>
 </code></pre>
 </div>
 <img src="4_markers_files/figure-html5/plotting-4.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
+<pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"LYZ"</span>, <span class='st'>"S100A4"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># can be a vector of gene names</span>
+</code></pre>
+</div>
+<img src="4_markers_files/figure-html5/plotting-5.png" width="624" style="display: block; margin: auto;" />
+<div class="sourceCode">
 <pre><code><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>sobj_clusters</span>, <span class='st'>"LYZ"</span>, split.by <span class='op'>=</span> <span class='st'>"orig.ident"</span><span class='op'>)</span> <span class='co'># &lt;- split into panels based on metadata column</span>
 </code></pre>
 </div>
-<p><img src="4_markers_files/figure-html5/plotting-5.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="4_markers_files/figure-html5/plotting-6.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="sidebar-how-to-regress-out-cell-cycle-ribosomal-gene-heterogeneity-and-do-you-need-to">Sidebar: How to regress out cell cycle / ribosomal gene heterogeneity (and do you need to?)</h3>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># 1. assess phase and PCA</span>
+<pre><code><span class='co'># 1. Assess phase and PCA</span>
 <span class='co'># Seurat stores a list of cell cycle specific genes for humans</span>
 <span class='va'>s.genes</span> <span class='op'>&lt;-</span> <span class='fu'>Seurat</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/Seurat/man/cc.genes.html'>cc.genes</a></span><span class='op'>$</span><span class='va'>s.genes</span> <span class='co'># obviously unsuitable for nonhuman</span>
 <span class='va'>g2m.genes</span> <span class='op'>&lt;-</span> <span class='fu'>Seurat</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/Seurat/man/cc.genes.html'>cc.genes</a></span><span class='op'>$</span><span class='va'>g2m.genes</span>
@@ -2453,7 +2460,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># 2. look for cell cycle-specific genes as main drivers of PCA</span>
+<pre><code><span class='co'># 2. Look for cell cycle-specific genes as main drivers of PCA</span>
 <span class='va'>topPCAgenes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span>
   <span class='va'>sobj_clusters</span><span class='op'>@</span><span class='va'>reductions</span><span class='op'>$</span><span class='va'>pca</span><span class='op'>@</span><span class='va'>feature.loadings</span>, <span class='co'># contribution of each gene to each PC is stored here</span>
   MARGIN <span class='op'>=</span> <span class='fl'>2</span>, 
@@ -2476,14 +2483,18 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 </code></pre>
 </div>
 <pre><code>#&gt; [1] &quot;PCNA&quot; &quot;SMC4&quot;</code></pre>
+<div class="sourceCode">
+<pre><code><span class='co'># 3. If cell cycle/ribosomal genes show up prominently in DE (be careful they might be biologically meaningful!)</span>
+</code></pre>
+</div>
 </div>
 <h2 id="cluster-identities">Cluster identities</h2>
-<p>Without venturing into the realm of philosphical debates on what a “cell type” constitutes, standard pratice is to use certain gene expression features to classify cells. This is often done manually, by visual inspection of key genes. Automated approaches that utilize a broader range of features are currently being developed.</p>
+<p>Without venturing into the realm of philosophical debates on what a “cell type” constitutes, standard practice is to use certain gene expression features to classify cells. This is often done manually, by visual inspection of key genes. Automated/less-biased approaches that utilize a broader range of features are currently being developed.</p>
 <h3 id="manual-inspection-of-key-genes-using-expertise-in-the-lab">Manual inspection of key genes using expertise in the lab</h3>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># from the Seurat pancreas example</span>
-<span class='co'># we now have pan_celseq2, fully annotated in metadata column "celltype", and pan_smartseq2, ready to be annotated</span>
+<pre><code><span class='co'># From the Seurat pancreas example</span>
+<span class='co'># We now have pan_celseq2, fully annotated in metadata column "celltype", and pan_smartseq2, ready to be annotated</span>
 
 <span class='va'>pan_ref</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='st'>"data/pan_celseq2.rds"</span><span class='op'>)</span>
 <span class='va'>pan_ref</span><span class='op'>[[</span><span class='st'>"celltype"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, <span class='op'>]</span>
@@ -2514,8 +2525,9 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 </div>
 <img src="4_markers_files/figure-html5/by%20markers-3.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code><span class='co'># optional, save the cluster numbers as "cluster.id"</span>
-<span class='va'>pan_new</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>StashIdent</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>pan_new</span>, save.name <span class='op'>=</span> <span class='st'>"cluster.id"</span><span class='op'>)</span> <span class='co'># or use AddMetaData</span>
+<pre><code><span class='co'># Optional, save the cluster numbers as "cluster.id"</span>
+<span class='va'>pan_new</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>StashIdent</a></span><span class='op'>(</span><span class='va'>pan_new</span>, 
+                      save.name <span class='op'>=</span> <span class='st'>"cluster.id"</span><span class='op'>)</span> <span class='co'># or use AddMetaData</span>
 
 <span class='co'># Use RenameIdents to remap the idents from the current IDs to the new IDs </span>
 <span class='va'>pan_new</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>RenameIdents</a></span><span class='op'>(</span><span class='va'>pan_new</span>,
@@ -2542,7 +2554,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 </div>
 <img src="4_markers_files/figure-html5/by%20markers-4.png" width="624" style="display: block; margin: auto;" />
 <div class="sourceCode">
-<pre><code><span class='co'># remember to save the new idents into meta.data</span>
+<pre><code><span class='co'># Remember to save the new idents into meta.data</span>
 <span class='va'>pan_new</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>StashIdent</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>pan_new</span>, save.name <span class='op'>=</span> <span class='st'>"cluster_name"</span><span class='op'>)</span>
 <span class='va'>pan_new</span><span class='op'>[[</span><span class='st'>"cluster_name"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, <span class='op'>]</span>
 </code></pre>
@@ -2550,13 +2562,13 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <pre><code>#&gt; [1] alpha alpha alpha alpha alpha
 #&gt; Levels: alpha beta delta</code></pre>
 </div>
-<h3 id="towards-a-more-automated-approach-of-identity-assignment">Towards a more automated approach of identity assignment</h3>
+<h3 id="towards-a-or-20-more-automated-approach-of-identity-assignment">Towards a (or 20) more automated approach of identity assignment</h3>
 <ol type="1">
-<li>Using <code>Seurat</code>, inference from previous seurat object (requires very similar seurat object), see <a href="https://satijalab.org/seurat/v3.2/integration.html">Seurat Integration Vignette</a> for more details.</li>
+<li>Using <code>Seurat</code>, inference from previous seurat object (requires very similar Seurat object), see <a href="https://satijalab.org/seurat/v3.2/integration.html">Seurat Integration Vignette</a> for more details.</li>
 </ol>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='co'># reset idents of pan_smartseq2</span>
+<pre><code><span class='co'># Reset idents of pan_smartseq2</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>pan_new</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"cluster.id"</span>
 
 <span class='va'>pancreas</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FindTransferAnchors.html'>FindTransferAnchors</a></span><span class='op'>(</span>reference <span class='op'>=</span> <span class='va'>pan_ref</span>, 
@@ -2578,15 +2590,15 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <p><img src="4_markers_files/figure-html5/Seurat%20integration-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
 <ol start="2" type="1">
-<li>Using other classification packages such as <code>clustifyr</code>.</li>
+<li>Using other classification packages such as <code>clustifyr</code> (disclosure: developed by the RBI).</li>
 </ol>
-<p><code>clustifyr</code> works by comparing the average gene expression in each cluster to a reference matrix that contains average gene signatures of reference cell types. The reference can be built from other single cell data, bulk-rna-seq, or other sources. Ranked Spearman correlation is used to compare the reference to the clusters. Only the highly variable genes are used for the correlation.</p>
+<p><code>clustifyr</code> works by comparing the average gene expression in each cluster to a reference matrix that contains average gene signatures of reference cell types. The reference can be built from other single cell data, bulk rna-seq, microarray data, or other sources. Ranked Spearman correlation is used to compare the reference to the clusters. Only the highly variable genes are used for the correlation.</p>
 <p>In order to compare our dataset we need to use a publicly available reference dataset. In this example, we use the other annotated experiment. Please see <a href="https://github.com/rnabioco/clustifyrdatahub">clustifyrdatahub</a> for prebuilt general references available.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://github.com/rnabioco/clustifyr#readme'>clustifyr</a></span><span class='op'>)</span>
 
-<span class='co'># build a reference from expression matrix data</span>
+<span class='co'># Build a reference from expression matrix data</span>
 <span class='va'>ref</span> <span class='op'>&lt;-</span> <span class='fu'><a href='http://rnabioco.github.io/clustifyr/reference/average_clusters.html'>average_clusters</a></span><span class='op'>(</span><span class='va'>pan_ref</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>RNA</span><span class='op'>@</span><span class='va'>data</span>,
                         metadata <span class='op'>=</span> <span class='va'>pan_ref</span><span class='op'>@</span><span class='va'>meta.data</span>,
                         cluster_col <span class='op'>=</span> <span class='st'>"celltype"</span><span class='op'>)</span>
@@ -2605,7 +2617,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
                 ref_mat <span class='op'>=</span> <span class='va'>ref</span>,
                 metadata <span class='op'>=</span> <span class='va'>pan_new</span><span class='op'>@</span><span class='va'>meta.data</span>,
                 cluster_col <span class='op'>=</span> <span class='st'>"cluster.id"</span>,
-                query_genes <span class='op'>=</span> <span class='va'>pan_new</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>RNA</span><span class='op'>@</span><span class='va'>var.features</span>, <span class='co'># using Seurat computed variable genes</span>
+                query_genes <span class='op'>=</span> <span class='va'>pan_new</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>RNA</span><span class='op'>@</span><span class='va'>var.features</span> <span class='co'># using Seurat computed variable genes</span>
                 <span class='op'>)</span>
 
 <span class='va'>res</span> <span class='co'># a matrix of correlation values between each cluster and reference cell types</span>
@@ -2628,7 +2640,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 <pre><code><span class='va'>res2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='http://rnabioco.github.io/clustifyr/reference/cor_to_call.html'>cor_to_call</a></span><span class='op'>(</span><span class='va'>res</span>, 
                     metadata <span class='op'>=</span> <span class='va'>pan_new2</span><span class='op'>@</span><span class='va'>meta.data</span>,
                     cluster_col <span class='op'>=</span> <span class='st'>"cluster.id"</span>,
-                    threshold <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span> <span class='co'># anything below 0.5 correlation are labeled as "unknown"</span>
+                    threshold <span class='op'>=</span> <span class='fl'>0.6</span><span class='op'>)</span> <span class='co'># anything below 0.6 correlation are labeled as "unknown"</span>
 
 <span class='va'>res2</span>
 </code></pre>
@@ -2650,12 +2662,12 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 #&gt; 11 8          beta  0.781
 #&gt; 12 4          delta 0.793</code></pre>
 <div class="sourceCode">
-<pre><code><span class='co'># format as meta.data</span>
+<pre><code><span class='co'># Format as meta.data</span>
 <span class='va'>new_meta</span> <span class='op'>&lt;-</span> <span class='fu'><a href='http://rnabioco.github.io/clustifyr/reference/call_to_metadata.html'>call_to_metadata</a></span><span class='op'>(</span><span class='va'>res2</span>, 
                              metadata <span class='op'>=</span> <span class='va'>pan_new</span><span class='op'>@</span><span class='va'>meta.data</span>,
                              cluster_col <span class='op'>=</span> <span class='st'>"cluster.id"</span><span class='op'>)</span>
 
-<span class='co'># insert back to overwrite metadata</span>
+<span class='co'># Insert back to overwrite metadata</span>
 <span class='va'>pan_new</span><span class='op'>@</span><span class='va'>meta.data</span> <span class='op'>&lt;-</span> <span class='va'>new_meta</span>
 
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>pan_new</span>, label <span class='op'>=</span> <span class='cn'>T</span>, group.by <span class='op'>=</span> <span class='st'>"type"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/SeuratTheme.html'>NoLegend</a></span><span class='op'>(</span><span class='op'>)</span>
@@ -2663,7 +2675,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 </div>
 <p><img src="4_markers_files/figure-html5/clustifyr%20annotation-1.png" width="624" style="display: block; margin: auto;" /></p>
 </div>
-<p><code>clustifyr</code> also takes seurat objects as input directly, finds various needed data, and output another object with identities assigned.</p>
+<p><code>clustifyr</code> also takes Seurat objects as input directly, finds various needed data, and output another object with identities assigned.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre><code><span class='va'>ref2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='http://rnabioco.github.io/clustifyr/reference/seurat_ref.html'>seurat_ref</a></span><span class='op'>(</span><span class='va'>pan_ref</span>,
@@ -2687,7 +2699,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 #&gt; Active assay: RNA (34363 features, 2000 variable features)
 #&gt;  2 dimensional reductions calculated: pca, umap</code></pre>
 <div class="sourceCode">
-<pre><code><span class='co'># look at UMAP</span>
+<pre><code><span class='co'># Look at UMAP</span>
 <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>res</span>, label <span class='op'>=</span> <span class='cn'>TRUE</span>, group.by <span class='op'>=</span> <span class='st'>"type"</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/SeuratTheme.html'>NoLegend</a></span><span class='op'>(</span><span class='op'>)</span> <span class='co'># saved in "type" metadata column</span>
 </code></pre>
 </div>
@@ -2726,7 +2738,7 @@ BiocManager::install(&quot;clustifyr&quot;)</code></pre>
 #&gt; 15 treated    6           18
 #&gt; 16 treated    7            6</code></pre>
 <div class="sourceCode">
-<pre><code><span class='va'>tab2</span> <span class='op'>&lt;-</span> <span class='va'>tab1</span> <span class='op'>%&gt;%</span> <span class='fu'>pivot_wider</span><span class='op'>(</span>names_from <span class='op'>=</span> <span class='va'>clusters</span>, values_from <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span> <span class='co'># spread out into "wide" form</span>
+<pre><code><span class='va'>tab2</span> <span class='op'>&lt;-</span> <span class='va'>tab1</span> <span class='op'>%&gt;%</span> <span class='fu'>pivot_wider</span><span class='op'>(</span>names_from <span class='op'>=</span> <span class='va'>clusters</span>, values_from <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span> <span class='co'># spread out "long" into "wide" form</span>
 
 <span class='va'>tab2</span>
 </code></pre>
