@@ -2065,10 +2065,16 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <nav class="distill-site-nav distill-site-header">
 <div class="nav-left">
 <a href="index.html" class="title">Single-cell RNA-seq Workshop</a>
-<a href="1_intro.html">Introduction</a>
-<a href="previous.html">Previous-workshops</a>
+<a href="prerequisite.html">Prerequisite-Material</a>
+<a href="tba.html">Introduction</a>
 <a href="2_filtering_QC.html">Data Filtering and Quality Control</a>
+<a href="tba.html">Clustering and Visualization</a>
 <a href="4_markers.html">Cluster Markers and Cell Type Assignment</a>
+<a href="tba.html">Trajectories</a>
+<a href="tba.html">Alignment</a>
+<a href="tba.html">Multi-modal</a>
+<a href="tba.html">VDJ</a>
+<a href="previous.html">Previous-workshops</a>
 </div>
 <div class="nav-right">
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
@@ -2094,6 +2100,8 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 </div>
 
 <div class="d-article">
+<p>Recorded lecture: <a href="https://www.dropbox.com/s/umf7f0vfq7i9xvt/zoom_0.mp4?dl=0" > <i class="fa fa-video-camera"></i> </a></p>
+<p>Rmarkdown: <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/2_filtering_QC.Rmd" style="text-decoration: none;"> <i class="fa fa-file-code-o"></i> </a></p>
 <h2 id="example-peripheral-blood-mononuclear-cell-pbmc-sample-data">Example: peripheral blood mononuclear cell (PBMC) sample data</h2>
 <p>To follow along on RStudio local:</p>
 <ol type="1">
@@ -2610,7 +2618,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
   <span class='fu'>cowplot</span><span class='fu'>::</span><span class='fu'><a href='https://wilkelab.org/cowplot/reference/theme_cowplot.html'>theme_cowplot</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="2_filtering_QC_files/figure-html5/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="2_filtering_QC_files/figure-html5/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="exercise-create-scatter-plots-comparing-cell-metrics">EXERCISE: Create scatter plots comparing cell metrics</h3>
 <div class="layout-chunk" data-layout="l-body">
@@ -2638,7 +2646,7 @@ code span.wa { color: #545454; font-weight: bold; font-style: italic; } /* Warni
 <span class='va'>p</span>
 </code></pre>
 </div>
-<p><img src="2_filtering_QC_files/figure-html5/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="2_filtering_QC_files/figure-html5/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="filtering-cells">Filtering cells</h3>
 <p>To filter cells for QC, we can use the <code>subset</code> function mentioned above. Be sure to look at the QC results as generated above to make decisions about reasonable thresholds.</p>

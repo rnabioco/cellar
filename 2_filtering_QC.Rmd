@@ -17,6 +17,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+Recorded lecture: <a href="https://www.dropbox.com/s/umf7f0vfq7i9xvt/zoom_0.mp4?dl=0" > <i class="fa fa-video-camera"></i> </a>
+
+Rmarkdown: <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/2_filtering_QC.Rmd" style="text-decoration: none;"> <i class="fa fa-file-code-o"></i> </a> 
+
 ## Example: peripheral blood mononuclear cell (PBMC) sample data
 
 To follow along on RStudio local: 
