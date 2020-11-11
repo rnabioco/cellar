@@ -17,93 +17,122 @@ knitr::opts_chunk$set(
 )
 ```
 
-## finding markers and differential expression analysis
-After clustering, differential expression testing (DE analysis, similar to bulk RNA seq) finds gene signatures of each cluster/cell population, to give more insights into biology.
+To follow along on RStudio local: 
 
-### many proposed methods  
-(In general, we recommend default "wilcox" or "t", good balances between speed and  accuracy)
+1. Download [Rmd](https://raw.githubusercontent.com/rnabioco/cellar/master/4_markers.Rmd)
 
-![Soneson and Robinson, 2018](4_markers_files/detests.jpg)
+2. Install `presto` and `clustifyr`
+```
+# From GitHub
+install.packages('remotes')
+remotes::install_github("https://github.com/immunogenomics/presto")
+
+# From Bioconductor
+BiocManager::install("clustifyr")
+```
+
+3. Download today's example [data1](https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/clustered_sobj.rds)
+[data2](https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/pan_celseq2.rds)
+[data3](https://scrnaseq-workshop.s3-us-west-2.amazonaws.com/pan_smartseq2.rds)
+
+## Finding markers and differential expression analysis
+After clustering, differential expression testing (DE analysis, similar to bulk RNA-seq) finds gene signatures of each cluster/cell population, to give more insights into biology.
+
+### Many proposed methods  
+(In general, we recommend default "wilcox" or "t", good balances between speed and accuracy)
+
+![Soneson and Robinson, 2018](data/detests.jpg)
 
 In Seurat, we can use the `FindAllMarkers()` function, which will perform the `wilcox.test()` by default . Specifically, the function will iterate through each cluster, comparing the cells in one cluster to the cells in all of the other clusters. The test is run for every gene that is detectable above certain thresholds. The output is then filtered to identify significant genes with a positive fold-change (i.e. higher in abundance the cluster).
 
-We recommend using the `wilcoxauc()` function from the `presto` package (installed from github), which will do the same thing but in a (tiny) fraction of the time, due to implementation with C++ backend.
+We recommend using the `wilcoxauc()` function from the `presto` package (installed from GitHub), which will do the same thing but in a (tiny) fraction of the time, due to implementation with C++ backend.
 
-### important considerations
-1. Keep things simple first and look at the results (try not integrating, not regressing), look at the output, and determine what variables to regress out (batch, nCount_RNA, percent_mito, cell cycle, if needed) during scaling (note this only affects dimension reduction and clustering).
+### Important considerations
+1. Keep things simple first and look at the results (try not integrating, not regressing), look at the output, and determine what variables need to be regressed out (batch, nCount_RNA, percent_mito, cell cycle, etc) during scaling (note this only affects dimension reduction and clustering).
 
-2. Note that the p-values from these tests will be absurdly low (near or at 0). This is in part due to the large number of samples tested (e.g. each cell is considered a sample) but also due to the data being clustered based on the gene expression. Testing for differential expression between clusters will always result in some differntially expressed genes... because that's what makes them different clusters in the first place, hence the logical is somewhat circular and inflate p-values. Nevertheless we can use the p-values to rank the genes, but you shouldn't just blindly trust that a p-value < 0.05 is something meaningful in single cell data.
+2. Note that the p-values from these tests will be absurdly low (near or at 0). This is in part due to the large number of samples tested (e.g. each cell is considered a sample) but also due to the data being clustered based on the gene expression. Testing for differential expression between clusters will always result in some differentially expressed genes... because that's what makes them different clusters in the first place, hence the logical is somewhat circular and result in inflated p-values. Nevertheless, we can use the p-values to rank the genes, but you shouldn't just blindly trust that a p-value < 0.05 is something meaningful in single cell data.
 
-A couple more words on preprocessing:
+3. Use normalized data for DE (slot is dependent on normalization method, also don't use integrated assay)
 
 ```{r "Load preprocessing data"}
 library(Seurat)
 library(tidyverse)
-# load data from saved RDS
-sobj <- readRDS("/Users/rf/class/scRNAseq/cellar_v2/cellar/_vignettes/data/filtered_sobj.rds")
 
-# log normalize
-sobj_l <- NormalizeData(sobj) # <- skip this step if using scran normalization
-sobj_l <- ScaleData(sobj_l,
-                    vars.to.regress = c("nCount_RNA",
-                                        "percent_mito"))
+# Use tiny example
+sobj <- CreateSeuratObject(Seurat::pbmc_small@assays$RNA@counts)
 
-# alternatively, sctransform is a one step normalization and scaling process
-sobj_sc <- suppressWarnings(SCTransform(object = sobj, # sctransform has some unhelpful warnings 
-                                        vars.to.regress = c("percent_mito"), # already corrects for transcript number
-                                        verbose = FALSE))
+# Log normalize
+sobj_l <- NormalizeData(sobj)
+
+sobj_l <- ScaleData(sobj_l)
+
+# SCTransform
+sobj_sc <- SCTransform(object = sobj)
 ```
 
-3. Use normalized data for DE (slot is dependent on normalization method, also don't use integrated assay)
-
 ```{r "explore normalization"}
-# before normalization, "data" slot is the same as counts
-sobj@assays$RNA@data[101:105,101:105] # raw counts
+# Before normalization, "data" slot is the same as counts
+sobj@assays$RNA@data[1:5, 1:5]
 
-# after log normalization, results are stored in "data" slot
-sobj_l@assays$RNA@data[101:105,101:105] # normalized
+# After log normalization, results are stored in "data" slot
+sobj_l@assays$RNA@data[1:5, 1:5] # normalized
 
-# after sctransform, results are stored in new assay "SCT"
-sobj_sc@assays$SCT@data[101:105,101:105] # normalized
-sobj_sc@assays$RNA@data[101:105,101:105] # still same as counts, make sure not to use this!
+# After sctransform, results are stored in new assay "SCT"
+sobj_sc@assays$SCT@data[1:5, 1:5] # normalized
+
+sobj_sc@assays$RNA@data[1:5, 1:5] # still same as counts, make sure not to use this!
 ```
 
 4. Note that marker genes found is very dependent on clustering and the compared populations.
 
-### find all markers for each cluster
-`FindAllMarkers` compares cells in each cluster to all other cells in the dataset. Typically, focus is given to genes upregulated in each cluster, ie markers.
+### Find all markers for each cluster
+`FindAllMarkers` compares cells in each cluster to all other cells in the dataset. Typically, focus is given to genes upregulated in each cluster, i.e. markers.
 
 ```{r "FindAllMarkers"}
-# load clustered object
-sobj_clusters <- readRDS("/Users/rf/class/scRNAseq/cellar_v2/cellar/_vignettes/data/clustered_sobj.rds")
+# Load clustered object
+sobj_clusters <- readRDS("data/clustered_sobj.rds")
 
-# also check/set ident to the desired comparison
+# Also check/set ident to the desired comparison
 Idents(sobj_clusters) %>% head()
-Idents(sobj_clusters) <- sobj_clusters@meta.data$clusters
+
+Idents(sobj_clusters) <- "clusters"
 
 markers_df <- FindAllMarkers(sobj_clusters,
                              assay = "RNA", # be careful with sobj_sc and intergrated objects
                              slot = "data",
                              only.pos = TRUE)
+
 markers_df %>% head()
 ```
 
 pct.1: fraction detected in the cluster in question, pct.2: fraction detected in the rest of the cells
-avg_logFC: expression comparison of the cluster in question (> 0 means higher) vs rest of the cells
+avg_logFC: expression comparison of the cluster in question (natural log, so exp(x) to reverse) vs rest of the cells
 
-And the equivalent but faster way using `presto::wilcoxauc`
+And save tables to disk with `write_csv`.
+
+```{r "saving files",eval=F}
+write_csv(markers_df, "data/allmarkers.csv")
+
+markers_df <- read_csv("data/allmarkers.csv")
+
+markers_df %>% head() # lost rownames, tidyverse strikes again
+```
+
+Consider the equivalent but faster way, using `presto::wilcoxauc`.
 
 ```{r "using presto instead"}
 library(presto)
-markers <- wilcoxauc(sobj_clusters, "clusters") # compute markers
-markers %>% head()
+
+markers_presto <- wilcoxauc(sobj_clusters, "clusters") # give metadata column name
+
+markers_presto %>% head() # also contains negative markers, how would you keep only the positive?
 ```
 
-### find DE genes for specific cell groups
-For more control in the comparisons, use `FindMarkers`. Positive average log (natural) fold change represents higher expression of the gene in cells of `ident.1`. pct1 and 2 are percent detected in each ident/population.
+### Find DE genes for specific cell groups
+For more control in the comparisons, use `FindMarkers`.
 
 ```{r "specific DE testing between groups"}
-# DE analysis for 2 clusters
+# DE analysis for cluster 1 vs 2
 markers_df2 <- FindMarkers(sobj_clusters,
                            assay = "RNA",
                            slot = "data",
@@ -114,12 +143,12 @@ markers_df2 %>% head()
 ```
 
 pct.1: fraction detected in the cells of ident.1, pct.2: fraction detected in the cells of ident.2
-avg_logFC: expression comparison of ident.1 vs ident.2 (> 0 means higher in ident.1)
+avg_logFC: expression comparison (natural log fold change) of ident.1 vs ident.2 (> 0 means higher in ident.1)
 
 `FindMarkers` defaults to the current active ident. To use other value groups, set idents to the intended column, or use the `group.by` argument.
 
 ```{r "specific DE testing between groups, more complicated example"}
-# compare control vs treated in only cluster 1
+# Compare control vs treated in only cluster 1
 markers_df3 <- FindMarkers(sobj_clusters,
                            assay = "RNA",
                            slot = "data",
@@ -132,20 +161,24 @@ markers_df3 <- FindMarkers(sobj_clusters,
 Genes of interest can then be visualized as violin plots or feature plots.
 
 ```{r "plotting"}
-# violin plots
-Idents(sobj_clusters) <- sobj_clusters@meta.data$clusters # plots are grouped by active ident
+# Violin plots
 VlnPlot(sobj_clusters, "LYZ")
+
 VlnPlot(sobj_clusters, c("LYZ", "S100A4")) # can be a vector of gene names
 
-# project on UMAP
+VlnPlot(sobj_clusters, "LYZ", split.by = "orig.ident", split.plot = TRUE)
+
+# Project on UMAP
 FeaturePlot(sobj_clusters, "LYZ")
+
 FeaturePlot(sobj_clusters, c("LYZ", "S100A4")) # can be a vector of gene names
+
 FeaturePlot(sobj_clusters, "LYZ", split.by = "orig.ident") # <- split into panels based on metadata column
 ```
 ### Sidebar: How to regress out cell cycle / ribosomal gene heterogeneity (and do you need to?)
 
 ```{r "cell cycle"}
-# 1. assess phase and PCA
+# 1. Assess phase and PCA
 # Seurat stores a list of cell cycle specific genes for humans
 s.genes <- Seurat::cc.genes$s.genes # obviously unsuitable for nonhuman
 g2m.genes <- Seurat::cc.genes$g2m.genes
@@ -154,150 +187,175 @@ s.genes
 g2m.genes
 
 # score and phase call is added to metadata
-sobj_l <- CellCycleScoring(sobj_l, 
-                           s.features = s.genes,
-                           g2m.features = g2m.genes,
-                           set.ident = FALSE)
-sobj_l@meta.data %>% head()
+sobj_clusters <- CellCycleScoring(sobj_clusters, 
+                                  s.features = s.genes,
+                                  g2m.features = g2m.genes,
+                                  set.ident = FALSE)
+
+sobj_clusters@meta.data %>% head()
 
 # check PCA to see if cell cycle has strong effects
-sobj_l <- FindVariableFeatures(sobj_l)
-sobj_l <- RunPCA(sobj_l, verbose = FALSE, npcs = 10)
-DimPlot(sobj_l, group.by = "Phase") # again, in this case, cell cycle does not have strong effects
+DimPlot(sobj_clusters, group.by = "Phase", reduction = "pca")
+
+DimPlot(sobj_clusters, group.by = "Phase") # again, in this case, cell cycle does not have strong effects
 ```
 
 ```{r "PCA genes"}
-# 2. look for cell cycle-specific genes as main drivers of PCA
+# 2. Look for cell cycle-specific genes as main drivers of PCA
 topPCAgenes <- apply(
-  sobj_l@reductions$pca@feature.loadings, # contribution of each gene to each PC is stored here
+  sobj_clusters@reductions$pca@feature.loadings, # contribution of each gene to each PC is stored here
   MARGIN = 2, 
   FUN = function(x) names(sort(abs(x), decreasing = TRUE)[1:10]) # finds the most important genes in each PC
   )
 
-topPCAgenes
+topPCAgenes[1:5, 1:5]
 
 topPCAgenes %>%
   as.vector() %>%
   intersect(c(s.genes, g2m.genes)) # see how many S and G2M genes intersect with that list
 
-# or just check top variable genes
+# 3. If cell cycle/ribosomal genes show up prominently in DE (be careful they might be biologically meaningful!)
 ```
 
-## cluster identities
+## Cluster identities
 
-Without venturing into the realm of philosphical debates on what a "cell type" constitutes, standard pratice is to use certain gene expression features to classify cells. This is often done manually, by visual inspection of key genes. Automated approaches that utilize a broader range of features are currently being developed.
+Without venturing into the realm of philosophical debates on what a "cell type" constitutes, standard practice is to use certain gene expression features to classify cells. This is often done manually, by visual inspection of key genes. Automated/less-biased approaches that utilize a broader range of features are currently being developed.
 
-### manual inspection of key genes using expertise in the lab
+### Manual inspection of key genes using expertise in the lab
 
 ```{r "manual inspection"}
-# from the Seurat pancreas example
-# we now have pan_celseq2, fully annotated in metadata column "celltype", and pan_smartseq2, ready to be annotated
-data_url = "https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"
-pan_celseq2 <- readRDS(url(file.path(data_url, "pan_celseq2.rds")))
-pan_celseq2@meta.data %>% head()
-pan_smartseq2 <- readRDS(url(file.path(data_url, "pan_smartseq2.rds")))
-pan_smartseq2@meta.data %>% head()
-a <- DimPlot(pan_smartseq2, label = TRUE) + NoLegend()
-a
+# From the Seurat pancreas example
+# We now have pan_celseq2, fully annotated in metadata column "celltype", and pan_smartseq2, ready to be annotated
 
-FeaturePlot(pan_smartseq2, c("IRX2","GC")) # marker genes for alpha
-FeaturePlot(pan_smartseq2, c("IAPP","MAFA")) # marker genes for beta
-FeaturePlot(pan_smartseq2, c("HHEX","LEPR")) # marker genes for delta
+pan_ref <- readRDS("data/pan_celseq2.rds")
+pan_ref[["celltype"]][1:5, ]
 
-# optional, save the cluster numbers as "cluster.id"
-pan_smartseq2 <- StashIdent(object = pan_smartseq2, save.name = "cluster.id") # or use AddMetaData
+pan_new <- readRDS("data/pan_smartseq2.rds")
+```
+
+```{r "by markers"}
+a <- DimPlot(pan_new, label = TRUE) + NoLegend()
+
+FeaturePlot(pan_new, c("IRX2","GC")) # marker genes for alpha
+
+FeaturePlot(pan_new, c("IAPP","MAFA")) # marker genes for beta
+
+FeaturePlot(pan_new, c("HHEX","LEPR")) # marker genes for delta
+
+# Optional, save the cluster numbers as "cluster.id"
+pan_new <- StashIdent(pan_new, 
+                      save.name = "cluster.id") # or use AddMetaData
 
 # Use RenameIdents to remap the idents from the current IDs to the new IDs 
-pan_smartseq2 <- RenameIdents(pan_smartseq2,
-                              "0" = "alpha",
-                              "1" = "alpha",
-                              "2" = "alpha",
-                              "3" = "alpha",
-                              "7" = "alpha",
-                              "9" = "alpha",
-                              "11" = "alpha", 
-                              "5" = "beta",
-                              "6" = "beta",
-                              "8" = "beta",
-                              "10" = "beta",
-                              "4" = "delta")
+pan_new <- RenameIdents(pan_new,
+                        "0" = "alpha",
+                        "1" = "alpha",
+                        "2" = "alpha",
+                        "3" = "alpha",
+                        "7" = "alpha",
+                        "9" = "alpha",
+                        "11" = "alpha", 
+                        "5" = "beta",
+                        "6" = "beta",
+                        "8" = "beta",
+                        "10" = "beta",
+                        "4" = "delta")
 
 # Plot UMAP with new cluster IDs
-b <- DimPlot(object = pan_smartseq2,
-        label = TRUE) + NoLegend()
+b <- DimPlot(object = pan_new,
+             label = TRUE) + 
+  NoLegend()
 
 cowplot::plot_grid(a,b)
 
-# remember to save the new idents into meta.data
-pan_smartseq2 <- StashIdent(object = pan_smartseq2, save.name = "cluster_name")
-pan_smartseq2@meta.data %>% head()
+# Remember to save the new idents into meta.data
+pan_new <- StashIdent(object = pan_new, save.name = "cluster_name")
+pan_new[["cluster_name"]][1:5, ]
 ```
 
-### towards a more automated approach of identity assignment
+### Towards a (or 20) more automated approach of identity assignment
 
-1. using `Seurat`, inference from previous seurat object (requires very similar seurat object), see [Seurat Integration Vignette](https://satijalab.org/seurat/v3.2/integration.html) for more details.
+1. Using `Seurat`, inference from previous seurat object (requires very similar Seurat object), see [Seurat Integration Vignette](https://satijalab.org/seurat/v3.2/integration.html) for more details.
 
 ```{r "Seurat integration"}
-# reset idents of pan_smartseq2
-Idents(pan_smartseq2) <- "cluster.id"
+# Reset idents of pan_smartseq2
+Idents(pan_new) <- "cluster.id"
 
-pancreas <- FindTransferAnchors(reference = pan_celseq2, query = pan_smartseq2, 
-    dims = 1:30)
-predictions <- TransferData(anchorset = pancreas, refdata = pan_celseq2$celltype, 
-    dims = 1:30)
-pan_smartseq2 <- AddMetaData(pan_smartseq2, metadata = predictions)
-Idents(pan_smartseq2) <- "predicted.id"
-DimPlot(pan_smartseq2, label = TRUE) + NoLegend()
+pancreas <- FindTransferAnchors(reference = pan_ref, 
+                                query = pan_new, 
+                                dims = 1:30)
+
+predictions <- TransferData(anchorset = pancreas, 
+                            refdata = pan_ref$celltype, 
+                            dims = 1:30)
+
+pan_new <- AddMetaData(pan_new, 
+                       metadata = predictions)
+
+Idents(pan_new) <- "predicted.id"
+
+DimPlot(pan_new, label = TRUE) + NoLegend()
 ```
 
-2. using other classification packages such as `clustifyr`.
+2. Using other classification packages such as `clustifyr` (disclosure: developed by the RBI).
 
-`clustifyr` works by comparing the average gene expression in each cluster to a reference matrix that contains average gene signatures of reference cell types. The reference can be built from other single cell data, bulk-rna-seq, or other sources. Ranked Spearman correlation is used to compare the reference to the clusters. Only the variable genes are used for the correlation. 
+`clustifyr` works by comparing the average gene expression in each cluster to a reference matrix that contains average gene signatures of reference cell types. The reference can be built from other single cell data, bulk rna-seq, microarray data, or other sources. Ranked Spearman correlation is used to compare the reference to the clusters. Only the highly variable genes are used for the correlation. 
 
-In order to compare our dataset we need to use a publically available reference dataset. In this example we use the other annotated experiment.Please see [clustifyrdatahub](https://github.com/rnabioco/clustifyrdatahub) for prebuilt general references available.
+In order to compare our dataset we need to use a publicly available reference dataset. In this example, we use the other annotated experiment. Please see [clustifyrdatahub](https://github.com/rnabioco/clustifyrdatahub) for prebuilt general references available.
 
 ```{r "clustifyr annotation"}
 library(clustifyr)
-# build a reference from expression matrix data
-ref <- average_clusters(pan_celseq2@assays$RNA@data,
-                        metadata = pan_celseq2@meta.data,
+
+# Build a reference from expression matrix data
+ref <- average_clusters(pan_ref@assays$RNA@data,
+                        metadata = pan_ref@meta.data,
                         cluster_col = "celltype")
-dim(ref)
-res <- clustify(input = pan_smartseq2@assays$RNA@data,
+
+ref[1:5,1:3]
+
+res <- clustify(input = pan_new@assays$RNA@data,
                 ref_mat = ref,
-                metadata = pan_smartseq2@meta.data,
+                metadata = pan_new@meta.data,
                 cluster_col = "cluster.id",
-                query_genes = pan_smartseq2@assays$RNA@var.features, # using Seurat computed variable genes
+                query_genes = pan_new@assays$RNA@var.features # using Seurat computed variable genes
                 )
+
 res # a matrix of correlation values between each cluster and reference cell types
+
 res2 <- cor_to_call(res, 
-                    metadata = pan_smartseq2@meta.data,
+                    metadata = pan_new2@meta.data,
                     cluster_col = "cluster.id",
-                    threshold = 0.5) # anything below 0.5 correlation are labeled as "unknown"
+                    threshold = 0.6) # anything below 0.6 correlation are labeled as "unknown"
+
 res2
 
-# same as last section
+# Format as meta.data
 new_meta <- call_to_metadata(res2, 
-                             metadata = pan_smartseq2@meta.data,
+                             metadata = pan_new@meta.data,
                              cluster_col = "cluster.id")
-pan_smartseq2@meta.data <- new_meta
-DimPlot(pan_smartseq2, label = T, group.by = "type") + NoLegend()
+
+# Insert back to overwrite metadata
+pan_new@meta.data <- new_meta
+
+DimPlot(pan_new, label = T, group.by = "type") + NoLegend()
 ```
-`clustifyr` also takes seurat objects as input directly, finds various needed data, and output another object with identities assigned.
+
+`clustifyr` also takes Seurat objects as input directly, finds various needed data, and output another object with identities assigned.
 
 ```{r "clustifyr with wrappers"}
-ref2 <- seurat_ref(pan_celseq2,
-                  cluster_col = "celltype")
-identical(ref,ref2) # exactly the same as chunk above
+ref2 <- seurat_ref(pan_ref,
+                   cluster_col = "celltype")
 
-res <- clustify(input = pan_smartseq2,
+identical(ref, ref2) # exactly the same as chunk above
+
+res <- clustify(input = pan_new,
                 ref_mat = ref2,
                 cluster_col = "cluster.id",
                 seurat_out = TRUE)
 
 res # returns a new seurat object
 
-# look at UMAP
+# Look at UMAP
 DimPlot(res, label = TRUE, group.by = "type") + NoLegend() # saved in "type" metadata column
 ```
 
@@ -307,27 +365,26 @@ Also see more tutorials at [`clustifyr`](https://rnabioco.github.io/clustifyr/).
 Insight into different samples can be gained from the proportion of cells that fall into each cell type. Unfortunately, no dedicated tools are available for statistical testing.
 
 ```{r "evaluate composition"}
-tab1 <- sobj_clusters@meta.data %>% group_by(orig.ident, clusters) %>% tally() # counting up all combinations
+tab1 <- sobj_clusters@meta.data %>%
+  group_by(orig.ident, clusters) %>%
+  tally() # counting up all combinations
+
 tab1
-tab2 <- tab1 %>% spread(key = clusters, value = n) # spread out into "wide" form
+
+tab2 <- tab1 %>% pivot_wider(names_from = clusters, values_from = n) # spread out "long" into "wide" form
+
 tab2
+
 tab3 <- tab1 %>% group_by(orig.ident) %>%
   mutate(n = n/sum(n)) %>% # convert counts to proportions first
-  spread(key = clusters, value = n) 
+  pivot_wider(names_from = clusters, values_from = n)
+
 tab3
 ```
 
-and save tables to disk with `write_csv`
+## Other things to do with marker genes 
+1. Gene list to pathway activity score, via `Seurat::AddModuleScore` or [`AUCell`](https://github.com/aertslab/AUCell)
 
-```{r "saving files",eval=F}
-write_csv(tab3, "data/perc_clusters.csv")
-tab4 <- read_csv("data/perc_clusters.csv")
-```
+2. If TF expression is too low for detection, consider [`SCENIC`](https://github.com/aertslab/SCENIC) for TF activity inference
 
-
-## other things to do with marker genes 
-1. gene list to pathway activity score, via [`AUCell`](https://github.com/aertslab/AUCell)
-
-2. if TF expression is too low, consider [`SCENIC`](https://github.com/aertslab/SCENIC) for TF activity inference
-
-3. standard GO term enrichment tools [`gProfiler2`](https://biit.cs.ut.ee/gprofiler/page/r), [`enrichR`](https://github.com/wjawaid/enrichR), [`fgsea`](https://github.com/ctlab/fgsea]), etc etc
+3. Standard GO term enrichment tools [`gProfiler2`](https://biit.cs.ut.ee/gprofiler/page/r), [`enrichR`](https://github.com/wjawaid/enrichR), [`fgsea`](https://github.com/ctlab/fgsea]), etc
