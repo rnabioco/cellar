@@ -17,6 +17,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+Recorded lecture: <a href="https://www.dropbox.com/s/f5143g5veni1aa0/zoom_0.mp4?dl=0" > <i class="fa fa-video-camera"></i> </a>
+
+Rmarkdown: <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/4_markers.Rmd" style="text-decoration: none;"> <i class="fa fa-file-code-o"></i> </a> 
+
 To follow along on RStudio local: 
 
 1. Download [Rmd](https://raw.githubusercontent.com/rnabioco/cellar/master/4_markers.Rmd)
@@ -156,6 +160,21 @@ markers_df3 <- FindMarkers(sobj_clusters,
                            group.by = "orig.ident", # <- grouping cells by this metadata column
                            ident.1 = "control",
                            ident.2 = "treated")
+
+# More complicated example
+# Compare cluster 1 control vs cluster 2 treated
+# Make new metadata column for this need
+sobj_clusters@meta.data$newid <- sobj_clusters@meta.data %>% 
+  mutate(newid = str_c(orig.ident, clusters, sep = "_")) %>% 
+  pull(newid)
+
+markers_df4 <- FindMarkers(sobj_clusters,
+                           assay = "RNA",
+                           slot = "data",
+                           group.by = "newid", 
+                           ident.1 = "control_1",
+                           ident.2 = "treated_2")
+
 ```
 
 Genes of interest can then be visualized as violin plots or feature plots.
