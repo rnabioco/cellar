@@ -25,6 +25,9 @@ navbar:
       href: tba.html 
     - text: "Previous-workshops"
       href: previous.html
+    - text: "Installing R"
+      href: r-install.html
+    
       
 output:
   distill::distill_article:
