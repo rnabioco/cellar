@@ -26,7 +26,7 @@ navbar:
     - text: "Previous-workshops"
       href: previous.html
     - text: "Installing R"
-      href: r-install.html
+      href: r_install.html
     
       
 output:
