@@ -20,7 +20,7 @@ navbar:
     - text: "Alignment"
       href: tba.html 
     - text: "Multi-modal"
-      href: tba.html       
+      href: 7_multimodal.html       
     - text: "VDJ"
       href: tba.html 
     - text: "Previous-workshops"
