@@ -2,26 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" version="1.0">
   <url>
     <loc>https://rnabioco.github.io/cellar/2_filtering_QC.html</loc>
-    <lastmod>2020-11-08T09:42:33-07:00</lastmod>
+    <lastmod>2020-11-10T11:40:18-07:00</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/cellar/4_markers.html</loc>
-    <lastmod>2020-11-08T09:42:33-07:00</lastmod>
+    <lastmod>2020-11-10T11:40:18-07:00</lastmod>
+  </url>
+  <url>
+    <loc>https://rnabioco.github.io/cellar/8_vdj.html</loc>
+    <lastmod>2020-11-16T12:01:43-07:00</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/cellar/</loc>
-    <lastmod>2020-11-08T09:42:49-07:00</lastmod>
+    <lastmod>2020-11-10T11:40:18-07:00</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/cellar/prerequisite.html</loc>
-    <lastmod>2020-11-10T08:18:20-07:00</lastmod>
+    <lastmod>2020-11-10T11:40:18-07:00</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/cellar/previous.html</loc>
-    <lastmod>2020-10-12T15:50:35-06:00</lastmod>
+    <lastmod>2020-11-10T11:40:18-07:00</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/cellar/tba.html</loc>
-    <lastmod>2020-11-10T08:26:12-07:00</lastmod>
+    <lastmod>2020-11-10T11:40:18-07:00</lastmod>
   </url>
 </urlset>
