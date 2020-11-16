@@ -22,7 +22,7 @@ navbar:
     - text: "Multi-modal"
       href: 7_multimodal.html       
     - text: "VDJ"
-      href: tba.html 
+      href: 8_vdj.html 
     - text: "Previous-workshops"
       href: previous.html
     - text: "Installing R"
