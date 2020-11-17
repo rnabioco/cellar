@@ -16,9 +16,9 @@ navbar:
     - text: "Cluster Markers and Cell Type Assignment"
       href: 4_markers.html
     - text: "Trajectories"
-      href: tba.html 
+      href: 5_trajectories.html
     - text: "Alignment"
-      href: tba.html 
+      href: 6_alignment.html 
     - text: "Multi-modal"
       href: 7_multimodal.html       
     - text: "VDJ"
