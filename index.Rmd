@@ -11,34 +11,41 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### **November 10th - 13th, 2020 **
+### **November 1st - 5th, 2021 **
 
-4-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio.
+4-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio. The course will be held in *person* on the Anschutz campus (Ed2N building P28-CTL-2201AB Computer Lab).
 
 ### **Prerequisites**
 
-A basic understanding of the R programming language. Individuals without R experience will need to complete remedial online courses suggested by instructors. 
+A basic understanding of the R programming language and a single cell RNA-seq dataset to analyze. Individuals without R experience will need to complete online courses suggested by instructors. The single cell RNA-seq dataset can be from a public resource, or private data from a lab on campus. The instructors will provide specific recommendations for preferred data formats, dataset size and complexity.
+
 
 ### **Schedule**
 
-* **Session 0** | November 9<sup>th</sup>, 1:00pm - 3:00pm
+Pre-class videos (< 30 min) with lecture and background material will be provided prior to each day's workshop. 
+
+* **Session 0** | November 1<sup>th</sup>, 9:00am - 11:00am
   + Course on-boarding session for those with questions on prerequisite material 
   
-* **Session 1** | November 10<sup>th</sup>, 1:00pm - 3:00pm
+* **Session 1** | November 2<sup>th</sup>, 9:00am - 11:00am
   + Introduction and data pre-processing
   + Quality control
-    
-* **Session 2** | November 11<sup>th</sup>, 1:00pm - 3:00pm
+      
+* **Session 2** | November 3<sup>th</sup>, 9:00am - 11:00am
   + Clustering
   + Cell-type annotation
 
-* **Session 3** | November 12<sup>th</sup>, 1:00pm - 3:00pm
+* **Session 3** | November 4<sup>th</sup>, 9:00am - 11:00am
   + Pseudotime
   + Dataset alignment
 
-* **Session 4** | November 13<sup>th</sup>, 1:00pm - 3:00pm
+* **Session 4** | November 5<sup>th</sup>, 9:00am - 11:00am
   + Multi-modal data
   + VDJ
+
+### **Office hours**
+
+An instructor will be available after class for an hour to assist with additional questions. Additional office hours may be scheduled by contacting workshop instuctors, or scheduled through the [RBI office hours](https://medschool.cuanschutz.edu/rbi/training-and-education/rbi-office-hours). 
 
 ### **Instructors**
 
@@ -47,10 +54,8 @@ Please contact us on slack ([RBI-scRNA-seq-workshop](rbiscrnaseqwo-b3y9537.slack
 - Ryan Sheridan  
 - Caitlin Winkler  
 - Tyler Matheny  
+- Kristen Wells-Wrasman
 - Rui Fu  
 - Kent Riemondy  
-- Scott Thompson  
-
-
 
 

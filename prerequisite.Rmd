@@ -4,11 +4,10 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      eval = FALSE)
 ```
 
-
-Recorded lecture: <a href="https://www.dropbox.com/s/2nicui696ypo3c7/zoom_1.mp4?dl=0" > <i class="fa fa-video-camera"></i> </a>
 
 Rmarkdown: <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/prerequisite.Rmd" style="text-decoration: none;"> <i class="fa fa-file-code-o"></i> </a> 
 

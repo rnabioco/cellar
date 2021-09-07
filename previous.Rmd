@@ -11,4 +11,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+[**November 10th - 13th, 2020 **](previous/2020/docs/index.html)
+
 [**August 13th - 15th, 2019 **](previous/2019/docs/index.html)
