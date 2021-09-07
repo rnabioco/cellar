@@ -28,21 +28,25 @@ Pre-class videos (< 30 min) with lecture and background material will be provide
   + Course on-boarding session for those with questions on prerequisite material 
   
 * **Session 1** | November 2<sup>th</sup>, 9:00am - 11:00am
-  + Introduction and data pre-processing
+  + Introduction to single cell RNA-seq
+  + Processing scRNA-seq data: from FASTQ to a count matrix
+  + Loading data into R
   + Quality control
       
 * **Session 2** | November 3<sup>th</sup>, 9:00am - 11:00am
-  + Clustering
+  + Dimensionality reduction techniques for scRNA-seq (PCA, UMAP, tSNE, etc)
+  + Clustering scRNA-seq data
+  + Differential expression and marker gene discovery
   + Cell-type annotation
 
 * **Session 3** | November 4<sup>th</sup>, 9:00am - 11:00am
-  + Pseudotime
-  + Dataset alignment
+  + Using pseudotime approaches to find trajectories or gene expression gradients   
+  + Working with multi-sample datasets and mitigating batch effects
 
 * **Session 4** | November 5<sup>th</sup>, 9:00am - 11:00am
-  + Multi-modal data
-  + VDJ
-
+  + Incorporating additional single cell signals, e.g. CITE-seq
+  + Additional time to discuss personal datasets
+  
 ### **Office hours**
 
 An instructor will be available after class for an hour to assist with additional questions. Additional office hours may be scheduled by contacting workshop instuctors, or scheduled through the [RBI office hours](https://medschool.cuanschutz.edu/rbi/training-and-education/rbi-office-hours). 
