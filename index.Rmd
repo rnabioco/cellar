@@ -13,12 +13,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### **November 1st - 5th, 2021 **
 
-4-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio. The course will be held in *person* on the Anschutz campus (Ed2N building P28-CTL-2201AB Computer Lab).
+5-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio. The course will be held in *person* on the Anschutz campus (Ed2N building P28-CTL-2201AB Computer Lab).
 
 ### **Prerequisites**
 
 A basic understanding of the R programming language and a single cell RNA-seq dataset to analyze. Individuals without R experience will need to complete online courses suggested by instructors. The single cell RNA-seq dataset can be from a public resource, or private data from a lab on campus. The instructors will provide specific recommendations for preferred data formats, dataset size and complexity.
 
+### **Register**
+
+Please fill out this [form](https://forms.gle/WBHJ2EQmR9Fttjdz6) to indicate your interest in the workshop.  Selected attendees will be notified by October 1. 
 
 ### **Schedule**
 
@@ -30,7 +33,7 @@ Pre-class videos (< 30 min) with lecture and background material will be provide
 * **Session 1** | November 2<sup>th</sup>, 9:00am - 11:00am
   + Introduction to single cell RNA-seq
   + Processing scRNA-seq data: from FASTQ to a count matrix
-  + Loading data into R
+  + Interacting with single cell data in R
   + Quality control
       
 * **Session 2** | November 3<sup>th</sup>, 9:00am - 11:00am
@@ -44,7 +47,7 @@ Pre-class videos (< 30 min) with lecture and background material will be provide
   + Working with multi-sample datasets and mitigating batch effects
 
 * **Session 4** | November 5<sup>th</sup>, 9:00am - 11:00am
-  + Incorporating additional single cell signals, e.g. CITE-seq
+  + Incorporating additional single cell modalities, e.g. CITE-seq
   + Additional time to discuss personal datasets
   
 ### **Office hours**
@@ -53,7 +56,7 @@ An instructor will be available after class for an hour to assist with additiona
 
 ### **Instructors**
 
-Please contact us on slack ([RBI-scRNA-seq-workshop](rbiscrnaseqwo-b3y9537.slack.com)) if you have questions. 
+Please contact the RBI fellows (rbi.fellows@cuanschutz.edu) if you have questions. 
 
 - Ryan Sheridan  
 - Caitlin Winkler  

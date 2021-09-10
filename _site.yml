@@ -5,10 +5,6 @@ repository_url: https://github.com/rnabioco/cellar
 favicon: img/logo.png
 navbar:
   left:
-    - text: "Prerequisite-Material"
-      href: prerequisite.html
-    - text: "Installing R"
-      href: r_install.html
     - text: "Previous-workshops"
       href: previous.html
       
