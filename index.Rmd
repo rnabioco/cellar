@@ -19,6 +19,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 A basic understanding of the R programming language and a single cell RNA-seq dataset to analyze. Individuals without R experience will need to complete online courses suggested by instructors. The single cell RNA-seq dataset can be from a public resource, or private data from a lab on campus. The instructors will provide specific recommendations for preferred data formats, dataset size and complexity.
 
+Attendees will be expected to devote time outside of the workshop lectures to review pre-class materials, and apply the concepts and techniques discussed in class to their chosen single cell dataset. 
+
 ### **Register**
 
 Please fill out this [form](https://forms.gle/WBHJ2EQmR9Fttjdz6) to indicate your interest in the workshop.  Selected attendees will be notified by October 1. 
@@ -50,9 +52,11 @@ Pre-class videos (< 30 min) with lecture and background material will be provide
   + Incorporating additional single cell modalities, e.g. CITE-seq
   + Additional time to discuss personal datasets
   
-### **Office hours**
+### **Assistance**
 
 An instructor will be available after class for an hour to assist with additional questions. Additional office hours may be scheduled by contacting workshop instuctors, or scheduled through the [RBI office hours](https://medschool.cuanschutz.edu/rbi/training-and-education/rbi-office-hours). 
+
+A slack workspace will be set up for the workshop to allow attendees to seek assistance from other attendees and instructors. 
 
 ### **Instructors**
 
