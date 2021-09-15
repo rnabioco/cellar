@@ -1,16 +1,18 @@
-title: "Single-cell RNA-seq Workshop"
-output_dir: "docs"
-base_url: https://rnabioco.github.io/cellar
-repository_url: https://github.com/rnabioco/cellar 
-favicon: img/logo.png
+name: "."
+title: "single cell RNA-seq workshop"
+description: |
+  single cell RNA-seq workshop
+output_dir: "_site"
 navbar:
-  left:
+  logo:
+    image: img/logo.png
+  search: false
+  right:
+    - text: "Workshop overview"
+      href: index.html
+    - text: "Classes"
+      href: classes.html
     - text: "Previous-workshops"
       href: previous.html
-      
-output:
-  distill::distill_article:
-    css: styles.css
-twitter:
-  site: "@rnabioco"
-exclude: ["data"]
+  source_url: https://github.com/rnabioco/cellar
+output: distill::distill_article
