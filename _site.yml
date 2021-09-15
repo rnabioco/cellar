@@ -2,7 +2,7 @@ name: "."
 title: "single cell RNA-seq workshop"
 description: |
   single cell RNA-seq workshop
-output_dir: "_site"
+output_dir: "docs"
 navbar:
   logo:
     image: img/logo.png

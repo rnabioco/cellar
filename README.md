@@ -21,11 +21,11 @@ library(distill)
 create_post("class-1", draft = TRUE)
 ```
 
-Navigate to the Rmarkdown in the `_posts` subdirectory, add content, then knit and check output html file. If the content looks ready to publish, remove `draft: True`from the header, reknit, then rebuild the site using the `Build website` button under the `Build` tab in Rstudio. `Build website` will update the classes listed in the `Classes` tab, unless `draft: True` is set. Also note that `Build website` will copy all files in the project into `_site` unless you list the files/directories to ignore in the `_site.yml`.
+Navigate to the Rmarkdown in the `_posts` subdirectory, add content, then knit and check output html file. If the content looks ready to publish, remove `draft: True`from the header, reknit, then rebuild the site using the `Build website` button under the `Build` tab in Rstudio. `Build website` will update the classes listed in the `Classes` tab, unless `draft: True` is set. Also note that `Build website` will copy all files in the project into `docs` unless you list the files/directories to ignore in the `_site.yml`.
 
 E.g. exclude: ["data"] 
 
 You can preview the website by viewing the index.html in the `_site` directory. 
 
-Once satisfied with the content, commit the content in the `_posts` directory and the changes in the `_site` directory to your branch. A pull request can then be used to merge in the content to master. 
+Once satisfied with the content, commit the content in the `_posts` directory and the changes in the `docs` directory to your branch. The `docs` directory contains the html that will be shown on the github pages website. A pull request can then be used to merge in the content to master. 
 
