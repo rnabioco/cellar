@@ -1,0 +1,16 @@
+---
+title: "TBA"
+description: |
+  Content to be added prior to course. See previous workshops for content from earlier workshops.
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
