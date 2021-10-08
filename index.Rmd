@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### **November 1st - 5th, 2021 **
 
-5-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio. The workshop will be held *in person* on the Anschutz campus (Ed2N building P28-CTL-2201AB Computer Lab), however depending on campus regulations and the state of the COVID-19 pandemic, it may be hosted in a virtual format.
+5-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio. The workshop will be held remotely with lectures conducted over Zoom, with assistance available via a slack channel.
 
 ### **Prerequisites**
 
