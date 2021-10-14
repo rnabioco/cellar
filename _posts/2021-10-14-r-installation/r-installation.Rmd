@@ -1,18 +1,14 @@
 ---
-title: "Installing R"
-author: "Kent Riemondy RBI"
+title: "R installation"
+description: |
+ This article will explain how to install R, Rstudio,
+ and packages in R.
 output:
   distill::distill_article:
-    toc: false  
+    self_contained: false
+draft: false 
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-# Setting up your computer for using R/Rstudio
-
-This article will explain how to install R, Rstudio, and how to install packages into R. 
 
 # Download R
 
@@ -25,11 +21,11 @@ Select the newest R version, download the `.pkg` file, then open and install.
 
 ## Windows
 
-Select the `base` link, then click download to download the `.exe` file. Open this file to install R. Rui Fu has the most experience with windows. 
+Select the `base` link, then click download to download the `.exe` file. Open this file to install R. 
 
 ## Linux
 
-If you are on linux, then follow the documentation for your linux OS. Ryan Sheridan is the resident linux expert. 
+If you are on linux, then follow the documentation for your linux OS. 
   
 # Download compiler tools  
 
@@ -101,7 +97,7 @@ library(Seurat)
 
 2) [Bioconductor](https://bioconductor.org/), which generally has bioinformatics related packages, such as clustifyr, DESeq2, ComplexHeatmap, etc. 
 
-To install bioconductor packages you should use the CRAN package `BiocManager`. BiocManager has a function called `install()` to install bioconductor packages. For example to install `clustifyyr`
+To install bioconductor packages you should use the CRAN package `BiocManager`. BiocManager has a function called `install()` to install bioconductor packages. For example to install `clustifyr`
 
 ```r
 install.packages("BiocManager")
