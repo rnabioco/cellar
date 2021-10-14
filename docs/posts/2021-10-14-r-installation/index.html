@@ -86,37 +86,37 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-<title>single cell RNA-seq workshop: TBA</title>
+<title>single cell RNA-seq workshop: R installation</title>
 
-<meta property="description" itemprop="description" content="Content to be added prior to course. See previous workshops for content from earlier workshops."/>
+<meta property="description" itemprop="description" content="This article will explain how to install R, Rstudio,&#10;and packages in R."/>
 
 
 <!--  https://schema.org/Article -->
-<meta property="article:published" itemprop="datePublished" content="2021-09-14"/>
-<meta property="article:created" itemprop="dateCreated" content="2021-09-14"/>
+<meta property="article:published" itemprop="datePublished" content="2021-10-14"/>
+<meta property="article:created" itemprop="dateCreated" content="2021-10-14"/>
 
 <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-<meta property="og:title" content="single cell RNA-seq workshop: TBA"/>
+<meta property="og:title" content="single cell RNA-seq workshop: R installation"/>
 <meta property="og:type" content="article"/>
-<meta property="og:description" content="Content to be added prior to course. See previous workshops for content from earlier workshops."/>
+<meta property="og:description" content="This article will explain how to install R, Rstudio,&#10;and packages in R."/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:site_name" content="single cell RNA-seq workshop"/>
 
 <!--  https://dev.twitter.com/cards/types/summary -->
 <meta property="twitter:card" content="summary"/>
-<meta property="twitter:title" content="single cell RNA-seq workshop: TBA"/>
-<meta property="twitter:description" content="Content to be added prior to course. See previous workshops for content from earlier workshops."/>
+<meta property="twitter:title" content="single cell RNA-seq workshop: R installation"/>
+<meta property="twitter:description" content="This article will explain how to install R, Rstudio,&#10;and packages in R."/>
 
 <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
 <script type="text/json" id="radix-rmarkdown-metadata">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output","date"]}},"value":[{"type":"character","attributes":{},"value":["TBA"]},{"type":"character","attributes":{},"value":["Content to be added prior to course. See previous workshops for content from earlier workshops."]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["09-14-2021"]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output","draft","date"]}},"value":[{"type":"character","attributes":{},"value":["R installation"]},{"type":"character","attributes":{},"value":["This article will explain how to install R, Rstudio,\nand packages in R."]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["10-14-2021"]}]}
 </script>
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["tba_files/anchor-4.2.2/anchor.min.js","tba_files/bowser-1.9.3/bowser.min.js","tba_files/distill-2.2.21/template.v2.js","tba_files/header-attrs-2.11/header-attrs.js","tba_files/jquery-3.6.0/jquery-3.6.0.js","tba_files/jquery-3.6.0/jquery-3.6.0.min.js","tba_files/jquery-3.6.0/jquery-3.6.0.min.map","tba_files/popper-2.6.0/popper.min.js","tba_files/tippy-6.2.7/tippy-bundle.umd.min.js","tba_files/tippy-6.2.7/tippy-light-border.css","tba_files/tippy-6.2.7/tippy.css","tba_files/tippy-6.2.7/tippy.umd.min.js","tba_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"NULL"}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../.."/>
@@ -1802,7 +1802,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"TBA","description":"Content to be added prior to course. See previous workshops for content from earlier workshops.","authors":[],"publishedDate":"2021-09-14T00:00:00.000+00:00"}
+{"title":"R installation","description":"This article will explain how to install R, Rstudio,\nand packages in R.","authors":[],"publishedDate":"2021-10-14T00:00:00.000+00:00"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1831,15 +1831,69 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>TBA</h1>
+<h1>R installation</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>Content to be added prior to course. See previous workshops for content from earlier workshops.</p></p>
+<p><p>This article will explain how to install R, Rstudio, and packages in R.</p></p>
 </div>
 
 
 <div class="d-article">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h1 id="download-r">Download R</h1>
+<p>Download R from CRAN. Go to the cran homepage <a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a>. Select your operating system.</p>
+<h2 id="macos">MacOS</h2>
+<p>Select the newest R version, download the <code>.pkg</code> file, then open and install.</p>
+<h2 id="windows">Windows</h2>
+<p>Select the <code>base</code> link, then click download to download the <code>.exe</code> file. Open this file to install R.</p>
+<h2 id="linux">Linux</h2>
+<p>If you are on linux, then follow the documentation for your linux OS.</p>
+<h1 id="download-compiler-tools">Download compiler tools</h1>
+<h2 id="macos-1">MacOS</h2>
+<p>You may need to install the xcode command line tools if a package requires compilation. Open the Terminal from <code>/Applications/Utilities/</code> (or use the search tool to search for terminal)</p>
+<p>Type the following into Terminal:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">xcode-select</span> <span class="at">--install</span></span></code></pre></div>
+<p>Press “Install” and verify installation by typing into terminal:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">--version</span></span></code></pre></div>
+<p>Which should print something similar to this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; gcc (GCC) 4.8.5</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Copyright (C) 2015 Free Software Foundation, Inc.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; This is free software; see the source for copying conditions.  There is NO</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span></span></code></pre></div>
+<p>Here’s a <a href="https://www.youtube.com/watch?v=Z01lzHNrSdU&amp;feature=emb_title">youtube video explainer</a></p>
+<p>Next you need to install <code>gfortran</code>. Follow this <a href="https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/">link</a> and go to the “INSTALL OS-SPECIFIC GFORTRAN BINARY” section. Select the download link based on your macOS version. This will supply an installer.</p>
+<h2 id="windows-1">Windows</h2>
+<p>You need to install <code>Rtools</code> from CRAN. Go to this link and download the exe installer for your OS: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="uri">https://cran.r-project.org/bin/windows/Rtools/</a></p>
+<h2 id="linux-1">Linux</h2>
+<p>You probably have a compiler already?</p>
+<h1 id="download-rstudio">Download Rstudio</h1>
+<p>Go to the <a href="https://rstudio.com/products/rstudio/download/#download">Rstudio website</a> and download the installer for your OS.</p>
+<h1 id="installing-packages">Installing packages</h1>
+<p>Once you have R and Rstudio set up, open up rstudio, then we will install various packages.</p>
+<p>In general there are 3 common places that you can get R packages from:</p>
+<ol type="1">
+<li>CRAN, this is the official R package repository. CRAN has 16,000+ packages, including the tidyverse (ggplot2, dplyr, etc) and Seurat. Packages are installed using the <code>install.packages()</code> function. A successful install only needs to be done once.</li>
+</ol>
+<p>In your console execute the following:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;Seurat&quot;</span>)</span></code></pre></div>
+<p>Test package installation once complete by loading the package(s)</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Seurat)</span></code></pre></div>
+<ol start="2" type="1">
+<li><a href="https://bioconductor.org/">Bioconductor</a>, which generally has bioinformatics related packages, such as clustifyr, DESeq2, ComplexHeatmap, etc.</li>
+</ol>
+<p>To install bioconductor packages you should use the CRAN package <code>BiocManager</code>. BiocManager has a function called <code>install()</code> to install bioconductor packages. For example to install <code>clustifyr</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BiocManager)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install</span>(<span class="st">&quot;clustifyr&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or equivalently you could run BiocManager::install(&quot;clustifyr&quot;)</span></span></code></pre></div>
+<ol start="3" type="1">
+<li><a href="https://github.com/">Github</a> hosts open-source code from millions of projects. R packages hosted on github can be installed using the <code>remotes</code> package. <code>Presto</code> or <code>djvdj</code> are examples of single cell RNA-seq analysis packages on github. You’ll need to find the organization name and the repository name on github to install.</li>
+</ol>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;rnabioco/djvdj&#39;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;immunogenomics/presto&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
