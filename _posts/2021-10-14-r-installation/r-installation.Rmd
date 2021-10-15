@@ -1,8 +1,5 @@
 ---
 title: "R installation"
-description: |
- This article will explain how to install R, Rstudio,
- and packages in R.
 output:
   distill::distill_article:
     self_contained: false
@@ -10,6 +7,8 @@ draft: false
 ---
 
 
+This article will explain how to install R, Rstudio, and packages in R.If you are already familar with this material, skip to the **Install packages for workshop** section to see the packages that we will use in the workshop. 
+ 
 # Download R
 
 Download R from CRAN. Go to the cran homepage https://cran.r-project.org/. Select your operating system. 
@@ -119,3 +118,57 @@ install.packages("remotes")
 remotes::install_github('rnabioco/djvdj')
 remotes::install_github('immunogenomics/presto')
 ```
+
+
+# Install packages for workshop
+
+We will use the following packages:
+
+From CRAN:  
+  - tidyverse  
+  - Seurat  
+  - rmarkdown  
+  - cowplot  
+  - colorblindr  
+  - markdown  
+  
+                  
+```{r, echo = T, eval = F}
+install.packages(c('tidyverse',
+                   'rmarkdown',
+                   'Seurat',
+                   'cowplot',
+                   'colorblindr',
+                   'markdown'))
+```
+
+From Bioconductor:  
+  - ComplexHeatmap  
+  - scran  
+  - scDblFinder  
+  - limma  
+  - clustifyr  
+  - slingshot  
+  - tradeSeq   
+  
+  
+```{r, echo = T, eval = F}
+BiocManager::install(c('ComplexHeatmap', 
+                       'scran',
+                       'scDblFinder',
+                       'limma',
+                       'clustifyr',
+                       'slingshot',
+                       'tradeSeq'))
+```
+
+
+From github:  
+  - destiny (hosted on bioconductor typically but not building correctly right now)
+  
+```{r, echo = T, eval = F}
+remotes::install_github('theislab/destiny')
+```
+
+If you'd like to test the installation, please run [this test Rmarkdown](https://raw.githubusercontent.com/rnabioco/cellar/master/docker/test.Rmd) hosted on github. 
+
