@@ -86,33 +86,37 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>R installation</title>
+  <title>Running R/Rstudio with docker</title>
 
+  <meta property="description" itemprop="description" content="In this post we will discuss how to use docker&#10;to run R and Rstudio in a standardized environment."/>
 
 
   <!--  https://schema.org/Article -->
   <meta property="article:published" itemprop="datePublished" content="2021-10-15"/>
   <meta property="article:created" itemprop="dateCreated" content="2021-10-15"/>
+  <meta name="article:author" content="Kent Riemondy"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="R installation"/>
+  <meta property="og:title" content="Running R/Rstudio with docker"/>
   <meta property="og:type" content="article"/>
+  <meta property="og:description" content="In this post we will discuss how to use docker&#10;to run R and Rstudio in a standardized environment."/>
   <meta property="og:locale" content="en_US"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="R installation"/>
+  <meta property="twitter:title" content="Running R/Rstudio with docker"/>
+  <meta property="twitter:description" content="In this post we will discuss how to use docker&#10;to run R and Rstudio in a standardized environment."/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","output","draft","date"]}},"value":[{"type":"character","attributes":{},"value":["R installation"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["10-15-2021"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Running R/Rstudio with docker"]},{"type":"character","attributes":{},"value":["In this post we will discuss how to use docker\nto run R and Rstudio in a standardized environment. \n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]}]}]},{"type":"character","attributes":{},"value":["10-15-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["r-installation_files/anchor-4.2.2/anchor.min.js","r-installation_files/bowser-1.9.3/bowser.min.js","r-installation_files/distill-2.2.21/template.v2.js","r-installation_files/header-attrs-2.11/header-attrs.js","r-installation_files/jquery-3.6.0/jquery-3.6.0.js","r-installation_files/jquery-3.6.0/jquery-3.6.0.min.js","r-installation_files/jquery-3.6.0/jquery-3.6.0.min.map","r-installation_files/popper-2.6.0/popper.min.js","r-installation_files/tippy-6.2.7/tippy-bundle.umd.min.js","r-installation_files/tippy-6.2.7/tippy-light-border.css","r-installation_files/tippy-6.2.7/tippy.css","r-installation_files/tippy-6.2.7/tippy.umd.min.js","r-installation_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["img/docker-hello.png","img/open-in-browser.png","img/rstudio-interface.png","img/rstudio-login.png","img/save-files-in-docker.png","running-rrstudio-with-docker_files/anchor-4.2.2/anchor.min.js","running-rrstudio-with-docker_files/bowser-1.9.3/bowser.min.js","running-rrstudio-with-docker_files/distill-2.2.21/template.v2.js","running-rrstudio-with-docker_files/header-attrs-2.11/header-attrs.js","running-rrstudio-with-docker_files/jquery-3.6.0/jquery-3.6.0.js","running-rrstudio-with-docker_files/jquery-3.6.0/jquery-3.6.0.min.js","running-rrstudio-with-docker_files/jquery-3.6.0/jquery-3.6.0.min.map","running-rrstudio-with-docker_files/popper-2.6.0/popper.min.js","running-rrstudio-with-docker_files/tippy-6.2.7/tippy-bundle.umd.min.js","running-rrstudio-with-docker_files/tippy-6.2.7/tippy-light-border.css","running-rrstudio-with-docker_files/tippy-6.2.7/tippy.css","running-rrstudio-with-docker_files/tippy-6.2.7/tippy.umd.min.js","running-rrstudio-with-docker_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1430,16 +1434,16 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="r-installation_files/header-attrs-2.11/header-attrs.js"></script>
-  <script src="r-installation_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-  <script src="r-installation_files/popper-2.6.0/popper.min.js"></script>
-  <link href="r-installation_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
-  <link href="r-installation_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
-  <script src="r-installation_files/tippy-6.2.7/tippy.umd.min.js"></script>
-  <script src="r-installation_files/anchor-4.2.2/anchor.min.js"></script>
-  <script src="r-installation_files/bowser-1.9.3/bowser.min.js"></script>
-  <script src="r-installation_files/webcomponents-2.0.0/webcomponents.js"></script>
-  <script src="r-installation_files/distill-2.2.21/template.v2.js"></script>
+  <script src="running-rrstudio-with-docker_files/header-attrs-2.11/header-attrs.js"></script>
+  <script src="running-rrstudio-with-docker_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <script src="running-rrstudio-with-docker_files/popper-2.6.0/popper.min.js"></script>
+  <link href="running-rrstudio-with-docker_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="running-rrstudio-with-docker_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="running-rrstudio-with-docker_files/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="running-rrstudio-with-docker_files/anchor-4.2.2/anchor.min.js"></script>
+  <script src="running-rrstudio-with-docker_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="running-rrstudio-with-docker_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="running-rrstudio-with-docker_files/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
   <!--/radix_placeholder_site_in_header-->
 
@@ -1451,7 +1455,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"R installation","authors":[],"publishedDate":"2021-10-15T00:00:00.000+00:00"}
+{"title":"Running R/Rstudio with docker","description":"In this post we will discuss how to use docker\nto run R and Rstudio in a standardized environment.","authors":[{"author":"Kent Riemondy","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2021-10-15T00:00:00.000+00:00","citationText":"Riemondy, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1461,119 +1465,132 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>R installation</h1>
+<h1>Running R/Rstudio with docker</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-
+<p><p>In this post we will discuss how to use docker to run R and Rstudio in a standardized environment.</p></p>
 </div>
 
+<div class="d-byline">
+  
+  Kent Riemondy
+  
+<br/>10-15-2021
+</div>
 
 <div class="d-article">
-<p>This article will explain how to install R, Rstudio, and packages in R.If you are already familar with this material, skip to the <strong>Install packages for workshop</strong> section to see the packages that we will use in the workshop.</p>
-<h1 id="download-r">Download R</h1>
-<p>Download R from CRAN. Go to the cran homepage <a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a>. Select your operating system.</p>
-<h2 id="macos">MacOS</h2>
-<p>Select the newest R version, download the <code>.pkg</code> file, then open and install.</p>
-<h2 id="windows">Windows</h2>
-<p>Select the <code>base</code> link, then click download to download the <code>.exe</code> file. Open this file to install R.</p>
-<h2 id="linux">Linux</h2>
-<p>If you are on linux, then follow the documentation for your linux OS.</p>
-<h1 id="download-compiler-tools">Download compiler tools</h1>
-<h2 id="macos-1">MacOS</h2>
-<p>You may need to install the xcode command line tools if a package requires compilation. Open the Terminal from <code>/Applications/Utilities/</code> (or use the search tool to search for terminal)</p>
-<p>Type the following into Terminal:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">xcode-select</span> <span class="at">--install</span></span></code></pre></div>
-<p>Press “Install” and verify installation by typing into terminal:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">--version</span></span></code></pre></div>
-<p>Which should print something similar to this:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; gcc (GCC) 4.8.5</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; Copyright (C) 2015 Free Software Foundation, Inc.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; This is free software; see the source for copying conditions.  There is NO</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&#39; warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span></span></code></pre></div>
-<p>Here’s a <a href="https://www.youtube.com/watch?v=Z01lzHNrSdU&amp;feature=emb_title">youtube video explainer</a></p>
-<p>Next you need to install <code>gfortran</code>. Follow this <a href="https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/">link</a> and go to the “INSTALL OS-SPECIFIC GFORTRAN BINARY” section. Select the download link based on your macOS version. This will supply an installer.</p>
-<h2 id="windows-1">Windows</h2>
-<p>You need to install <code>Rtools</code> from CRAN. Go to this link and download the exe installer for your OS: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="uri">https://cran.r-project.org/bin/windows/Rtools/</a></p>
-<h2 id="linux-1">Linux</h2>
-<p>You probably have a compiler already?</p>
-<h1 id="download-rstudio">Download Rstudio</h1>
-<p>Go to the <a href="https://rstudio.com/products/rstudio/download/#download">Rstudio website</a> and download the installer for your OS.</p>
-<h1 id="installing-packages">Installing packages</h1>
-<p>Once you have R and Rstudio set up, open up rstudio, then we will install various packages.</p>
-<p>In general there are 3 common places that you can get R packages from:</p>
+<p>We’ve built a <a href="https://hub.docker.com/r/kenter/rstudio-scrnaseq">docker image</a> that contains the R packages used in the workshop and made it available on dockerhub. This image can be used if you have issues installing the recommended R packages.</p>
+<h1 id="what-is-docker">What is docker?</h1>
+<p>Docker is an application that allows identical software environments (called <code>images</code>) to be run in different operating systems (<code>MacOS</code>, <code>Linux</code> or <code>Windows</code>). The standardized software environment (<code>programs</code>, <code>data</code>, and <code>configuration</code>) takes away the headache of trying to install and maintain software. Practically using docker also enforces a reproducible analysis environment.</p>
+<p>In this post we will discuss the basics of how to:</p>
 <ol type="1">
-<li>CRAN, this is the official R package repository. CRAN has 16,000+ packages, including the tidyverse (ggplot2, dplyr, etc) and Seurat. Packages are installed using the <code>install.packages()</code> function. A successful install only needs to be done once.</li>
+<li>install docker<br />
+</li>
+<li>run docker on the command-line/terminal<br />
+</li>
+<li>run a docker container containing R, Rstudio</li>
+<li>run a docker container for this workshop that contains a variety of single cell packages</li>
 </ol>
-<p>In your console execute the following:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;Seurat&quot;</span>)</span></code></pre></div>
-<p>Test package installation once complete by loading the package(s)</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Seurat)</span></code></pre></div>
+<h1 id="install-docker">Install docker</h1>
+<p>MacOS: Install Docker desktop here: <a href="https://docs.docker.com/desktop/mac/install/" class="uri">https://docs.docker.com/desktop/mac/install/</a></p>
+<p>Windows: If you do not have the WSL enabled or installed, following the instructions here: <a href="https://docs.microsoft.com/en-us/windows/wsl/install" class="uri">https://docs.microsoft.com/en-us/windows/wsl/install</a></p>
+<p>Then download and install Docker desktop for windows: <a href="https://docs.docker.com/desktop/windows/install/" class="uri">https://docs.docker.com/desktop/windows/install/</a></p>
+<p>Open the docker application to confirm installation.</p>
+<h1 id="how-to-run-a-docker-container">How to run a docker container</h1>
+<p>A docker <code>image</code> refers to the standarized software environment. A docker <code>container</code> is the copy of the image that is downloaded and run on a specific computer.</p>
+<p>If the docker application is running, then you should be able to run a docker container in the command line. Open up <code>Terminal</code> in <code>macOS</code> or <code>PowerShell</code> in windows.</p>
+<p>If you run the following command, an image with R and Rstudio installed (<code>rocker/tidyverse</code>) will be downloaded from <a href="https://hub.docker.com/u/rocker/#!"><code>dockerhub</code></a> and activated.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-e</span> PASSWORD=rna <span class="at">-p</span> 8787:8787 rocker/tidyverse</span></code></pre></div>
+<p>We’ll explain the other command arguments in a moment.</p>
+<p>You’ll see some messages that will look something like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Unable</span> to find image <span class="st">&#39;rocker/tidyverse:latest&#39;</span> locally</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">latest:</span> Pulling from rocker/tidyverse</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Status:</span> Downloaded newer image for rocker/verse:latest</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[s6-init]</span> making user provided files available at /var/run/s6/etc...exited 0.</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">[s6-init]</span> ensuring user provided files have correct perms...exited 0.</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">[fix-attrs.d]</span> applying ownership <span class="kw">&amp;</span> <span class="ex">permissions</span> fixes...</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">[fix-attrs.d]</span> done.</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">[cont-init.d]</span> executing container initialization scripts...</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">[cont-init.d]</span> userconf: executing...</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">skipping</span> /var/run/s6/container_environment/HOME</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">skipping</span> /var/run/s6/container_environment/PASSWORD</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">skipping</span> /var/run/s6/container_environment/RSTUDIO_VERSION</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">[cont-init.d]</span> userconf: exited 0.</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">[cont-init.d]</span> done.</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">[services.d]</span> starting services</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">[services.d]</span> done.</span></code></pre></div>
+<p>After running this command an rstudio instance will be running on your computer that you can access through your web browser. Open a browser and enter <code>http://</code>, followed by your ip address, followed by <code>:8787</code>. In you are on a linux or MacOS machine you can navigate to <code>http//localhost:8787</code>. If you do not know the IP address you can find it in a few ways.</p>
+<ol type="1">
+<li>If you select the container in the docker desktop app, you can directly open the container in a browser by clicking the <code>open in browser</code> button.</li>
+</ol>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/open-in-browser.png" width="1201" /></p>
+</div>
 <ol start="2" type="1">
-<li><a href="https://bioconductor.org/">Bioconductor</a>, which generally has bioinformatics related packages, such as clustifyr, DESeq2, ComplexHeatmap, etc.</li>
+<li>You can obtain the IP address from the command line.</li>
 </ol>
-<p>To install bioconductor packages you should use the CRAN package <code>BiocManager</code>. BiocManager has a function called <code>install()</code> to install bioconductor packages. For example to install <code>clustifyr</code></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BiocManager)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install</span>(<span class="st">&quot;clustifyr&quot;</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or equivalently you could run BiocManager::install(&quot;clustifyr&quot;)</span></span></code></pre></div>
-<ol start="3" type="1">
-<li><a href="https://github.com/">Github</a> hosts open-source code from millions of projects. R packages hosted on github can be installed using the <code>remotes</code> package. <code>Presto</code> or <code>djvdj</code> are examples of single cell RNA-seq analysis packages on github. You’ll need to find the organization name and the repository name on github to install.</li>
+<p>Get list of all of your containers using docker ps</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> ps</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">CONTAINER</span> ID   IMAGE          COMMAND   CREATED          STATUS          PORTS                                       NAMES</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">d2629b78er4f</span>   rocker/verse   <span class="st">&quot;/init&quot;</span>   14 minutes ago   Up 14 minutes   0.0.0.0:8787-<span class="op">&gt;</span>8787/tcp, :::8787-<span class="op">&gt;</span>8787/tcp   blissful_jepsen</span></code></pre></div>
+<p>Then use docker inspect get ip address using the value found under “CONTAINER ID”</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> inspect d2629b78er4f</span></code></pre></div>
+<p>Just get the ip-address</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> inspect <span class="at">--format</span><span class="op">=</span><span class="st">&#39;{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}&#39;</span> d2629b78er4f</span></code></pre></div>
+<p>Navigate to <code>http://Your.I.p.Address:8787</code></p>
+<p>You should see a Rstudio login page</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/rstudio-login.png" width="1206" /></p>
+</div>
+<p>Login to rstudio with username <code>rstudio</code> and password <code>rna</code>. You should see Rstudio running in your browser.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="img/rstudio-interface.png" width="1385" /></p>
+</div>
+<p>Once you are done playing around in rstudio you can stop the container by terminating the process in your terminal:</p>
+<p>Go back to your terminal and run CTRL + C in macOS or linux, or Ctrl+Break in Windows</p>
+<p>You’ll see a few more messages, then the command will exit back to your prompt</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">s6-finish]</span> waiting for services.</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[s6-finish]</span> sending all processes the TERM signal.</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">[s6-finish]</span> sending all processes the KILL signal and exiting.</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span></span></code></pre></div>
+<p>When you initiated the docker container we used the following command:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-e</span> PASSWORD=rna <span class="at">-p</span> 8787:8787 rocker/tidyverse</span></code></pre></div>
+<p>The <code>--rm</code> is a special flag that tells docker to delete the container after exiting. You can verify this occurred by looking at your containers in Docker Desktop or by runnning <code>docker ps</code> on the command line.</p>
+<p>The <code>--rm</code> option is a good way to start working with docker. If you don’t include this a new container will be made each time you execute <code>docker run</code> unless you provide different flags. This can quickly take up disk space if you are not careful so we recommend that you use <code>--rm</code> for now. The other advantage is this approach ensures that your R environment is restored to a clean environment each time you start the container.</p>
+<p>The <code>-e PASSWORD=rna</code> parameter specified that the password for logging into rstudio should be <code>rna</code>.</p>
+<p>The <code>-p 8787:8787</code> parameter specified that Rstudio should be served on the <code>8787</code> port.</p>
+<h1 id="how-to-use-and-create-files-on-your-local-computer">How to use and create files on your local computer</h1>
+<p>You may have noticed that you do not have access to local files in the rstudio instance by default. This is expected behavior as the docker container exists in an isolated environment for your local computer.</p>
+<p>If you want to provide rstudio access to a local directory to allow reading and writing local files do the following:</p>
+<ol type="1">
+<li><p>Find the path to a directory on your computer e.g. for the desktop on macOs use <code>~/Desktop</code> or for documents in windows <code>C:\Documents</code></p></li>
+<li><p>add the <code>-v</code> parameter which has the syntax <code>-v /path/to/local/directory:/path/in/container</code>. Because we are using <code>rstudio</code>, if we put files into the container at <code>/home/rstudio</code>, they will be visible to rstudio.</p></li>
 </ol>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;rnabioco/djvdj&#39;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&#39;immunogenomics/presto&#39;</span>)</span></code></pre></div>
-<h1 id="install-packages-for-workshop">Install packages for workshop</h1>
-<p>We will use the following packages:</p>
-<p>From CRAN:<br />
-- tidyverse<br />
-- Seurat<br />
-- rmarkdown<br />
-- cowplot<br />
-- colorblindr<br />
-- markdown</p>
+<p>Try it out: Here I am making my a class directory on my desktop (on a macOS) visible to rstudio. The class directory has 1 file called <code>hello-world.txt</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-v</span> ~/Desktop/class:/home/rstudio <span class="at">-e</span> PASSWORD=rna <span class="at">-p</span> 8787:8787 rocker/tidyverse</span></code></pre></div>
+<p>In Rstudio I can now see the <code>hello-world.txt</code> file, and if I make a new file in R called <code>docker-file.txt</code>, it will now be visible on my local computer, and persist after I exit docker.</p>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'tidyverse'</span>,
-                   <span class='st'>'rmarkdown'</span>,
-                   <span class='st'>'Seurat'</span>,
-                   <span class='st'>'cowplot'</span>,
-                   <span class='st'>'colorblindr'</span>,
-                   <span class='st'>'markdown'</span><span class='op'>)</span><span class='op'>)</span>
-</code></pre>
+<p><img src="img/docker-hello.png" width="1389" /></p>
 </div>
-</div>
-<p>From Bioconductor:<br />
-- ComplexHeatmap<br />
-- scran<br />
-- scDblFinder<br />
-- limma<br />
-- clustifyr<br />
-- slingshot<br />
-- tradeSeq</p>
+<p>Similarly you could write a R script or Rmarkdown document, run it in rstudio, then save the script into your local files for future reuse.</p>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>BiocManager</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/BiocManager/man/install.html'>install</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'ComplexHeatmap'</span>, 
-                       <span class='st'>'scran'</span>,
-                       <span class='st'>'scDblFinder'</span>,
-                       <span class='st'>'limma'</span>,
-                       <span class='st'>'clustifyr'</span>,
-                       <span class='st'>'slingshot'</span>,
-                       <span class='st'>'tradeSeq'</span><span class='op'>)</span><span class='op'>)</span>
-</code></pre>
+<p><img src="img/save-files-in-docker.png" width="1396" /></p>
 </div>
-</div>
-<p>From github:<br />
-- destiny (hosted on bioconductor typically but not building correctly right now)</p>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>remotes</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/remotes/man/install_github.html'>install_github</a></span><span class='op'>(</span><span class='st'>'theislab/destiny'</span><span class='op'>)</span>
-</code></pre>
-</div>
-</div>
-<p>If you’d like to test the installation, please run <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/docker/test.Rmd">this test Rmarkdown</a> hosted on github.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h1 id="using-docker-for-workshop">Using docker for workshop</h1>
+<p>We have a docker image available on dockerhub that includes the packages that will be used in the class.</p>
+<p><a href="https://hub.docker.com/r/kenter/rstudio-scrnaseq"><code>rstudio-scrnaseq</code></a></p>
+<p>You can use this image in the same manner as above, instead using <code>kenter/rstudio-scrnaseq</code>.</p>
+<p>Try it out:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-e</span> PASSWORD=rna <span class="at">-p</span> 8787:8787 kenter/rstudio-scrnaseq</span></code></pre></div>
+<p>When you open rstudio you should be able to load <code>Seurat</code> and other single cell packages. We’ve also included a <code>test.Rmd</code> document that lists and loads all of the relevant installed packages, and tests basic Seurat commands.</p>
+<h1 id="additional-resources">Additional resources</h1>
+<p>If you’ve never used docker here are some useful tutorials on using docker:</p>
+<p><a href="https://bioconductor.org/help/docker/#quickstart" class="uri">https://bioconductor.org/help/docker/#quickstart</a><br />
+<a href="https://jsta.github.io/r-docker-tutorial/" class="uri">https://jsta.github.io/r-docker-tutorial/</a><br />
+<a href="https://replikation.github.io/bioinformatics_side/docker/docker/#important-commands" class="uri">https://replikation.github.io/bioinformatics_side/docker/docker/#important-commands</a></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
