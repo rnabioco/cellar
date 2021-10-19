@@ -20,7 +20,7 @@ output:
 draft: true
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   message     = FALSE,
   warning     = FALSE,
@@ -82,7 +82,6 @@ CITEseq_cDNA.csv.gz: UMI count gene expression data
 CITEseq_ADT.csv.gz: Antibody count data
 CITEseq_HTO.csv.gz: Hashtag count data 
 
-
 ```{r "Load data"}
 # Data URL
 data_url <- "https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"
@@ -91,7 +90,7 @@ data_url <- "https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"
 import_counts <- function(file_name, file_url = data_url) {
   mtx <- file.path(file_url, file_name) %>%
     read_csv() %>%
-    column_to_rownames("...1") %>%
+    column_to_rownames("X1") %>%
     as.sparse()
 
   mtx
@@ -110,7 +109,6 @@ adt_mtx[, 1:10]
 hto_mtx <- import_counts("CITEseq_HTO.csv.gz")
 
 hto_mtx[, 1:10]
-
 ```
 
 ### Creating a Seurat object
@@ -118,26 +116,27 @@ hto_mtx[, 1:10]
 When adding multiple assays to a Seurat object, we first must identify cell barcodes that are present in all of the datasets. If one of the assays has a different number of cell barcodes Seurat will throw an error.
 
 ```{r "Create Seurat object"}
-
 # Get list of common cell barcodes
 rna_bcs <- colnames(rna_mtx)
 adt_bcs <- colnames(adt_mtx)
 hto_bcs <- colnames(hto_mtx)
 
-merged_bcs <-  intersect(rna_bcs, adt_bcs) %>%
+merged_bcs <- rna_bcs %>%
+  intersect(adt_bcs) %>%
   intersect(hto_bcs)
 
 # Create Seurat object
-sobj <-  CreateSeuratObject(rna_mtx[, merged_bcs], 
-                            min.cells = 5)
+sobj <-  CreateSeuratObject(
+  counts    = rna_mtx[, merged_bcs], 
+  min.cells = 5
+)
 
 # Add CITE-seq and cell hashing data to Seurat object
-sobj[["ADT"]] <-  CreateAssayObject(adt_mtx[, merged_bcs])
+sobj[["ADT"]] <- CreateAssayObject(adt_mtx[, merged_bcs])
 
 sobj[["HTO"]] <- CreateAssayObject(hto_mtx[, merged_bcs])
   
 sobj
-
 ```
 
 <br>
@@ -146,7 +145,7 @@ sobj
 
 ## Demultiplexing hashed samples
 
-We will first use the cell hashing data to assign cells to their sample of origin. This is referred to as demuliplexing as we are using the cell hashing antibody barcodes to assign each cell to a sample. 
+We will first use the cell hashing data to assign cells to their sample of origin. This is referred to as demultiplexing as we are using the cell hashing antibody barcodes to assign each cell to a sample. 
 
 ### Normalizing HTO counts
 
@@ -155,14 +154,12 @@ To account for differences in antibody binding efficiencies, CITE-seq and cell h
 Note that the best approach for normalizing CITE-seq data has not been settled. For a more detailed discussion, and alternative approaches, see the Normalization chapter from the [Orchestrating Single Cell Analysis eBook](https://bioconductor.org/books/release/OSCA/integrating-with-protein-abundance.html#normalization-1) from Bioconductor.
 
 ```{r "Normalize HTO counts"}
-
 # Normalize HTO counts
 sobj <- sobj %>%
   NormalizeData(
     assay = "HTO",
     normalization.method = "CLR"
   )
-
 ```
 
 ### Sample demultiplexing and identification of doublets
@@ -177,74 +174,68 @@ The `HTODemux` function automatically adds several columns to the meta.data tabl
 * HTO_classification.global: singlet classification (singlet, doublet, negative)
 * hash.ID: final HTO assignment including doublet and negative classifications
 
-```{r "Demultiplex samples", fig.width = 8, fig.height = 6}
-
+```{r "Demultiplex samples", fig.width = 11, fig.height = 8}
 # Demultiplex samples
 # By default HTODemux will look for the "HTO" assay
-sobj <-  HTODemux(sobj, positive.quantile = 0.97)
+sobj <- sobj %>%
+  HTODemux(positive.quantile = 0.97)
 
-head(sobj@meta.data)
+head(sobj@meta.data, 5)
 
 # Summarize cell classifications
 table(sobj$HTO_classification.global)
 
 # Create ridge plots showing HTO signal
-RidgePlot(sobj,
-          assay    = "HTO",
-          features = rownames(hto_mtx),
-          ncol     = 2
-)
-
+sobj %>%
+  RidgePlot(
+    assay    = "HTO",
+    features = rownames(hto_mtx),
+    ncol     = 2
+  )
 ```
 
 ### Compare the number of cells with each hash.ID and calculate the doublet rate
 
-```{r echo = FALSE, fig.width = 7, fig.height = 4}
-
+```{r fig.width = 9, fig.height = 5, echo = FALSE}
 # Calculate doublet rate
 sobj@meta.data %>%
   group_by(hash.ID) %>% 
-  summarize(fract = n() / nrow(.))
+  summarize(
+    n     = n(),
+    fract = n / nrow(.)
+  )
 
 # Create bar graphs comparing cell count for each sample
-HTO_bars_1 <- sobj@meta.data %>%
-  rownames_to_column("cell_id") %>%
-  
-  ggplot(aes(hash.ID, fill = hash.ID)) +
-  geom_bar() +
-  labs(y = "Cell Count") +
-  cowplot::theme_cowplot() +
+dat <- sobj@meta.data %>%
+  rownames_to_column("cell_id")
+
+hto_theme <- cowplot::theme_cowplot() +
   theme(
     legend.position = "none",
     axis.title.x    = element_blank(),
     axis.text.x     = element_text(hjust = 1, angle = 45)
   )
 
-# Create stacked bar graph showing fraction of cells
-HTO_bars_2 <- sobj@meta.data %>%
-  rownames_to_column("cell_id") %>%
-  group_by(hash.ID) %>%
-  summarize(hash_frac = n() / nrow(.)) %>%
-  
-  ggplot(aes("CITE-seq", hash_frac, fill = hash.ID)) +
-  geom_bar(stat = "identity", color = "white", size = 0.5) +
-  labs(y = "Fraction of Cells") +
-  cowplot::theme_cowplot() +
-  theme(
-    legend.title = element_blank(),
-    axis.title.x = element_blank(),
-    axis.text.x  = element_blank(),
-    axis.ticks.x = element_blank()
-  )
+bars_1 <- dat %>%
+  ggplot(aes(hash.ID, fill = hash.ID)) +
+  geom_bar() +
+  labs(y = "cell count") +
+  hto_theme
+
+bars_2 <- dat %>%
+  ggplot(aes("PBMC", fill = hash.ID)) +
+  geom_bar() +
+  labs(y = "cell count") +
+  hto_theme +
+  theme(legend.position = "right")
 
 # Combine plots
 plot_grid(
-  HTO_bars_1, HTO_bars_2,
+  bars_1, bars_2,
+  align       = "h",
   nrow        = 1,
-  rel_widths  = c(0.5, 0.5),
-  rel_heights = c(1, 0.8)
+  rel_widths  = c(1, 0.6)
 )
-
 ```
 
 <br>
@@ -257,8 +248,7 @@ Now that we have assigned each cell to the appropriate sample we can continue wi
 
 ### Assessing data quality
 
-```{r "Create RNA violin plots", fig.width = 8, fig.height = 4}
-
+```{r "Create RNA violin plots", fig.width = 11, fig.height = 5}
 # Add mitochondrial percentage to meta.data table
 sobj <- sobj %>%
   PercentageFeatureSet(
@@ -272,32 +262,28 @@ sobj %>%
   VlnPlot(
     features = c("nCount_RNA", "nFeature_RNA", "percent_mito"), 
     ncol     = 3,
-    pt.size  = 0.25
+    pt.size  = 0
   )
-
 ```
 
-```{r "Create ADT and HTO violin plots", fig.width = 6, fig.height = 4}
-
+```{r "Create ADT and HTO violin plots", fig.width = 8, fig.height = 5}
 # Aim to sequence CITE-seq libraries at 2k-5k reads/cell, cell hashing 1k-2k reads/cell
-
 sobj %>%
   VlnPlot(
     features = c("nCount_ADT", "nCount_HTO"),
     ncol    = 2,
-    pt.size = 0.25,
-    log     = T
+    pt.size = 0,
+    log     = TRUE
   )
-
 ```
 
 ```{r "Filter cells"}
-
 # Filter cells based on HTO class, number of genes, and percent mito UMIs
-filt_so <-  subset(sobj,
-    nFeature_RNA > 250 &   # Remove cells with < 250 detected genes
-    nFeature_RNA < 2500 &  # Remove cells with > 2500 detected genes (could be doublets)
-    percent_mito < 15 &    # Remove cells with > 0.15 mito/total reads
+filt_so <-  sobj %>%
+  subset(
+    nFeature_RNA > 250 &                    # Remove cells with < 250 detected genes
+    nFeature_RNA < 2500 &                   # Remove cells with > 2500 detected genes (could be doublets)
+    percent_mito < 15 &                     # Remove cells with > 0.15 mito/total reads
     HTO_classification.global == "Singlet"
   )
 
@@ -313,14 +299,9 @@ filt_so <- filt_so %>%
   )
 
 # Add sample names to meta.data table
-filt_so <- filt_so %>%
-  AddMetaData(
-    metadata = Idents(filt_so),
-    col.name = "sample"
-  )
+filt_so$sample <- Idents(filt_so)
 
-head(filt_so@meta.data)
-
+head(filt_so@meta.data, 5)
 ```
 
 <br>
@@ -332,20 +313,26 @@ head(filt_so@meta.data)
 Like the cell hashing data, CITE-seq counts can be normalized by performing a centered log-ratio transformation.
 
 ```{r "Normalize data", results = FALSE}
-
 # Normalize expression data
-filt_so <-  NormalizeData(filt_so,
-                          normalization.method = "LogNormalize",
-                          verbose = FALSE) %>%
+filt_so <-  filt_so %>%
+  NormalizeData(
+    normalization.method = "LogNormalize",
+    verbose = FALSE
+  ) %>%
   FindVariableFeatures(verbose = FALSE) %>%
   ScaleData(verbose = FALSE)
 
 # Normalize CITE-seq data
-filt_so <-  NormalizeData(filt_so,
-                          assay = "ADT",
-                          normalization.method = "CLR") %>%  
-  ScaleData(assay = "ADT", verbose = FALSE)
-
+filt_so <-  filt_so %>%
+  NormalizeData(
+    assay                = "ADT",
+    normalization.method = "CLR",
+    verbose              = FALSE
+  ) %>%  
+  ScaleData(
+    assay   = "ADT",
+    verbose = FALSE
+  )
 ```
 
 <br>
@@ -356,40 +343,52 @@ filt_so <-  NormalizeData(filt_so,
 
 ### Perform pricipal component analysis
 
-```{r "Perform PCA", fig.width = 10, fig.height = 4}
-
+```{r "Perform PCA", fig.width = 11.5, fig.height = 5}
 # Perform PCA
-filt_so <-  RunPCA(filt_so, verbose = FALSE)       # By default only variable features are used for PCA, uses only the RNA data
+# By default only variable features are used for PCA, this uses only the RNA data
+filt_so <- filt_so %>%
+  RunPCA(verbose = FALSE)
 
 # Plot standard deviations of principal components
-elbow_plot <- ElbowPlot(filt_so, ndims = 50)
+elbow_plot <- filt_so %>%
+  ElbowPlot(ndims = 50)
 
 # Create scatter plot comparing PC-1 and PC-2
-PCA_plot <- DimPlot(filt_so, reduction = "pca")
+pca_plot <- filt_so %>%
+  DimPlot(reduction = "pca")
 
-plot_grid(elbow_plot, PCA_plot,
-          nrow = 1,
-          rel_widths = c(0.45, 0.55))
-
+plot_grid(
+  elbow_plot, pca_plot,
+  nrow       = 1,
+  rel_widths = c(0.45, 0.55)
+)
 ```
 
 ### Cluster cells using gene expression data
 
-```{r "Cluster cells and run UMAP"}
-
+```{r "Cluster cells and run UMAP", fig.width = 6, fig.height = 5}
 # Cluster cells
-filt_so <- FindNeighbors(filt_so, dims = 1:20) %>%
-  FindClusters(resolution = 0.6, verbose = FALSE)
+filt_so <- filt_so %>%
+  FindNeighbors(dims = 1:20) %>%
+  FindClusters(
+    resolution = 0.2,
+    verbose    = FALSE
+  )
 
-# Store clusters as RNA clusters in meta.data for clarity 
-filt_so@meta.data$RNA_clusters <- filt_so@meta.data$RNA_snn_res.0.6 
+# For clarity store clusters in meta.data as RNA_clusters
+filt_so$RNA_clusters <- filt_so$RNA_snn_res.0.2
 
 # Run UMAP
 # Use same PCs as clustering, by default reduction = "pca"
-filt_so <- RunUMAP(filt_so, dims = 1:20)
+filt_so <- filt_so %>%
+  RunUMAP(dims = 1:20)
 
 # Create UMAP
-DimPlot(filt_so, reduction = "umap", group.by = "RNA_clusters")
+filt_so %>%
+  DimPlot(
+    reduction = "umap",
+    group.by  = "RNA_clusters"
+  )
 ```
 
 <br>
@@ -402,53 +401,58 @@ DimPlot(filt_so, reduction = "umap", group.by = "RNA_clusters")
 
 Since there are only a few antibodies and not many dimensions, instead of performing PCA we can just use the scaled matrix for clustering directly. In contrast to the gene expression data, we have already done feature selection and dimensionality reduction by choosing (for very practical reasons) to only stain cells with a few antibodies that discriminate cell populations. However, if you stained cells with many (>100s) antibodies, then you may want to select variable antibodies, and use PCA for clustering.
 
-We will directly pass the `scaled.data` matrix from the ADT assay to the  `FindNeighbors` function, which creates a Shared Nearest Neighbor (SNN) graph that is used for clustering.
+We will directly pass the `scaled.data` matrix from the ADT assay to the `FindNeighbors` function, which creates a Shared Nearest Neighbor (SNN) graph that is used for clustering.
 
 ```{r "Cluster cells using antibody data", results = FALSE}
+filt_so <- filt_so %>%
+  FindNeighbors(
+    assay      = "ADT",
+    features   = rownames(filt_so@assays$ADT),
+    graph.name = "ADT_snn"
+  )
 
-filt_so <- FindNeighbors(filt_so,
-                         assay = "ADT", 
-                         features = rownames(filt_so@assays$ADT),
-                         graph.name = "ADT_snn")
+filt_so <- filt_so %>%
+  FindClusters(
+    resolution = 0.2,
+    graph.name = "ADT_snn"
+  )
 
-filt_so <- FindClusters(filt_so,
-                        resolution = 0.2,
-                        graph.name = "ADT_snn")
-
-filt_so@meta.data$ADT_clusters <- filt_so@meta.data$ADT_snn_res.0.2
-
+# For clarity store clusters in meta.data as ADT_clusters
+filt_so$ADT_clusters <- filt_so$ADT_snn_res.0.2
 ```
 
-### Run UMAP using the antibody signal
+### Run UMAP using antibody signal
 
-
-```{r "Run UMAP for antibody data"}
-
+```{r "Run UMAP for antibody data", fig.width = 11.5, fig.height = 5}
 # Run UMAP
-filt_so <- RunUMAP(filt_so,
-                   assay = "ADT",
-                   features = rownames(filt_so@assays$ADT),
-                   reduction.name = "adt_umap",
-                   reduction.key = "ADTUMAP_")
+filt_so <- filt_so %>%
+  RunUMAP(
+    assay          = "ADT",
+    graph          = "ADT_snn",
+    reduction.name = "adt_umap",
+    reduction.key  = "ADTUMAP_"
+  )
 
 # Plot UMAPs
-DimPlot(filt_so,
+filt_so %>%
+  DimPlot(
     reduction = "adt_umap", 
-    group.by = c("sample", "ADT_clusters"),
-    ncol = 2)
+    group.by  = c("sample", "ADT_clusters"),
+    ncol      = 2
+  )
 ```
 
 ### Identify marker proteins
 
 ```{r echo = FALSE}
-
 # Identify differentially expressed proteins for each cluster
-ADT_markers <-  FindAllMarkers(filt_so,
-                               assay    = "ADT",
-                               only.pos = T)
+ADT_markers <- filt_so %>%
+  FindAllMarkers(
+    assay    = "ADT",
+    only.pos = TRUE
+  )
 
 ADT_markers
-
 ```
 
 <br>
@@ -459,7 +463,7 @@ ADT_markers
 
 ### Overlay antibody signal on UMAPs
 
-```{r "Overlay antibody signal on UMAPs", fig.width = 10, fig.height = 8}
+```{r "Overlay antibody signal on UMAPs", fig.width = 10, fig.height = 8.5}
 # Set active.assay to ADT
 filt_so@active.assay <- "ADT"
 
@@ -476,13 +480,11 @@ filt_so %>%
     reduction = "adt_umap",
     features  = c("adt-CD4", "CD4", "adt-CD8", "CD8A")
   )
-
 ```
 
 ### Ridge plots
 
-```{r "Create ridge plots", fig.width = 10, fig.height = 6}
-
+```{r "Create ridge plots", fig.width = 15, fig.height = 8}
 # Create ridge plot
 filt_so %>%
   RidgePlot(features = c(
@@ -490,19 +492,16 @@ filt_so %>%
     "adt-CD19", "adt-CD3",  
     "adt-CD4",  "adt-CD8"
   ))
-
 ```
 
 ### Violin plots
 
 ```{r "Create violinplots", fig.width = 8, fig.height = 8}
-
 filt_so %>%
   VlnPlot(
     features = c("adt-CD4", "rna_CD4", "adt-CD19", "rna_CD19"),
     ncol = 2
   )
-
 ```
 
 <br>
@@ -517,14 +516,13 @@ We can use 2-d scatterplots to derive "gates" to assign cell types in the same m
 
 CD19 is a marker of B-cells, whereas CD3 is a marker of T-cells. We can compare their expression to classify B-cells. 
 
-```{r "Filter using antibody signal"}
-
+```{r "Filter using antibody signal", fig.width = 6, fig.height = 5}
 # Plot CD3 and CD19 signal
-FeatureScatter(filt_so, "adt-CD3", "adt-CD19")
-
+filt_so %>%
+  FeatureScatter("adt-CD3", "adt-CD19")
 ```
 
-```{r}
+```{r, fig.width = 6, fig.height = 5}
 # Identify CD19+ cells using antibody signal
 CD19_cells <- filt_so %>%
   subset(`adt-CD19` > 2.5 & `adt-CD3` < 1) %>%
@@ -540,14 +538,13 @@ labeled_so <- filt_so %>%
 head(labeled_so@active.ident)
 
 # Label UMAP with new cell identities
-DimPlot(labeled_so, reduction = "adt_umap")
-
+labeled_so %>%
+  DimPlot(reduction = "adt_umap")
 ```
 
 ### Filter cells using CellSelector()
 
 ```{r "Filter using CellSelector()", eval = FALSE}
-
 # Plot CD3 and CD19 signal
 CD19_plot <- filt_so %>%
   FeatureScatter("adt-CD3", "adt-CD19")
@@ -570,19 +567,17 @@ labeled_so@active.ident %>%
 # Label UMAP with new cell identities
 labeled_so %>%
   DimPlot(reduction = "adt_umap")
-
 ```
 
 ### Identify CD4+ and CD8+ cells
 
-```{r}
-
+```{r, fig.width = 6, fig.height = 5}
 # Compare CD3 and CD19 signal
-FeatureScatter(filt_so, "adt-CD4", "adt-CD8")
-
+filt_so %>%
+  FeatureScatter("adt-CD4", "adt-CD8")
 ```
 
-```{r}
+```{r, fig.width = 6, fig.height = 5}
 # Identify CD4+ and CD8+ cells using antibody signal
 CD4_cells <- labeled_so %>%
   subset(`adt-CD4` > 2.5 & `adt-CD8` < 1) %>%
@@ -598,10 +593,11 @@ labeled_so <- labeled_so %>%
   SetIdent(value = "CD8+", cells = CD8_cells)
 
 # Add cell identities to meta.data table
-labeled_so@meta.data$cell_label <- Idents(labeled_so)
+labeled_so$cell_label <- Idents(labeled_so)
 
 # Label UMAP with new cell identities
-DimPlot(labeled_so, reduction = "adt_umap")
+labeled_so %>%
+  DimPlot(reduction = "adt_umap")
 ```
 
 <br>
@@ -610,25 +606,33 @@ DimPlot(labeled_so, reduction = "adt_umap")
 
 ## Examine CITE-seq derived cell labels on gene expression umap
 
-```{r}
-DimPlot(labeled_so, 
-        reduction = "umap",
-        group.by = "cell_label")
+```{r, fig.width = 6, fig.height = 5}
+labeled_so %>%
+  DimPlot( 
+    reduction = "umap",
+    group.by  = "cell_label"
+  )
 ```
 
-```{r,  fig.width = 10, fig.height = 8}
+```{r,  fig.width = 10, fig.height = 13}
+feats <- c(
+  "adt-CD4", "CD4",
+  "adt-CD8", "CD8A", 
+  "adt-CD19", "CD19"
+)
+
 filt_so %>%
   FeaturePlot(
     reduction = "umap",
-    features  = c("adt-CD4", "CD4",
-                  "adt-CD8", "CD8A", 
-                  "adt-CD19", "CD19")
+    features  = feats
   )
-
 ```
 
+<br>
 
-## How to combine antibody and RNA data for clustering and UMAP?
+<br>
+
+## Combining CITE-seq and gene expression data
 
 The authors of Seurat have implemented a new algorithm for combined data from different types of assays (e.g. antibody data and RNA data), described in a [preprint](https://www.biorxiv.org/content/10.1101/2020.10.12.335331v1) and presented in a  [vignette](https://satijalab.org/seurat/v4.0/weighted_nearest_neighbor_analysis.html).
 
@@ -639,35 +643,39 @@ We could literally just merge the two datasets together then run them through Se
 Seurat has implemented a "Weighted Nearest Neighbor" approach that will combine the nearest neighbor graphs from the RNA data with the antibody data. The algorithm will calculate relative weights for the RNA or the Protein data for each cell and use these new weights to constuct a shared graph. The related weights are calculated based on the relative information content of neighboring cells in each modalitly. So if the data from 1 modality provides more information, then it is weighted higher. 
 
 ```{r}
-# need to use PCA on the antibody data
-labeled_so <- RunPCA(labeled_so, 
-                     assay = "ADT", 
-                     features = rownames(labeled_so@assays$ADT),
-                     reduction.name = 'apca')
+# Need to run PCA on the antibody data
+labeled_so <- labeled_so %>%
+  RunPCA( 
+    assay          = "ADT", 
+    features       = rownames(labeled_so@assays$ADT),
+    reduction.name = 'apca'
+  )
 
-labeled_so <- FindMultiModalNeighbors(labeled_so, 
-                                      reduction.list = list("pca",
-                                                            "apca"), 
-                                      dims.list = list(1:20,
-                                                       1:6),
-                                      modality.weight.name = "RNA.weight")
+labeled_so <- labeled_so %>%
+  FindMultiModalNeighbors(
+    reduction.list       = list("pca", "apca"), 
+    dims.list            = list(1:20, 1:6),
+    modality.weight.name = "RNA.weight"
+  )
 
-labeled_so <- RunUMAP(labeled_so, 
-                      nn.name = "weighted.nn", 
-                      reduction.name = "wnn.umap", 
-                      reduction.key = "wnnUMAP_")
+labeled_so <- labeled_so %>%
+  RunUMAP(
+    nn.name        = "weighted.nn", 
+    reduction.name = "wnn.umap", 
+    reduction.key  = "wnnUMAP_"
+  )
 ```
 
-```{r, fig.width = 15, fig.height = 5}
-rna_umap <- DimPlot(labeled_so, reduction = "umap")
-adt_umap <- DimPlot(labeled_so, reduction = "adt_umap")
+```{r, fig.width = 18, fig.height = 5}
+rna_umap  <- DimPlot(labeled_so, reduction = "umap")
+adt_umap  <- DimPlot(labeled_so, reduction = "adt_umap")
 both_umap <- DimPlot(labeled_so, reduction = "wnn.umap")
 
-plot_grid(rna_umap,
-          adt_umap,
-          both_umap,
-          labels = c("RNA", "ADT", "Both"),
-          ncol = 3)
+plot_grid(
+  rna_umap, adt_umap, both_umap,
+  labels = c("RNA", "ADT", "Both"),
+  ncol   = 3
+)
 ```
 
 <br>

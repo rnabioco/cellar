@@ -20,19 +20,19 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -52,11 +52,11 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { color: #20794d; } /* Attribute */
+code span.at { } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
 code span.cf { color: #007ba5; } /* ControlFlow */
@@ -77,7 +77,7 @@ code span.kw { color: #007ba5; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
 code span.ot { color: #007ba5; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
-code span.sc { color: #20794d; } /* SpecialChar */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
 code span.st { color: #20794d; } /* String */
 code span.va { color: #111111; } /* Variable */
@@ -85,78 +85,79 @@ code span.vs { color: #20794d; } /* VerbatimString */
 code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
+
   <!--radix_placeholder_meta_tags-->
   <title>Working with Multi-modal data</title>
-
+  
   <meta property="description" itemprop="description" content="A short description of the post."/>
-
-
+  
+  
   <!--  https://schema.org/Article -->
   <meta property="article:published" itemprop="datePublished" content="2021-10-13"/>
   <meta property="article:created" itemprop="dateCreated" content="2021-10-13"/>
   <meta name="article:author" content="Kent Riemondy"/>
   <meta name="article:author" content="Ryan Sheridan"/>
-
+  
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
   <meta property="og:title" content="Working with Multi-modal data"/>
   <meta property="og:type" content="article"/>
   <meta property="og:description" content="A short description of the post."/>
   <meta property="og:locale" content="en_US"/>
-
+  
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
   <meta property="twitter:title" content="Working with Multi-modal data"/>
   <meta property="twitter:description" content="A short description of the post."/>
-
+  
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
-
+  
   <script type="text/json" id="radix-rmarkdown-metadata">
   {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","draft"]}},"value":[{"type":"character","attributes":{},"value":["Working with Multi-modal data"]},{"type":"character","attributes":{},"value":["A short description of the post.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]},{"type":"character","attributes":{},"value":["https://github.com/kriemo"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-0750-1273"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Ryan Sheridan"]},{"type":"character","attributes":{},"value":["https://github.com/sheridar"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-4012-3147"]}]}]},{"type":"character","attributes":{},"value":["10-13-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[true]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["multi-modal_files/anchor-4.2.2/anchor.min.js","multi-modal_files/bowser-1.9.3/bowser.min.js","multi-modal_files/distill-2.2.21/template.v2.js","multi-modal_files/figure-html5/Cluster cells and run UMAP-1.png","multi-modal_files/figure-html5/Create ADT and HTO violin plots-1.png","multi-modal_files/figure-html5/Create ridge plots-1.png","multi-modal_files/figure-html5/Create RNA violin plots-1.png","multi-modal_files/figure-html5/Create violinplots-1.png","multi-modal_files/figure-html5/Demultiplex samples-1.png","multi-modal_files/figure-html5/Filter using antibody signal-1.png","multi-modal_files/figure-html5/Overlay antibody signal on UMAPs-1.png","multi-modal_files/figure-html5/Overlay antibody signal on UMAPs-2.png","multi-modal_files/figure-html5/Perform PCA-1.png","multi-modal_files/figure-html5/Run UMAP for antibody data-1.png","multi-modal_files/figure-html5/unnamed-chunk-1-1.png","multi-modal_files/figure-html5/unnamed-chunk-10-1.png","multi-modal_files/figure-html5/unnamed-chunk-2-1.png","multi-modal_files/figure-html5/unnamed-chunk-3-1.png","multi-modal_files/figure-html5/unnamed-chunk-4-1.png","multi-modal_files/figure-html5/unnamed-chunk-5-1.png","multi-modal_files/figure-html5/unnamed-chunk-6-1.png","multi-modal_files/figure-html5/unnamed-chunk-7-1.png","multi-modal_files/figure-html5/unnamed-chunk-8-1.png","multi-modal_files/figure-html5/unnamed-chunk-9-1.png","multi-modal_files/header-attrs-2.11/header-attrs.js","multi-modal_files/jquery-3.6.0/jquery-3.6.0.js","multi-modal_files/jquery-3.6.0/jquery-3.6.0.min.js","multi-modal_files/jquery-3.6.0/jquery-3.6.0.min.map","multi-modal_files/popper-2.6.0/popper.min.js","multi-modal_files/tippy-6.2.7/tippy-bundle.umd.min.js","multi-modal_files/tippy-6.2.7/tippy-light-border.css","multi-modal_files/tippy-6.2.7/tippy.css","multi-modal_files/tippy-6.2.7/tippy.umd.min.js","multi-modal_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["multi-modal_files/anchor-4.2.2/anchor.min.js","multi-modal_files/bowser-1.9.3/bowser.min.js","multi-modal_files/distill-2.2.21/template.v2.js","multi-modal_files/figure-html5/Cluster cells and run UMAP-1.png","multi-modal_files/figure-html5/Create ADT and HTO violin plots-1.png","multi-modal_files/figure-html5/Create ridge plots-1.png","multi-modal_files/figure-html5/Create RNA violin plots-1.png","multi-modal_files/figure-html5/Create violinplots-1.png","multi-modal_files/figure-html5/Demultiplex samples-1.png","multi-modal_files/figure-html5/Filter using antibody signal-1.png","multi-modal_files/figure-html5/Overlay antibody signal on UMAPs-1.png","multi-modal_files/figure-html5/Overlay antibody signal on UMAPs-2.png","multi-modal_files/figure-html5/Perform PCA-1.png","multi-modal_files/figure-html5/Run UMAP for antibody data-1.png","multi-modal_files/figure-html5/unnamed-chunk-1-1.png","multi-modal_files/figure-html5/unnamed-chunk-10-1.png","multi-modal_files/figure-html5/unnamed-chunk-2-1.png","multi-modal_files/figure-html5/unnamed-chunk-3-1.png","multi-modal_files/figure-html5/unnamed-chunk-4-1.png","multi-modal_files/figure-html5/unnamed-chunk-5-1.png","multi-modal_files/figure-html5/unnamed-chunk-6-1.png","multi-modal_files/figure-html5/unnamed-chunk-7-1.png","multi-modal_files/figure-html5/unnamed-chunk-8-1.png","multi-modal_files/figure-html5/unnamed-chunk-9-1.png","multi-modal_files/header-attrs-2.11/header-attrs.js","multi-modal_files/jquery-3.5.1/AUTHORS.txt","multi-modal_files/jquery-3.5.1/jquery-1.12.4.js","multi-modal_files/jquery-3.5.1/jquery-1.12.4.min.js","multi-modal_files/jquery-3.5.1/jquery-1.12.4.min.map","multi-modal_files/jquery-3.5.1/jquery-2.2.4.js","multi-modal_files/jquery-3.5.1/jquery-2.2.4.min.js","multi-modal_files/jquery-3.5.1/jquery-2.2.4.min.map","multi-modal_files/jquery-3.5.1/jquery-3.5.1.js","multi-modal_files/jquery-3.5.1/jquery-3.5.1.min.js","multi-modal_files/jquery-3.5.1/jquery-3.5.1.min.map","multi-modal_files/jquery-3.5.1/LICENSE.txt","multi-modal_files/jquery-3.6.0/jquery-3.6.0.js","multi-modal_files/jquery-3.6.0/jquery-3.6.0.min.js","multi-modal_files/jquery-3.6.0/jquery-3.6.0.min.map","multi-modal_files/popper-2.6.0/popper.min.js","multi-modal_files/tippy-6.2.7/tippy-bundle.umd.min.js","multi-modal_files/tippy-6.2.7/tippy-light-border.css","multi-modal_files/tippy-6.2.7/tippy.css","multi-modal_files/tippy-6.2.7/tippy.umd.min.js","multi-modal_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
   <!--radix_placeholder_distill-->
-
+  
   <style type="text/css">
-
+  
   body {
     background-color: white;
   }
-
+  
   .pandoc-table {
     width: 100%;
   }
-
+  
   .pandoc-table>caption {
     margin-bottom: 10px;
   }
-
+  
   .pandoc-table th:not([align]) {
     text-align: left;
   }
-
+  
   .pagedtable-footer {
     font-size: 15px;
   }
-
+  
   d-byline .byline {
     grid-template-columns: 2fr 2fr;
   }
-
+  
   d-byline .byline h3 {
     margin-block-start: 1.5em;
   }
-
+  
   d-byline .byline .authors-affiliations h3 {
     margin-block-start: 0.5em;
   }
-
+  
   .authors-affiliations .orcid-id {
     width: 16px;
     height:16px;
@@ -165,12 +166,12 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     vertical-align: middle;
     padding-bottom: 2px;
   }
-
+  
   d-title .dt-tags {
     margin-top: 1em;
     grid-column: text;
   }
-
+  
   .dt-tags .dt-tag {
     text-decoration: none;
     display: inline-block;
@@ -184,24 +185,24 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     text-transform: uppercase;
     font-weight: 500;
   }
-
+  
   d-article table.gt_table td,
   d-article table.gt_table th {
     border-bottom: none;
   }
-
+  
   .html-widget {
     margin-bottom: 2.0em;
   }
-
+  
   .l-screen-inset {
     padding-right: 16px;
   }
-
+  
   .l-screen .caption {
     margin-left: 10px;
   }
-
+  
   .shaded {
     background: rgb(247, 247, 247);
     padding-top: 20px;
@@ -209,75 +210,75 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
-
+  
   .shaded .html-widget {
     margin-bottom: 0;
     border: 1px solid rgba(0, 0, 0, 0.1);
   }
-
+  
   .shaded .shaded-content {
     background: white;
   }
-
+  
   .text-output {
     margin-top: 0;
     line-height: 1.5em;
   }
-
+  
   .hidden {
     display: none !important;
   }
-
+  
   d-article {
     padding-top: 2.5rem;
     padding-bottom: 30px;
   }
-
+  
   d-appendix {
     padding-top: 30px;
   }
-
+  
   d-article>p>img {
     width: 100%;
   }
-
+  
   d-article h2 {
     margin: 1rem 0 1.5rem 0;
   }
-
+  
   d-article h3 {
     margin-top: 1.5rem;
   }
-
+  
   d-article iframe {
     border: 1px solid rgba(0, 0, 0, 0.1);
     margin-bottom: 2.0em;
     width: 100%;
   }
-
+  
   /* Tweak code blocks */
-
+  
   d-article div.sourceCode code,
   d-article pre code {
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   }
-
+  
   d-article pre,
   d-article div.sourceCode,
   d-article div.sourceCode pre {
     overflow: auto;
   }
-
+  
   d-article div.sourceCode {
     background-color: white;
   }
-
+  
   d-article div.sourceCode pre {
     padding-left: 10px;
     font-size: 12px;
     border-left: 2px solid rgba(0,0,0,0.1);
   }
-
+  
   d-article pre {
     font-size: 12px;
     color: black;
@@ -289,50 +290,50 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     word-break: normal;
     word-wrap: normal;
     line-height: 1.5;
-
+  
     -moz-tab-size: 4;
     -o-tab-size: 4;
     tab-size: 4;
-
+  
     -webkit-hyphens: none;
     -moz-hyphens: none;
     -ms-hyphens: none;
     hyphens: none;
   }
-
+  
   d-article pre a {
     border-bottom: none;
   }
-
+  
   d-article pre a:hover {
     border-bottom: none;
     text-decoration: underline;
   }
-
+  
   d-article details {
     grid-column: text;
     margin-bottom: 0.8em;
   }
-
+  
   @media(min-width: 768px) {
-
+  
   d-article pre,
   d-article div.sourceCode,
   d-article div.sourceCode pre {
     overflow: visible !important;
   }
-
+  
   d-article div.sourceCode pre {
     padding-left: 18px;
     font-size: 14px;
   }
-
+  
   d-article pre {
     font-size: 14px;
   }
-
+  
   }
-
+  
   figure img.external {
     background: white;
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -340,9 +341,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     padding: 18px;
     box-sizing: border-box;
   }
-
+  
   /* CSS for d-contents */
-
+  
   .d-contents {
     grid-column: text;
     color: rgba(0,0,0,0.8);
@@ -354,7 +355,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     padding-left: 0.25em;
     justify-self: start;
   }
-
+  
   @media(min-width: 1000px) {
     .d-contents.d-contents-float {
       height: 0;
@@ -365,82 +366,82 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       padding-left: 2em;
     }
   }
-
+  
   .d-contents nav h3 {
     font-size: 18px;
     margin-top: 0;
     margin-bottom: 1em;
   }
-
+  
   .d-contents li {
     list-style-type: none
   }
-
+  
   .d-contents nav > ul {
     padding-left: 0;
   }
-
+  
   .d-contents ul {
     padding-left: 1em
   }
-
+  
   .d-contents nav ul li {
     margin-top: 0.6em;
     margin-bottom: 0.2em;
   }
-
+  
   .d-contents nav a {
     font-size: 13px;
     border-bottom: none;
     text-decoration: none
     color: rgba(0, 0, 0, 0.8);
   }
-
+  
   .d-contents nav a:hover {
     text-decoration: underline solid rgba(0, 0, 0, 0.6)
   }
-
+  
   .d-contents nav > ul > li > a {
     font-weight: 600;
   }
-
+  
   .d-contents nav > ul > li > ul {
     font-weight: inherit;
   }
-
+  
   .d-contents nav > ul > li > ul > li {
     margin-top: 0.2em;
   }
-
-
+  
+  
   .d-contents nav ul {
     margin-top: 0;
     margin-bottom: 0.25em;
   }
-
+  
   .d-article-with-toc h2:nth-child(2) {
     margin-top: 0;
   }
-
-
+  
+  
   /* Figure */
-
+  
   .figure {
     position: relative;
     margin-bottom: 2.5em;
     margin-top: 1.5em;
   }
-
+  
   .figure img {
     width: 100%;
   }
-
+  
   .figure .caption {
     color: rgba(0, 0, 0, 0.6);
     font-size: 12px;
     line-height: 1.5em;
   }
-
+  
   .figure img.external {
     background: white;
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -448,42 +449,42 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     padding: 18px;
     box-sizing: border-box;
   }
-
+  
   .figure .caption a {
     color: rgba(0, 0, 0, 0.6);
   }
-
+  
   .figure .caption b,
   .figure .caption strong, {
     font-weight: 600;
     color: rgba(0, 0, 0, 1.0);
   }
-
+  
   /* Citations */
-
+  
   d-article .citation {
     color: inherit;
     cursor: inherit;
   }
-
+  
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
   }
-
+  
   /* Citation hover box */
-
+  
   .tippy-box[data-theme~=light-border] {
     background-color: rgba(250, 250, 250, 0.95);
   }
-
+  
   .tippy-content > p {
     margin-bottom: 0;
     padding: 2px;
   }
-
-
+  
+  
   /* Tweak 1000px media break to show more text */
-
+  
   @media(min-width: 1000px) {
     .base-grid,
     distill-header,
@@ -499,11 +500,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
       grid-column-gap: 16px;
     }
-
+  
     .grid {
       grid-column-gap: 16px;
     }
-
+  
     d-article {
       font-size: 1.06rem;
       line-height: 1.7em;
@@ -512,7 +513,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       font-size: 13px;
     }
   }
-
+  
   @media(min-width: 1180px) {
     .base-grid,
     distill-header,
@@ -528,16 +529,16 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
       grid-column-gap: 32px;
     }
-
+  
     .grid {
       grid-column-gap: 32px;
     }
   }
-
-
+  
+  
   /* Get the citation styles for the appendix (not auto-injected on render since
      we do our own rendering of the citation appendix) */
-
+  
   d-appendix .citation-appendix,
   .d-appendix .citation-appendix {
     font-size: 11px;
@@ -554,9 +555,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     white-space: pre-wrap;
     word-wrap: break-word;
   }
-
+  
   /* Include appendix styles here so they can be overridden */
-
+  
   d-appendix {
     contain: layout style;
     font-size: 0.8em;
@@ -568,7 +569,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     padding-top: 60px;
     padding-bottom: 48px;
   }
-
+  
   d-appendix h3 {
     grid-column: page-start / text-start;
     font-size: 15px;
@@ -577,59 +578,59 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     margin-bottom: 0;
     color: rgba(0,0,0,0.65);
   }
-
+  
   d-appendix h3 + * {
     margin-top: 1em;
   }
-
+  
   d-appendix ol {
     padding: 0 0 0 15px;
   }
-
+  
   @media (min-width: 768px) {
     d-appendix ol {
       padding: 0 0 0 30px;
       margin-left: -30px;
     }
   }
-
+  
   d-appendix li {
     margin-bottom: 1em;
   }
-
+  
   d-appendix a {
     color: rgba(0, 0, 0, 0.6);
   }
-
+  
   d-appendix > * {
     grid-column: text;
   }
-
+  
   d-appendix > d-footnote-list,
   d-appendix > d-citation-list,
   d-appendix > distill-appendix {
     grid-column: screen;
   }
-
+  
   /* Include footnote styles here so they can be overridden */
-
+  
   d-footnote-list {
     contain: layout style;
   }
-
+  
   d-footnote-list > * {
     grid-column: text;
   }
-
+  
   d-footnote-list a.footnote-backlink {
     color: rgba(0,0,0,0.3);
     padding-left: 0.5em;
   }
-
-
-
+  
+  
+  
   /* Anchor.js */
-
+  
   .anchorjs-link {
     /*transition: all .25s linear; */
     text-decoration: none;
@@ -640,86 +641,86 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     text-decoration: none;
     border-bottom: none;
   }
-
+  
   /* Social footer */
-
+  
   .social_footer {
     margin-top: 30px;
     margin-bottom: 0;
     color: rgba(0,0,0,0.67);
   }
-
+  
   .disqus-comments {
     margin-right: 30px;
   }
-
+  
   .disqus-comment-count {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
     cursor: pointer;
   }
-
+  
   #disqus_thread {
     margin-top: 30px;
   }
-
+  
   .article-sharing a {
     border-bottom: none;
     margin-right: 8px;
   }
-
+  
   .article-sharing a:hover {
     border-bottom: none;
   }
-
+  
   .sidebar-section.subscribe {
     font-size: 12px;
     line-height: 1.6em;
   }
-
+  
   .subscribe p {
     margin-bottom: 0.5em;
   }
-
-
+  
+  
   .article-footer .subscribe {
     font-size: 15px;
     margin-top: 45px;
   }
-
-
+  
+  
   .sidebar-section.custom {
     font-size: 12px;
     line-height: 1.6em;
   }
-
+  
   .custom p {
     margin-bottom: 0.5em;
   }
-
+  
   /* Styles for listing layout (hide title) */
   .layout-listing d-title, .layout-listing .d-title {
     display: none;
   }
-
+  
   /* Styles for posts lists (not auto-injected) */
-
-
+  
+  
   .posts-with-sidebar {
     padding-left: 45px;
     padding-right: 45px;
   }
-
+  
   .posts-list .description h2,
   .posts-list .description p {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
   }
-
+  
   .posts-list .description h2 {
     font-weight: 700;
     border-bottom: none;
     padding-bottom: 0;
   }
-
+  
   .posts-list h2.post-tag {
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     padding-bottom: 12px;
@@ -728,7 +729,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     margin-top: 60px;
     margin-bottom: 24px;
   }
-
+  
   .posts-list .post-preview {
     text-decoration: none;
     overflow: hidden;
@@ -736,29 +737,29 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     padding: 24px 0;
   }
-
+  
   .post-preview-last {
     border-bottom: none !important;
   }
-
+  
   .posts-list .posts-list-caption {
     grid-column: screen;
     font-weight: 400;
   }
-
+  
   .posts-list .post-preview h2 {
     margin: 0 0 6px 0;
     line-height: 1.2em;
     font-style: normal;
     font-size: 24px;
   }
-
+  
   .posts-list .post-preview p {
     margin: 0 0 12px 0;
     line-height: 1.4em;
     font-size: 16px;
   }
-
+  
   .posts-list .post-preview .thumbnail {
     box-sizing: border-box;
     margin-bottom: 24px;
@@ -769,32 +770,32 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     width: 100%;
     display: block;
   }
-
+  
   .posts-list .metadata {
     font-size: 12px;
     line-height: 1.4em;
     margin-bottom: 18px;
   }
-
+  
   .posts-list .metadata > * {
     display: inline-block;
   }
-
+  
   .posts-list .metadata .publishedDate {
     margin-right: 2em;
   }
-
+  
   .posts-list .metadata .dt-authors {
     display: block;
     margin-top: 0.3em;
     margin-right: 2em;
   }
-
+  
   .posts-list .dt-tags {
     display: block;
     line-height: 1em;
   }
-
+  
   .posts-list .dt-tags .dt-tag {
     display: inline-block;
     color: rgba(0,0,0,0.6);
@@ -807,24 +808,24 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     text-transform: uppercase;
     font-weight: 500;
   }
-
+  
   .posts-list img {
     opacity: 1;
   }
-
+  
   .posts-list img[data-src] {
     opacity: 0;
   }
-
+  
   .posts-more {
     clear: both;
   }
-
-
+  
+  
   .posts-sidebar {
     font-size: 16px;
   }
-
+  
   .posts-sidebar h3 {
     font-size: 16px;
     margin-top: 0;
@@ -832,39 +833,39 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     font-weight: 400;
     text-transform: uppercase;
   }
-
+  
   .sidebar-section {
     margin-bottom: 30px;
   }
-
+  
   .categories ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
   }
-
+  
   .categories li {
     color: rgba(0, 0, 0, 0.8);
     margin-bottom: 0;
   }
-
+  
   .categories li>a {
     border-bottom: none;
   }
-
+  
   .categories li>a:hover {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
   }
-
+  
   .categories .active {
     font-weight: 600;
   }
-
+  
   .categories .category-count {
     color: rgba(0, 0, 0, 0.4);
   }
-
-
+  
+  
   @media(min-width: 768px) {
     .posts-list .post-preview h2 {
       font-size: 26px;
@@ -900,55 +901,55 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       padding-bottom: 24px;
     }
   }
-
-
+  
+  
   /* Improve display for browsers without grid (IE/Edge <= 15) */
-
+  
   .downlevel {
     line-height: 1.6em;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
     margin: 0;
   }
-
+  
   .downlevel .d-title {
     padding-top: 6rem;
     padding-bottom: 1.5rem;
   }
-
+  
   .downlevel .d-title h1 {
     font-size: 50px;
     font-weight: 700;
     line-height: 1.1em;
     margin: 0 0 0.5rem;
   }
-
+  
   .downlevel .d-title p {
     font-weight: 300;
     font-size: 1.2rem;
     line-height: 1.55em;
     margin-top: 0;
   }
-
+  
   .downlevel .d-byline {
     padding-top: 0.8em;
     padding-bottom: 0.8em;
     font-size: 0.8rem;
     line-height: 1.8em;
   }
-
+  
   .downlevel .section-separator {
     border: none;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
   }
-
+  
   .downlevel .d-article {
     font-size: 1.06rem;
     line-height: 1.7em;
     padding-top: 1rem;
     padding-bottom: 2rem;
   }
-
-
+  
+  
   .downlevel .d-appendix {
     padding-left: 0;
     padding-right: 0;
@@ -960,11 +961,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     padding-top: 40px;
     padding-bottom: 48px;
   }
-
+  
   .downlevel .footnotes ol {
     padding-left: 13px;
   }
-
+  
   .downlevel .base-grid,
   .downlevel .distill-header,
   .downlevel .d-title,
@@ -981,7 +982,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     padding-left: 40px;
     padding-right: 40px;
   }
-
+  
   @media(min-width: 768px) {
     .downlevel .base-grid,
     .downlevel .distill-header,
@@ -1001,14 +1002,14 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     max-width: 900px;
   }
   }
-
+  
   .downlevel pre code {
     display: block;
     border-left: 2px solid rgba(0, 0, 0, .1);
     padding: 0 0 0 20px;
     font-size: 14px;
   }
-
+  
   .downlevel code, .downlevel pre {
     color: black;
     background: none;
@@ -1019,27 +1020,27 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     word-break: normal;
     word-wrap: normal;
     line-height: 1.5;
-
+  
     -moz-tab-size: 4;
     -o-tab-size: 4;
     tab-size: 4;
-
+  
     -webkit-hyphens: none;
     -moz-hyphens: none;
     -ms-hyphens: none;
     hyphens: none;
   }
-
+  
   .downlevel .posts-list .post-preview {
     color: inherit;
   }
-
-
-
+  
+  
+  
   </style>
-
+  
   <script type="application/javascript">
-
+  
   function is_downlevel_browser() {
     if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
                                    window.navigator.userAgent)) {
@@ -1048,20 +1049,20 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       return window.load_distill_framework === undefined;
     }
   }
-
+  
   // show body when load is complete
   function on_load_complete() {
-
+  
     // add anchors
     if (window.anchors) {
       window.anchors.options.placement = 'left';
       window.anchors.add('d-article > h2, d-article > h3, d-article > h4, d-article > h5');
     }
-
-
+  
+  
     // set body to visible
     document.body.style.visibility = 'visible';
-
+  
     // force redraw for leaflet widgets
     if (window.HTMLWidgets) {
       var maps = window.HTMLWidgets.findAll(".leaflet");
@@ -1074,39 +1075,39 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
         });
       });
     }
-
+  
     // trigger 'shown' so htmlwidgets resize
     $('d-article').trigger('shown');
   }
-
+  
   function init_distill() {
-
+  
     init_common();
-
+  
     // create front matter
     var front_matter = $('<d-front-matter></d-front-matter>');
     $('#distill-front-matter').wrap(front_matter);
-
+  
     // create d-title
     $('.d-title').changeElementType('d-title');
-
+  
     // create d-byline
     var byline = $('<d-byline></d-byline>');
     $('.d-byline').replaceWith(byline);
-
+  
     // create d-article
     var article = $('<d-article></d-article>');
     $('.d-article').wrap(article).children().unwrap();
-
+  
     // move posts container into article
     $('.posts-container').appendTo($('d-article'));
-
+  
     // create d-appendix
     $('.d-appendix').changeElementType('d-appendix');
-
+  
     // flag indicating that we have appendix items
     var appendix = $('.appendix-bottom').children('h3').length > 0;
-
+  
     // replace footnotes with <d-footnote>
     $('.footnote-ref').each(function(i, val) {
       appendix = true;
@@ -1122,10 +1123,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     });
     // remove footnotes
     $('.footnotes').remove();
-
+  
     // move refs into #references-listing
     $('#references-listing').replaceWith($('#refs'));
-
+  
     $('h1.appendix, h2.appendix').each(function(i, val) {
       $(this).changeElementType('h3');
     });
@@ -1135,16 +1136,16 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       appendix = true;
       $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
     });
-
+  
     // show d-appendix if we have appendix content
     $("d-appendix").css('display', appendix ? 'grid' : 'none');
-
+  
     // localize layout chunks to just output
     $('.layout-chunk').each(function(i, val) {
-
+  
       // capture layout
       var layout = $(this).attr('data-layout');
-
+  
       // apply layout to markdown level block elements
       var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
@@ -1157,40 +1158,40 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
           $(this).wrap(layout_div);
         }
       });
-
-
+  
+  
       // unwrap the layout-chunk div
       $(this).children().unwrap();
     });
-
+  
     // remove code block used to force  highlighting css
     $('.distill-force-highlighting-css').parent().remove();
-
+  
     // remove empty line numbers inserted by pandoc when using a
     // custom syntax highlighting theme
     $('code.sourceCode a:empty').remove();
-
+  
     // load distill framework
     load_distill_framework();
-
+  
     // wait for window.distillRunlevel == 4 to do post processing
     function distill_post_process() {
-
+  
       if (!window.distillRunlevel || window.distillRunlevel < 4)
         return;
-
+  
       // hide author/affiliations entirely if we have no authors
       var front_matter = JSON.parse($("#distill-front-matter").html());
       var have_authors = front_matter.authors && front_matter.authors.length > 0;
       if (!have_authors)
         $('d-byline').addClass('hidden');
-
+  
       // article with toc class
       $('.d-contents').parent().addClass('d-article-with-toc');
-
+  
       // strip links that point to #
       $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
-
+  
       // add orcid ids
       $('.authors-affiliations').find('.author').each(function(i, el) {
         var orcid_id = front_matter.authors[i].orcidID;
@@ -1205,12 +1206,12 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
           $(this).append(a);
         }
       });
-
+  
       // hide elements of author/affiliations grid that have no value
       function hide_byline_column(caption) {
         $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
       }
-
+  
       // affiliations
       var have_affiliations = false;
       for (var i = 0; i<front_matter.authors.length; ++i) {
@@ -1222,11 +1223,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       }
       if (!have_affiliations)
         $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
-
+  
       // published date
       if (!front_matter.publishedDate)
         hide_byline_column("Published");
-
+  
       // document object identifier
       var doi = $('d-byline').find('h3:contains("DOI")');
       var doi_p = doi.next().empty();
@@ -1246,25 +1247,28 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
            .html(front_matter.doi)
            .appendTo(doi_p);
       }
-
+  
        // change plural form of authors/affiliations
       if (front_matter.authors.length === 1) {
         var grid = $('.authors-affiliations');
         grid.children('h3:contains("Authors")').text('Author');
         grid.children('h3:contains("Affiliations")').text('Affiliation');
       }
-
+  
       // remove d-appendix and d-footnote-list local styles
       $('d-appendix > style:first-child').remove();
       $('d-footnote-list > style:first-child').remove();
-
+  
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
-
+  
       // hoverable references
       $('span.citation[data-cites]').each(function() {
-        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        var refs = $(this).attr('data-cites').split(" ");
+        var refHtml = refs.map(function(ref) {
+          return "<p>" + $('#ref-' + ref).html() + "</p>";
+        }).join("\n");
         window.tippy(this, {
           allowHTML: true,
           content: refHtml,
@@ -1275,39 +1279,39 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
           placement: 'bottom-start'
         });
       });
-
+  
       // clear polling timer
       clearInterval(tid);
-
+  
       // show body now that everything is ready
       on_load_complete();
     }
-
+  
     var tid = setInterval(distill_post_process, 50);
     distill_post_process();
-
+  
   }
-
+  
   function init_downlevel() {
-
+  
     init_common();
-
+  
      // insert hr after d-title
     $('.d-title').after($('<hr class="section-separator"/>'));
-
+  
     // check if we have authors
     var front_matter = JSON.parse($("#distill-front-matter").html());
     var have_authors = front_matter.authors && front_matter.authors.length > 0;
-
+  
     // manage byline/border
     if (!have_authors)
       $('.d-byline').remove();
     $('.d-byline').after($('<hr class="section-separator"/>'));
     $('.d-byline a').remove();
-
+  
     // remove toc
     $('.d-contents').remove();
-
+  
     // move appendix elements
     $('h1.appendix, h2.appendix').each(function(i, val) {
       $(this).changeElementType('h3');
@@ -1315,62 +1319,62 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     $('h3.appendix').each(function(i, val) {
       $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
     });
-
-
+  
+  
     // inject headers into references and footnotes
     var refs_header = $('<h3></h3>');
     refs_header.text('References');
     $('#refs').prepend(refs_header);
-
+  
     var footnotes_header = $('<h3></h3');
     footnotes_header.text('Footnotes');
     $('.footnotes').children('hr').first().replaceWith(footnotes_header);
-
+  
     // move appendix-bottom entries to the bottom
     $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
     $('.appendix-bottom').remove();
-
+  
     // remove appendix if it's empty
     if ($('.d-appendix').children().length === 0)
       $('.d-appendix').remove();
-
+  
     // prepend separator above appendix
     $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
-
+  
     // trim code
     $('pre>code').each(function(i, val) {
       $(this).html($.trim($(this).html()));
     });
-
+  
     // move posts-container right before article
     $('.posts-container').insertBefore($('.d-article'));
-
+  
     $('body').addClass('downlevel');
-
+  
     on_load_complete();
   }
-
-
+  
+  
   function init_common() {
-
+  
     // jquery plugin to change element types
     (function($) {
       $.fn.changeElementType = function(newType) {
         var attrs = {};
-
+  
         $.each(this[0].attributes, function(idx, attr) {
           attrs[attr.nodeName] = attr.nodeValue;
         });
-
+  
         this.replaceWith(function() {
           return $("<" + newType + "/>", attrs).append($(this).contents());
         });
       };
     })(jQuery);
-
+  
     // prevent underline for linked images
     $('a > img').parent().css({'border-bottom' : 'none'});
-
+  
     // mark non-body figures created by knitr chunks as 100% width
     $('.layout-chunk').each(function(i, val) {
       var figures = $(this).find('img, .html-widget');
@@ -1382,35 +1386,35 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
           var fig = $(this);
           fig.css('width', fig.attr('width') + 'px');
         });
-
+  
       }
     });
-
+  
     // auto-append index.html to post-preview links in file: protocol
     // and in rstudio ide preview
     $('.post-preview').each(function(i, val) {
       if (window.location.protocol === "file:")
         $(this).attr('href', $(this).attr('href') + "index.html");
     });
-
+  
     // get rid of index.html references in header
     if (window.location.protocol !== "file:") {
       $('.distill-site-header a[href]').each(function(i,val) {
         $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
       });
     }
-
+  
     // add class to pandoc style tables
     $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
     $('.kable-table').children('table').addClass('pandoc-table');
-
+  
     // add figcaption style to table captions
     $('caption').parent('table').addClass("figcaption");
-
+  
     // initialize posts list
     if (window.init_posts_list)
       window.init_posts_list();
-
+  
     // implmement disqus comment link
     $('.disqus-comment-count').click(function() {
       window.headroom_prevent_pin = true;
@@ -1424,19 +1428,18 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       }
     });
   }
-
+  
   document.addEventListener('DOMContentLoaded', function() {
     if (is_downlevel_browser())
       init_downlevel();
     else
       window.addEventListener('WebComponentsReady', init_distill);
   });
-
+  
   </script>
-
+  
   <!--/radix_placeholder_distill-->
-  <script src="multi-modal_files/header-attrs-2.11/header-attrs.js"></script>
-  <script src="multi-modal_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <script src="multi-modal_files/jquery-3.5.1/jquery-3.5.1.min.js"></script>
   <script src="multi-modal_files/popper-2.6.0/popper.min.js"></script>
   <link href="multi-modal_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="multi-modal_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -1456,7 +1459,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Working with Multi-modal data","description":"A short description of the post.","authors":[{"author":"Kent Riemondy","authorURL":"https://github.com/kriemo","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-0750-1273"},{"author":"Ryan Sheridan","authorURL":"https://github.com/sheridar","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-4012-3147"}],"publishedDate":"2021-10-13T00:00:00.000+00:00","citationText":"Riemondy & Sheridan, 2021"}
+{"title":"Working with Multi-modal data","description":"A short description of the post.","authors":[{"author":"Kent Riemondy","authorURL":"https://github.com/kriemo","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-0750-1273"},{"author":"Ryan Sheridan","authorURL":"https://github.com/sheridar","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-4012-3147"}],"publishedDate":"2021-10-13T00:00:00.000-06:00","citationText":"Riemondy & Sheridan, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1515,7 +1518,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <span class='va'>import_counts</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>file_name</span>, <span class='va'>file_url</span> <span class='op'>=</span> <span class='va'>data_url</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='va'>mtx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>file_url</span>, <span class='va'>file_name</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
     <span class='fu'>read_csv</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='fu'>column_to_rownames</span><span class='op'>(</span><span class='st'>"...1"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+    <span class='fu'>column_to_rownames</span><span class='op'>(</span><span class='st'>"X1"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
     <span class='fu'><a href='https://satijalab.org/seurat/reference/as.sparse.html'>as.sparse</a></span><span class='op'>(</span><span class='op'>)</span>
 
   <span class='va'>mtx</span>
@@ -1564,15 +1567,18 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <span class='va'>adt_bcs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>adt_mtx</span><span class='op'>)</span>
 <span class='va'>hto_bcs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>hto_mtx</span><span class='op'>)</span>
 
-<span class='va'>merged_bcs</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>rna_bcs</span>, <span class='va'>adt_bcs</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+<span class='va'>merged_bcs</span> <span class='op'>&lt;-</span> <span class='va'>rna_bcs</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>adt_bcs</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/r/base/sets.html'>intersect</a></span><span class='op'>(</span><span class='va'>hto_bcs</span><span class='op'>)</span>
 
 <span class='co'># Create Seurat object</span>
-<span class='va'>sobj</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://satijalab.org/seurat/reference/CreateSeuratObject.html'>CreateSeuratObject</a></span><span class='op'>(</span><span class='va'>rna_mtx</span><span class='op'>[</span>, <span class='va'>merged_bcs</span><span class='op'>]</span>, 
-                            min.cells <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
+<span class='va'>sobj</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://satijalab.org/seurat/reference/CreateSeuratObject.html'>CreateSeuratObject</a></span><span class='op'>(</span>
+  counts    <span class='op'>=</span> <span class='va'>rna_mtx</span><span class='op'>[</span>, <span class='va'>merged_bcs</span><span class='op'>]</span>, 
+  min.cells <span class='op'>=</span> <span class='fl'>5</span>
+<span class='op'>)</span>
 
 <span class='co'># Add CITE-seq and cell hashing data to Seurat object</span>
-<span class='va'>sobj</span><span class='op'>[[</span><span class='st'>"ADT"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://satijalab.org/seurat/reference/CreateAssayObject.html'>CreateAssayObject</a></span><span class='op'>(</span><span class='va'>adt_mtx</span><span class='op'>[</span>, <span class='va'>merged_bcs</span><span class='op'>]</span><span class='op'>)</span>
+<span class='va'>sobj</span><span class='op'>[[</span><span class='st'>"ADT"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/CreateAssayObject.html'>CreateAssayObject</a></span><span class='op'>(</span><span class='va'>adt_mtx</span><span class='op'>[</span>, <span class='va'>merged_bcs</span><span class='op'>]</span><span class='op'>)</span>
 
 <span class='va'>sobj</span><span class='op'>[[</span><span class='st'>"HTO"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/CreateAssayObject.html'>CreateAssayObject</a></span><span class='op'>(</span><span class='va'>hto_mtx</span><span class='op'>[</span>, <span class='va'>merged_bcs</span><span class='op'>]</span><span class='op'>)</span>
   
@@ -1587,7 +1593,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <p><br></p>
 <p><br></p>
 <h2 id="demultiplexing-hashed-samples">Demultiplexing hashed samples</h2>
-<p>We will first use the cell hashing data to assign cells to their sample of origin. This is referred to as demuliplexing as we are using the cell hashing antibody barcodes to assign each cell to a sample.</p>
+<p>We will first use the cell hashing data to assign cells to their sample of origin. This is referred to as demultiplexing as we are using the cell hashing antibody barcodes to assign each cell to a sample.</p>
 <h3 id="normalizing-hto-counts">Normalizing HTO counts</h3>
 <p>To account for differences in antibody binding efficiencies, CITE-seq and cell hashing data can be normalized by performing a centered log-ratio transformation for each individual antibody.</p>
 <p>Note that the best approach for normalizing CITE-seq data has not been settled. For a more detailed discussion, and alternative approaches, see the Normalization chapter from the <a href="https://bioconductor.org/books/release/OSCA/integrating-with-protein-abundance.html#normalization-1">Orchestrating Single Cell Analysis eBook</a> from Bioconductor.</p>
@@ -1615,9 +1621,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Demultiplex samples</span>
 <span class='co'># By default HTODemux will look for the "HTO" assay</span>
-<span class='va'>sobj</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://satijalab.org/seurat/reference/HTODemux.html'>HTODemux</a></span><span class='op'>(</span><span class='va'>sobj</span>, positive.quantile <span class='op'>=</span> <span class='fl'>0.97</span><span class='op'>)</span>
+<span class='va'>sobj</span> <span class='op'>&lt;-</span> <span class='va'>sobj</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/HTODemux.html'>HTODemux</a></span><span class='op'>(</span>positive.quantile <span class='op'>=</span> <span class='fl'>0.97</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>sobj</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>sobj</span><span class='op'>@</span><span class='va'>meta.data</span>, <span class='fl'>5</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>#&gt;                     orig.ident nCount_RNA nFeature_RNA nCount_ADT
@@ -1626,28 +1633,24 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 #&gt; AAACCTGCACCAGGTC SeuratProject       4182         1394        509
 #&gt; AAACCTGCACTCTGTC SeuratProject       3681         1456         43
 #&gt; AAACCTGGTATGAAAC SeuratProject       2503         1255        530
-#&gt; AAACCTGGTGAGTATA SeuratProject       1241          692        352
 #&gt;                  nFeature_ADT nCount_HTO nFeature_HTO HTO_maxID
 #&gt; AAACCTGAGACAAAGG            5        358            3     HTO28
 #&gt; AAACCTGAGCTACCGC            8        180            2     HTO30
 #&gt; AAACCTGCACCAGGTC            7        163            2     HTO28
 #&gt; AAACCTGCACTCTGTC            6        174            2     HTO44
 #&gt; AAACCTGGTATGAAAC            6        638            2     HTO28
-#&gt; AAACCTGGTGAGTATA            6         71            2     HTO44
 #&gt;                  HTO_secondID HTO_margin HTO_classification
 #&gt; AAACCTGAGACAAAGG        HTO29   3.211027              HTO28
 #&gt; AAACCTGAGCTACCGC        HTO29   3.448779              HTO30
 #&gt; AAACCTGCACCAGGTC        HTO29   2.802755              HTO28
 #&gt; AAACCTGCACTCTGTC        HTO29   3.148890              HTO44
 #&gt; AAACCTGGTATGAAAC        HTO29   3.649778              HTO28
-#&gt; AAACCTGGTGAGTATA        HTO29   2.285112              HTO44
 #&gt;                  HTO_classification.global hash.ID
 #&gt; AAACCTGAGACAAAGG                   Singlet   HTO28
 #&gt; AAACCTGAGCTACCGC                   Singlet   HTO30
 #&gt; AAACCTGCACCAGGTC                   Singlet   HTO28
 #&gt; AAACCTGCACTCTGTC                   Singlet   HTO44
-#&gt; AAACCTGGTATGAAAC                   Singlet   HTO28
-#&gt; AAACCTGGTGAGTATA                   Singlet   HTO44</code></pre>
+#&gt; AAACCTGGTATGAAAC                   Singlet   HTO28</code></pre>
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Summarize cell classifications</span>
 <span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>sobj</span><span class='op'>$</span><span class='va'>HTO_classification.global</span><span class='op'>)</span>
@@ -1658,27 +1661,28 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 #&gt;      386        1     3905</code></pre>
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Create ridge plots showing HTO signal</span>
-<span class='fu'><a href='https://satijalab.org/seurat/reference/RidgePlot.html'>RidgePlot</a></span><span class='op'>(</span><span class='va'>sobj</span>,
-          assay    <span class='op'>=</span> <span class='st'>"HTO"</span>,
-          features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>hto_mtx</span><span class='op'>)</span>,
-          ncol     <span class='op'>=</span> <span class='fl'>2</span>
-<span class='op'>)</span>
+<span class='va'>sobj</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RidgePlot.html'>RidgePlot</a></span><span class='op'>(</span>
+    assay    <span class='op'>=</span> <span class='st'>"HTO"</span>,
+    features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>hto_mtx</span><span class='op'>)</span>,
+    ncol     <span class='op'>=</span> <span class='fl'>2</span>
+  <span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Demultiplex%20samples-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Demultiplex%20samples-1.png" width="1056" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="compare-the-number-of-cells-with-each-hash.id-and-calculate-the-doublet-rate">Compare the number of cells with each hash.ID and calculate the doublet rate</h3>
 <div class="layout-chunk" data-layout="l-body">
-<pre><code>#&gt; # A tibble: 6 × 2
-#&gt;   hash.ID     fract
-#&gt;   &lt;fct&gt;       &lt;dbl&gt;
-#&gt; 1 Doublet  0.0899  
-#&gt; 2 HTO28    0.251   
-#&gt; 3 HTO30    0.199   
-#&gt; 4 HTO44    0.230   
-#&gt; 5 HTO29    0.229   
-#&gt; 6 Negative 0.000233</code></pre>
-<p><img src="multi-modal_files/figure-html5/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>#&gt; # A tibble: 6 x 3
+#&gt;   hash.ID      n    fract
+#&gt; * &lt;fct&gt;    &lt;int&gt;    &lt;dbl&gt;
+#&gt; 1 Doublet    386 0.0899  
+#&gt; 2 HTO28     1079 0.251   
+#&gt; 3 HTO30      854 0.199   
+#&gt; 4 HTO44      988 0.230   
+#&gt; 5 HTO29      984 0.229   
+#&gt; 6 Negative     1 0.000233</code></pre>
+<p><img src="multi-modal_files/figure-html5/unnamed-chunk-1-1.png" width="864" style="display: block; margin: auto;" /></p>
 </div>
 <p><br></p>
 <p><br></p>
@@ -1700,34 +1704,34 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <span class='fu'><a href='https://satijalab.org/seurat/reference/VlnPlot.html'>VlnPlot</a></span><span class='op'>(</span>
     features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nCount_RNA"</span>, <span class='st'>"nFeature_RNA"</span>, <span class='st'>"percent_mito"</span><span class='op'>)</span>, 
     ncol     <span class='op'>=</span> <span class='fl'>3</span>,
-    pt.size  <span class='op'>=</span> <span class='fl'>0.25</span>
+    pt.size  <span class='op'>=</span> <span class='fl'>0</span>
   <span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Create%20RNA%20violin%20plots-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Create%20RNA%20violin%20plots-1.png" width="1056" style="display: block; margin: auto;" /></p>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Aim to sequence CITE-seq libraries at 2k-5k reads/cell, cell hashing 1k-2k reads/cell</span>
-
 <span class='va'>sobj</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://satijalab.org/seurat/reference/VlnPlot.html'>VlnPlot</a></span><span class='op'>(</span>
     features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nCount_ADT"</span>, <span class='st'>"nCount_HTO"</span><span class='op'>)</span>,
     ncol    <span class='op'>=</span> <span class='fl'>2</span>,
-    pt.size <span class='op'>=</span> <span class='fl'>0.25</span>,
-    log     <span class='op'>=</span> <span class='cn'>T</span>
+    pt.size <span class='op'>=</span> <span class='fl'>0</span>,
+    log     <span class='op'>=</span> <span class='cn'>TRUE</span>
   <span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Create%20ADT%20and%20HTO%20violin%20plots-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Create%20ADT%20and%20HTO%20violin%20plots-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Filter cells based on HTO class, number of genes, and percent mito UMIs</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span><span class='op'>(</span><span class='va'>sobj</span>,
-    <span class='va'>nFeature_RNA</span> <span class='op'>&gt;</span> <span class='fl'>250</span> <span class='op'>&amp;</span>   <span class='co'># Remove cells with &lt; 250 detected genes</span>
-    <span class='va'>nFeature_RNA</span> <span class='op'>&lt;</span> <span class='fl'>2500</span> <span class='op'>&amp;</span>  <span class='co'># Remove cells with &gt; 2500 detected genes (could be doublets)</span>
-    <span class='va'>percent_mito</span> <span class='op'>&lt;</span> <span class='fl'>15</span> <span class='op'>&amp;</span>    <span class='co'># Remove cells with &gt; 0.15 mito/total reads</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span>  <span class='va'>sobj</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span><span class='op'>(</span>
+    <span class='va'>nFeature_RNA</span> <span class='op'>&gt;</span> <span class='fl'>250</span> <span class='op'>&amp;</span>                    <span class='co'># Remove cells with &lt; 250 detected genes</span>
+    <span class='va'>nFeature_RNA</span> <span class='op'>&lt;</span> <span class='fl'>2500</span> <span class='op'>&amp;</span>                   <span class='co'># Remove cells with &gt; 2500 detected genes (could be doublets)</span>
+    <span class='va'>percent_mito</span> <span class='op'>&lt;</span> <span class='fl'>15</span> <span class='op'>&amp;</span>                     <span class='co'># Remove cells with &gt; 0.15 mito/total reads</span>
     <span class='va'>HTO_classification.global</span> <span class='op'>==</span> <span class='st'>"Singlet"</span>
   <span class='op'>)</span>
 
@@ -1749,13 +1753,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <span class='op'>)</span>
 
 <span class='co'># Add sample names to meta.data table</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://satijalab.org/seurat/reference/AddMetaData.html'>AddMetaData</a></span><span class='op'>(</span>
-    metadata <span class='op'>=</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>filt_so</span><span class='op'>)</span>,
-    col.name <span class='op'>=</span> <span class='st'>"sample"</span>
-  <span class='op'>)</span>
+<span class='va'>filt_so</span><span class='op'>$</span><span class='va'>sample</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>filt_so</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>filt_so</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>filt_so</span><span class='op'>@</span><span class='va'>meta.data</span>, <span class='fl'>5</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>#&gt;                     orig.ident nCount_RNA nFeature_RNA nCount_ADT
@@ -1764,35 +1764,30 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 #&gt; AAACCTGCACCAGGTC SeuratProject       4182         1394        509
 #&gt; AAACCTGCACTCTGTC SeuratProject       3681         1456         43
 #&gt; AAACCTGGTATGAAAC SeuratProject       2503         1255        530
-#&gt; AAACCTGGTGAGTATA SeuratProject       1241          692        352
 #&gt;                  nFeature_ADT nCount_HTO nFeature_HTO HTO_maxID
 #&gt; AAACCTGAGACAAAGG            5        358            3     HTO28
 #&gt; AAACCTGAGCTACCGC            8        180            2     HTO30
 #&gt; AAACCTGCACCAGGTC            7        163            2     HTO28
 #&gt; AAACCTGCACTCTGTC            6        174            2     HTO44
 #&gt; AAACCTGGTATGAAAC            6        638            2     HTO28
-#&gt; AAACCTGGTGAGTATA            6         71            2     HTO44
 #&gt;                  HTO_secondID HTO_margin HTO_classification
 #&gt; AAACCTGAGACAAAGG        HTO29   3.211027              HTO28
 #&gt; AAACCTGAGCTACCGC        HTO29   3.448779              HTO30
 #&gt; AAACCTGCACCAGGTC        HTO29   2.802755              HTO28
 #&gt; AAACCTGCACTCTGTC        HTO29   3.148890              HTO44
 #&gt; AAACCTGGTATGAAAC        HTO29   3.649778              HTO28
-#&gt; AAACCTGGTGAGTATA        HTO29   2.285112              HTO44
 #&gt;                  HTO_classification.global hash.ID percent_mito
 #&gt; AAACCTGAGACAAAGG                   Singlet   HTO28     7.105435
 #&gt; AAACCTGAGCTACCGC                   Singlet   HTO30     9.622563
 #&gt; AAACCTGCACCAGGTC                   Singlet   HTO28     7.747489
 #&gt; AAACCTGCACTCTGTC                   Singlet   HTO44     6.166802
 #&gt; AAACCTGGTATGAAAC                   Singlet   HTO28     7.311227
-#&gt; AAACCTGGTGAGTATA                   Singlet   HTO44    12.006446
 #&gt;                  sample
 #&gt; AAACCTGAGACAAAGG PBMC-1
 #&gt; AAACCTGAGCTACCGC PBMC-3
 #&gt; AAACCTGCACCAGGTC PBMC-1
 #&gt; AAACCTGCACTCTGTC PBMC-4
-#&gt; AAACCTGGTATGAAAC PBMC-1
-#&gt; AAACCTGGTGAGTATA PBMC-4</code></pre>
+#&gt; AAACCTGGTATGAAAC PBMC-1</code></pre>
 </div>
 <p><br></p>
 <p><br></p>
@@ -1801,17 +1796,25 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Normalize expression data</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://satijalab.org/seurat/reference/NormalizeData.html'>NormalizeData</a></span><span class='op'>(</span><span class='va'>filt_so</span>,
-                          normalization.method <span class='op'>=</span> <span class='st'>"LogNormalize"</span>,
-                          verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span>  <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/NormalizeData.html'>NormalizeData</a></span><span class='op'>(</span>
+    normalization.method <span class='op'>=</span> <span class='st'>"LogNormalize"</span>,
+    verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
+  <span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://satijalab.org/seurat/reference/FindVariableFeatures.html'>FindVariableFeatures</a></span><span class='op'>(</span>verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://satijalab.org/seurat/reference/ScaleData.html'>ScaleData</a></span><span class='op'>(</span>verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='co'># Normalize CITE-seq data</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://satijalab.org/seurat/reference/NormalizeData.html'>NormalizeData</a></span><span class='op'>(</span><span class='va'>filt_so</span>,
-                          assay <span class='op'>=</span> <span class='st'>"ADT"</span>,
-                          normalization.method <span class='op'>=</span> <span class='st'>"CLR"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>  
-  <span class='fu'><a href='https://satijalab.org/seurat/reference/ScaleData.html'>ScaleData</a></span><span class='op'>(</span>assay <span class='op'>=</span> <span class='st'>"ADT"</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span>  <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/NormalizeData.html'>NormalizeData</a></span><span class='op'>(</span>
+    assay                <span class='op'>=</span> <span class='st'>"ADT"</span>,
+    normalization.method <span class='op'>=</span> <span class='st'>"CLR"</span>,
+    verbose              <span class='op'>=</span> <span class='cn'>FALSE</span>
+  <span class='op'>)</span> <span class='op'>%&gt;%</span>  
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/ScaleData.html'>ScaleData</a></span><span class='op'>(</span>
+    assay   <span class='op'>=</span> <span class='st'>"ADT"</span>,
+    verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
+  <span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -1822,40 +1825,55 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Perform PCA</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunPCA.html'>RunPCA</a></span><span class='op'>(</span><span class='va'>filt_so</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>       <span class='co'># By default only variable features are used for PCA, uses only the RNA data</span>
+<span class='co'># By default only variable features are used for PCA, this uses only the RNA data</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunPCA.html'>RunPCA</a></span><span class='op'>(</span>verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='co'># Plot standard deviations of principal components</span>
-<span class='va'>elbow_plot</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/ElbowPlot.html'>ElbowPlot</a></span><span class='op'>(</span><span class='va'>filt_so</span>, ndims <span class='op'>=</span> <span class='fl'>50</span><span class='op'>)</span>
+<span class='va'>elbow_plot</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/ElbowPlot.html'>ElbowPlot</a></span><span class='op'>(</span>ndims <span class='op'>=</span> <span class='fl'>50</span><span class='op'>)</span>
 
 <span class='co'># Create scatter plot comparing PC-1 and PC-2</span>
-<span class='va'>PCA_plot</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>filt_so</span>, reduction <span class='op'>=</span> <span class='st'>"pca"</span><span class='op'>)</span>
+<span class='va'>pca_plot</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span>reduction <span class='op'>=</span> <span class='st'>"pca"</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>plot_grid</a></span><span class='op'>(</span><span class='va'>elbow_plot</span>, <span class='va'>PCA_plot</span>,
-          nrow <span class='op'>=</span> <span class='fl'>1</span>,
-          rel_widths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.45</span>, <span class='fl'>0.55</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>plot_grid</a></span><span class='op'>(</span>
+  <span class='va'>elbow_plot</span>, <span class='va'>pca_plot</span>,
+  nrow       <span class='op'>=</span> <span class='fl'>1</span>,
+  rel_widths <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.45</span>, <span class='fl'>0.55</span><span class='op'>)</span>
+<span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Perform%20PCA-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Perform%20PCA-1.png" width="1104" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="cluster-cells-using-gene-expression-data">Cluster cells using gene expression data</h3>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Cluster cells</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span><span class='va'>filt_so</span>, dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span>resolution <span class='op'>=</span> <span class='fl'>0.6</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span>
+    resolution <span class='op'>=</span> <span class='fl'>0.2</span>,
+    verbose    <span class='op'>=</span> <span class='cn'>FALSE</span>
+  <span class='op'>)</span>
 
-<span class='co'># Store clusters as RNA clusters in meta.data for clarity </span>
-<span class='va'>filt_so</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>$</span><span class='va'>RNA_clusters</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>$</span><span class='va'>RNA_snn_res.0.6</span> 
+<span class='co'># For clarity store clusters in meta.data as RNA_clusters</span>
+<span class='va'>filt_so</span><span class='op'>$</span><span class='va'>RNA_clusters</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span><span class='op'>$</span><span class='va'>RNA_snn_res.0.2</span>
 
 <span class='co'># Run UMAP</span>
 <span class='co'># Use same PCs as clustering, by default reduction = "pca"</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span><span class='va'>filt_so</span>, dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span><span class='op'>)</span>
 
 <span class='co'># Create UMAP</span>
-<span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>filt_so</span>, reduction <span class='op'>=</span> <span class='st'>"umap"</span>, group.by <span class='op'>=</span> <span class='st'>"RNA_clusters"</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span>
+    reduction <span class='op'>=</span> <span class='st'>"umap"</span>,
+    group.by  <span class='op'>=</span> <span class='st'>"RNA_clusters"</span>
+  <span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Cluster%20cells%20and%20run%20UMAP-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Cluster%20cells%20and%20run%20UMAP-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <p><br></p>
 <p><br></p>
@@ -1865,61 +1883,68 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <p>We will directly pass the <code>scaled.data</code> matrix from the ADT assay to the <code>FindNeighbors</code> function, which creates a Shared Nearest Neighbor (SNN) graph that is used for clustering.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span><span class='va'>filt_so</span>,
-                         assay <span class='op'>=</span> <span class='st'>"ADT"</span>, 
-                         features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>filt_so</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>ADT</span><span class='op'>)</span>,
-                         graph.name <span class='op'>=</span> <span class='st'>"ADT_snn"</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span>
+    assay      <span class='op'>=</span> <span class='st'>"ADT"</span>,
+    features   <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>filt_so</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>ADT</span><span class='op'>)</span>,
+    graph.name <span class='op'>=</span> <span class='st'>"ADT_snn"</span>
+  <span class='op'>)</span>
 
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span><span class='va'>filt_so</span>,
-                        resolution <span class='op'>=</span> <span class='fl'>0.2</span>,
-                        graph.name <span class='op'>=</span> <span class='st'>"ADT_snn"</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span>
+    resolution <span class='op'>=</span> <span class='fl'>0.2</span>,
+    graph.name <span class='op'>=</span> <span class='st'>"ADT_snn"</span>
+  <span class='op'>)</span>
 
-<span class='va'>filt_so</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>$</span><span class='va'>ADT_clusters</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>$</span><span class='va'>ADT_snn_res.0.2</span>
+<span class='co'># For clarity store clusters in meta.data as ADT_clusters</span>
+<span class='va'>filt_so</span><span class='op'>$</span><span class='va'>ADT_clusters</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span><span class='op'>$</span><span class='va'>ADT_snn_res.0.2</span>
 </code></pre>
 </div>
 </div>
-<h3 id="run-umap-using-the-antibody-signal">Run UMAP using the antibody signal</h3>
+<h3 id="run-umap-using-antibody-signal">Run UMAP using antibody signal</h3>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Run UMAP</span>
-<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span><span class='va'>filt_so</span>,
-                   assay <span class='op'>=</span> <span class='st'>"ADT"</span>,
-                   features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>filt_so</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>ADT</span><span class='op'>)</span>,
-                   reduction.name <span class='op'>=</span> <span class='st'>"adt_umap"</span>,
-                   reduction.key <span class='op'>=</span> <span class='st'>"ADTUMAP_"</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>&lt;-</span> <span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span>
+    assay          <span class='op'>=</span> <span class='st'>"ADT"</span>,
+    graph          <span class='op'>=</span> <span class='st'>"ADT_snn"</span>,
+    reduction.name <span class='op'>=</span> <span class='st'>"adt_umap"</span>,
+    reduction.key  <span class='op'>=</span> <span class='st'>"ADTUMAP_"</span>
+  <span class='op'>)</span>
 
 <span class='co'># Plot UMAPs</span>
-<span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>filt_so</span>,
+<span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span>
     reduction <span class='op'>=</span> <span class='st'>"adt_umap"</span>, 
-    group.by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"sample"</span>, <span class='st'>"ADT_clusters"</span><span class='op'>)</span>,
-    ncol <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+    group.by  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"sample"</span>, <span class='st'>"ADT_clusters"</span><span class='op'>)</span>,
+    ncol      <span class='op'>=</span> <span class='fl'>2</span>
+  <span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Run%20UMAP%20for%20antibody%20data-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Run%20UMAP%20for%20antibody%20data-1.png" width="1104" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="identify-marker-proteins">Identify marker proteins</h3>
 <div class="layout-chunk" data-layout="l-body">
 <pre><code>#&gt;                     p_val avg_log2FC pct.1 pct.2     p_val_adj
-#&gt; adt-CD8      0.000000e+00  1.0183630 0.996 0.940  0.000000e+00
-#&gt; adt-CD4     1.634829e-213  1.1375554 0.972 0.912 1.307864e-212
-#&gt; adt-CD14    6.625301e-139  1.0013079 0.871 0.346 5.300241e-138
-#&gt; adt-CD45     1.715050e-94  0.5889587 0.915 0.613  1.372040e-93
-#&gt; adt-CD45RO   9.890876e-90  0.6050448 0.972 0.865  7.912700e-89
-#&gt; adt-CD19     1.238443e-73  0.3811490 0.994 0.912  9.907541e-73
-#&gt; adt-CD41     4.628810e-36  0.4433490 1.000 0.922  3.703048e-35
-#&gt; adt-CD191    2.318370e-79  1.6849055 1.000 0.916  1.854696e-78
-#&gt; adt-CD45RA   1.496662e-18  0.3003838 0.992 0.982  1.197330e-17
-#&gt; adt-CD45RO1  7.607724e-17  0.3631645 0.984 0.871  6.086180e-16
+#&gt; adt-CD8      0.000000e+00  1.9813885 0.996 0.940  0.000000e+00
+#&gt; adt-CD4     1.634829e-213  2.4744195 0.972 0.912 1.307864e-212
+#&gt; adt-CD14    6.625301e-139  2.2351278 0.871 0.346 5.300241e-138
+#&gt; adt-CD45     1.715050e-94  1.1299631 0.915 0.613  1.372040e-93
+#&gt; adt-CD45RO   9.890876e-90  1.6445220 0.972 0.865  7.912700e-89
+#&gt; adt-CD45RA   4.323820e-07  0.4249255 0.987 0.982  3.459056e-06
+#&gt; adt-CD19     2.318370e-79  4.9637748 1.000 0.916  1.854696e-78
+#&gt; adt-CD45RA1  1.496662e-18  0.5880825 0.992 0.982  1.197330e-17
+#&gt; adt-CD45RO1  7.607724e-17  0.7118029 0.984 0.871  6.086180e-16
 #&gt;             cluster       gene
 #&gt; adt-CD8           0    adt-CD8
 #&gt; adt-CD4           1    adt-CD4
 #&gt; adt-CD14          3   adt-CD14
 #&gt; adt-CD45          3   adt-CD45
 #&gt; adt-CD45RO        3 adt-CD45RO
-#&gt; adt-CD19          3   adt-CD19
-#&gt; adt-CD41          3    adt-CD4
-#&gt; adt-CD191         5   adt-CD19
-#&gt; adt-CD45RA        5 adt-CD45RA
+#&gt; adt-CD45RA        3 adt-CD45RA
+#&gt; adt-CD19          5   adt-CD19
+#&gt; adt-CD45RA1       5 adt-CD45RA
 #&gt; adt-CD45RO1       5 adt-CD45RO</code></pre>
 </div>
 <p><br></p>
@@ -1963,7 +1988,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Create%20ridge%20plots-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Create%20ridge%20plots-1.png" width="1440" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="violin-plots">Violin plots</h3>
 <div class="layout-chunk" data-layout="l-body">
@@ -1986,10 +2011,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Plot CD3 and CD19 signal</span>
-<span class='fu'><a href='https://satijalab.org/seurat/reference/FeatureScatter.html'>FeatureScatter</a></span><span class='op'>(</span><span class='va'>filt_so</span>, <span class='st'>"adt-CD3"</span>, <span class='st'>"adt-CD19"</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FeatureScatter.html'>FeatureScatter</a></span><span class='op'>(</span><span class='st'>"adt-CD3"</span>, <span class='st'>"adt-CD19"</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/Filter%20using%20antibody%20signal-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/Filter%20using%20antibody%20signal-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2019,10 +2045,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 #&gt; Levels: CD19+ Other</code></pre>
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Label UMAP with new cell identities</span>
-<span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, reduction <span class='op'>=</span> <span class='st'>"adt_umap"</span><span class='op'>)</span>
+<span class='va'>labeled_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span>reduction <span class='op'>=</span> <span class='st'>"adt_umap"</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/unnamed-chunk-3-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/unnamed-chunk-3-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <h3 id="filter-cells-using-cellselector">Filter cells using CellSelector()</h3>
 <div class="layout-chunk" data-layout="l-body">
@@ -2056,10 +2083,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Compare CD3 and CD19 signal</span>
-<span class='fu'><a href='https://satijalab.org/seurat/reference/FeatureScatter.html'>FeatureScatter</a></span><span class='op'>(</span><span class='va'>filt_so</span>, <span class='st'>"adt-CD4"</span>, <span class='st'>"adt-CD8"</span><span class='op'>)</span>
+<span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FeatureScatter.html'>FeatureScatter</a></span><span class='op'>(</span><span class='st'>"adt-CD4"</span>, <span class='st'>"adt-CD8"</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/unnamed-chunk-4-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -2078,80 +2106,93 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>SetIdent</a></span><span class='op'>(</span>value <span class='op'>=</span> <span class='st'>"CD8+"</span>, cells <span class='op'>=</span> <span class='va'>CD8_cells</span><span class='op'>)</span>
 
 <span class='co'># Add cell identities to meta.data table</span>
-<span class='va'>labeled_so</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>$</span><span class='va'>cell_label</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>labeled_so</span><span class='op'>)</span>
+<span class='va'>labeled_so</span><span class='op'>$</span><span class='va'>cell_label</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>labeled_so</span><span class='op'>)</span>
 
 <span class='co'># Label UMAP with new cell identities</span>
-<span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, reduction <span class='op'>=</span> <span class='st'>"adt_umap"</span><span class='op'>)</span>
+<span class='va'>labeled_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span>reduction <span class='op'>=</span> <span class='st'>"adt_umap"</span><span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/unnamed-chunk-5-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/unnamed-chunk-5-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <p><br></p>
 <p><br></p>
 <h2 id="examine-cite-seq-derived-cell-labels-on-gene-expression-umap">Examine CITE-seq derived cell labels on gene expression umap</h2>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, 
-        reduction <span class='op'>=</span> <span class='st'>"umap"</span>,
-        group.by <span class='op'>=</span> <span class='st'>"cell_label"</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>labeled_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span> 
+    reduction <span class='op'>=</span> <span class='st'>"umap"</span>,
+    group.by  <span class='op'>=</span> <span class='st'>"cell_label"</span>
+  <span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/unnamed-chunk-6-1.png" width="624" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>feats</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+  <span class='st'>"adt-CD4"</span>, <span class='st'>"CD4"</span>,
+  <span class='st'>"adt-CD8"</span>, <span class='st'>"CD8A"</span>, 
+  <span class='st'>"adt-CD19"</span>, <span class='st'>"CD19"</span>
+<span class='op'>)</span>
+
+<span class='va'>filt_so</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://satijalab.org/seurat/reference/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span>
     reduction <span class='op'>=</span> <span class='st'>"umap"</span>,
-    features  <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"adt-CD4"</span>, <span class='st'>"CD4"</span>,
-                  <span class='st'>"adt-CD8"</span>, <span class='st'>"CD8A"</span>, 
-                  <span class='st'>"adt-CD19"</span>, <span class='st'>"CD19"</span><span class='op'>)</span>
+    features  <span class='op'>=</span> <span class='va'>feats</span>
   <span class='op'>)</span>
 </code></pre>
 </div>
 <p><img src="multi-modal_files/figure-html5/unnamed-chunk-7-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
-<h2 id="how-to-combine-antibody-and-rna-data-for-clustering-and-umap">How to combine antibody and RNA data for clustering and UMAP?</h2>
+<p><br></p>
+<p><br></p>
+<h2 id="combining-cite-seq-and-gene-expression-data">Combining CITE-seq and gene expression data</h2>
 <p>The authors of Seurat have implemented a new algorithm for combined data from different types of assays (e.g. antibody data and RNA data), described in a <a href="https://www.biorxiv.org/content/10.1101/2020.10.12.335331v1">preprint</a> and presented in a <a href="https://satijalab.org/seurat/v4.0/weighted_nearest_neighbor_analysis.html">vignette</a>.</p>
 <p>The basic idea is that we want to cluster and visualize the data using <strong>both</strong> the RNA and antibody data. How to do this?</p>
 <p>We could literally just merge the two datasets together then run them through Seurat. This will however end up downweighting the contribution of the antibody data because there are so few antibodies(~8) compared to RNA features (~10,000)</p>
 <p>Seurat has implemented a “Weighted Nearest Neighbor” approach that will combine the nearest neighbor graphs from the RNA data with the antibody data. The algorithm will calculate relative weights for the RNA or the Protein data for each cell and use these new weights to constuct a shared graph. The related weights are calculated based on the relative information content of neighboring cells in each modalitly. So if the data from 1 modality provides more information, then it is weighted higher.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># need to use PCA on the antibody data</span>
-<span class='va'>labeled_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/RunPCA.html'>RunPCA</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, 
-                     assay <span class='op'>=</span> <span class='st'>"ADT"</span>, 
-                     features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>labeled_so</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>ADT</span><span class='op'>)</span>,
-                     reduction.name <span class='op'>=</span> <span class='st'>'apca'</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Need to run PCA on the antibody data</span>
+<span class='va'>labeled_so</span> <span class='op'>&lt;-</span> <span class='va'>labeled_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunPCA.html'>RunPCA</a></span><span class='op'>(</span> 
+    assay          <span class='op'>=</span> <span class='st'>"ADT"</span>, 
+    features       <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>labeled_so</span><span class='op'>@</span><span class='va'>assays</span><span class='op'>$</span><span class='va'>ADT</span><span class='op'>)</span>,
+    reduction.name <span class='op'>=</span> <span class='st'>'apca'</span>
+  <span class='op'>)</span>
 
-<span class='va'>labeled_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindMultiModalNeighbors.html'>FindMultiModalNeighbors</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, 
-                                      reduction.list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"pca"</span>,
-                                                            <span class='st'>"apca"</span><span class='op'>)</span>, 
-                                      dims.list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span>,
-                                                       <span class='fl'>1</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>)</span>,
-                                      modality.weight.name <span class='op'>=</span> <span class='st'>"RNA.weight"</span><span class='op'>)</span>
+<span class='va'>labeled_so</span> <span class='op'>&lt;-</span> <span class='va'>labeled_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindMultiModalNeighbors.html'>FindMultiModalNeighbors</a></span><span class='op'>(</span>
+    reduction.list       <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"pca"</span>, <span class='st'>"apca"</span><span class='op'>)</span>, 
+    dims.list            <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>)</span>,
+    modality.weight.name <span class='op'>=</span> <span class='st'>"RNA.weight"</span>
+  <span class='op'>)</span>
 
-<span class='va'>labeled_so</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, 
-                      nn.name <span class='op'>=</span> <span class='st'>"weighted.nn"</span>, 
-                      reduction.name <span class='op'>=</span> <span class='st'>"wnn.umap"</span>, 
-                      reduction.key <span class='op'>=</span> <span class='st'>"wnnUMAP_"</span><span class='op'>)</span>
+<span class='va'>labeled_so</span> <span class='op'>&lt;-</span> <span class='va'>labeled_so</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span>
+    nn.name        <span class='op'>=</span> <span class='st'>"weighted.nn"</span>, 
+    reduction.name <span class='op'>=</span> <span class='st'>"wnn.umap"</span>, 
+    reduction.key  <span class='op'>=</span> <span class='st'>"wnnUMAP_"</span>
+  <span class='op'>)</span>
 </code></pre>
 </div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>rna_umap</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, reduction <span class='op'>=</span> <span class='st'>"umap"</span><span class='op'>)</span>
-<span class='va'>adt_umap</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, reduction <span class='op'>=</span> <span class='st'>"adt_umap"</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>rna_umap</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, reduction <span class='op'>=</span> <span class='st'>"umap"</span><span class='op'>)</span>
+<span class='va'>adt_umap</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, reduction <span class='op'>=</span> <span class='st'>"adt_umap"</span><span class='op'>)</span>
 <span class='va'>both_umap</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>labeled_so</span>, reduction <span class='op'>=</span> <span class='st'>"wnn.umap"</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>plot_grid</a></span><span class='op'>(</span><span class='va'>rna_umap</span>,
-          <span class='va'>adt_umap</span>,
-          <span class='va'>both_umap</span>,
-          labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"RNA"</span>, <span class='st'>"ADT"</span>, <span class='st'>"Both"</span><span class='op'>)</span>,
-          ncol <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>plot_grid</a></span><span class='op'>(</span>
+  <span class='va'>rna_umap</span>, <span class='va'>adt_umap</span>, <span class='va'>both_umap</span>,
+  labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"RNA"</span>, <span class='st'>"ADT"</span>, <span class='st'>"Both"</span><span class='op'>)</span>,
+  ncol   <span class='op'>=</span> <span class='fl'>3</span>
+<span class='op'>)</span>
 </code></pre>
 </div>
-<p><img src="multi-modal_files/figure-html5/unnamed-chunk-9-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p><img src="multi-modal_files/figure-html5/unnamed-chunk-9-1.png" width="1728" style="display: block; margin: auto;" /></p>
 </div>
 <p><br></p>
 <p><br></p>
@@ -2254,14 +2295,14 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 <h3 id="build-cell-browser-session">Build Cell Browser session</h3>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> cellbrowser/html</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">cbBuild</span> <span class="dt">\</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-i</span> cellbrowser/RNA/cellbrowser.conf <span class="dt">\</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-i</span> cellbrowser/ADT/cellbrowser.conf <span class="dt">\</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-o</span> cellbrowser/html <span class="dt">\</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 8888</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="fu">mkdir</span> -p cellbrowser/html</span>
+<span id="cb12-3"><a href="#cb12-3"></a></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="ex">cbBuild</span> \</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  -i cellbrowser/RNA/cellbrowser.conf \</span>
+<span id="cb12-6"><a href="#cb12-6"></a>  -i cellbrowser/ADT/cellbrowser.conf \</span>
+<span id="cb12-7"><a href="#cb12-7"></a>  -o cellbrowser/html \</span>
+<span id="cb12-8"><a href="#cb12-8"></a>  -p 8888</span></code></pre></div>
 </div>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
