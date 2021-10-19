@@ -18,6 +18,8 @@ output:
   distill::distill_article:
     self_contained: false
 draft: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include = FALSE}
@@ -695,10 +697,9 @@ UCSC hosts a [large collection of cellbrowsers](http://cells.ucsc.edu/) for vari
 
 ### Merge gene expression and antibody matrices
 
-We won't be generating these browsers in the class, however below is some example code of how to build browsers.
+We won't be generating these browsers in the class, however below is an example of how to build a browser. The first step is to combine the gene expression and antibody data into a single matrix.  
 
 ```{r "Merge RNA and ADT matrices", eval = FALSE}
-
 # Combine RNA and ADT matrices
 merged_so   <- labeled_so
 RNA_data    <- merged_so@assays$RNA@data
@@ -710,92 +711,68 @@ merged_so@assays$RNA@data <- merged_data
 
 # Set active assay
 merged_so@active.assay <- "RNA"
-
 ```
 
 ### Create Cell Browser files
 
-```{r "Create gene expression Cell Browser files", eval = FALSE}
+To create the files needed for the session, we can use the make_cellbrowser function from the [scbp](https://github.com/rnabioco/scbp) package written by Kent Riemondy. This function extracts the required data from our Seurat object and generates configuration files needed to build the session. To include both the gene expression and antibody UMAPs, we generate separate sets of files for each.
 
+```{r "Create gene expression Cell Browser files", eval = FALSE}
 # Create Cell Browser directories for gene expression data
 dir.create(
-  path = "cellbrowser/RNA",
-  recursive = T
+  path      = "cellbrowser",
+  recursive = TRUE
+)
+
+# meta.data fields to include in browser
+feats <- c(
+  "Sample"      = "sample",
+  "clusters"    = "RNA_clusters",
+  "ADT cluster" = "ADT_clusters",
+  "Cell label"  = "cell_label",
+  
+  "RNA UMI count"     = "nCount_RNA",
+  "Gene count"        = "nFeature_RNA",
+  "Percent mito UMIs" = "percent_mito",
+  "ADT UMI count"     = "nCount_ADT",
+  "Antibody count"    = "nFeature_ADT",
+  "HTO UMI count"     = "nCount_HTO",
+  "HTO count"         = "nFeature_HTO"
 )
 
 # Create Cell Browser files for gene expression data
 merged_so %>%
-  ExportToCellbrowser(
-    dir          = "cellbrowser/RNA",
-    reductions   = "umap",
-    dataset.name = "RNA",
-
-    sample       = "Sample",
-    RNA_clusters = "Cluster",
-    ADT_clusters = "ADT cluster",
-    cell_label   = "Cell label",
-    
-    nCount_RNA   = "RNA UMI count",
-    nFeature_RNA = "Gene count",
-    percent_mito = "Percent mito UMIs",
-    nCount_ADT   = "ADT UMI count",
-    nFeature_ADT = "Antibody count",
-    nCount_HTO   = "HTO UMI count",
-    nFeature_HTO = "HTO count"
+  make_cellbrowser(
+    outdir      = "cellbrowser",
+    column_list = feats,
+    embeddings  = "umap",
+    project     = "RNA"
   )
-
 ```
 
 ```{r "Create ADT Cell Browser files", eval = FALSE}
-
-# Create Cell Browser directories for antibody data
-dir.create(
-  path = "cellbrowser/ADT",
-  recursive = T
-)
-
-# Export marker genes
-ADT_markers %>%
-  rename(score = p_val_adj) %>%
-  select(cluster, gene, score) %>%
-  write_tsv("cellbrowser/ADT/ADT_markers.tsv")
-
 # Create Cell Browser files for antibody data
 merged_so %>%
-  ExportToCellbrowser(
-    dir          = "cellbrowser/ADT",
-    reductions   = "adt_umap",
-    dataset.name = "ADT",
-    markers.file = "cellbrowser/ADT/ADT_markers.tsv",
-    
-    sample       = "Sample",
-    ADT_clusters = "Cluster",
-    RNA_clusters = "RNA cluster",
-    cell_label   = "Cell label",
-    
-    nCount_RNA   = "RNA UMI count",
-    nFeature_RNA = "Gene count",
-    percent_mito = "Percent mito UMIs",
-    nCount_ADT   = "ADT UMI count",
-    nFeature_ADT = "Antibody count",
-    nCount_HTO   = "HTO UMI count",
-    nFeature_HTO = "HTO count"
+  make_cellbrowser(
+    outdir      = "cellbrowser",
+    column_list = feats,
+    embeddings  = "adt_umap",
+    project     = "ADT"
   )
-
 ```
 
 ### Build Cell Browser session
 
-```{bash "Build Cell Browser session", eval = FALSE}
+To build the cell browser session, install [cbBuild](https://cellbrowser.readthedocs.io). This tool will build the session using the configuration files generated in the previous step.
 
-mkdir -p cellbrowser/html
+```{bash "Build Cell Browser session", eval = FALSE}
+mkdir -p cellbrowser/browser
 
 cbBuild \
   -i cellbrowser/RNA/cellbrowser.conf \
   -i cellbrowser/ADT/cellbrowser.conf \
-  -o cellbrowser/html \
+  -o cellbrowser/browser \
   -p 8888
-
 ```
 
 

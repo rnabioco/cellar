@@ -113,7 +113,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","draft"]}},"value":[{"type":"character","attributes":{},"value":["Working with Multi-modal data"]},{"type":"character","attributes":{},"value":["A short description of the post.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]},{"type":"character","attributes":{},"value":["https://github.com/kriemo"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-0750-1273"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Ryan Sheridan"]},{"type":"character","attributes":{},"value":["https://github.com/sheridar"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-4012-3147"]}]}]},{"type":"character","attributes":{},"value":["10-13-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[true]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","draft","editor_options"]}},"value":[{"type":"character","attributes":{},"value":["Working with Multi-modal data"]},{"type":"character","attributes":{},"value":["A short description of the post.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]},{"type":"character","attributes":{},"value":["https://github.com/kriemo"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-0750-1273"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Ryan Sheridan"]},{"type":"character","attributes":{},"value":["https://github.com/sheridar"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-4012-3147"]}]}]},{"type":"character","attributes":{},"value":["10-13-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[true]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["chunk_output_type"]}},"value":[{"type":"character","attributes":{},"value":["console"]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
@@ -2206,7 +2206,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </ul>
 <p>UCSC hosts a <a href="http://cells.ucsc.edu/">large collection of cellbrowsers</a> for various single cell datasets.</p>
 <h3 id="merge-gene-expression-and-antibody-matrices">Merge gene expression and antibody matrices</h3>
-<p>We won’t be generating these browsers in the class, however below is some example code of how to build browsers.</p>
+<p>We won’t be generating these browsers in the class, however below is an example of how to build a browser. The first step is to combine the gene expression and antibody data into a single matrix.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Combine RNA and ADT matrices</span>
@@ -2224,85 +2224,65 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 </div>
 <h3 id="create-cell-browser-files">Create Cell Browser files</h3>
+<p>To create the files needed for the session, we can use the make_cellbrowser function from the <a href="https://github.com/rnabioco/scbp">scbp</a> package written by Kent Riemondy. This function extracts the required data from our Seurat object and generates configuration files needed to build the session. To include both the gene expression and antibody UMAPs, we generate separate sets of files for each.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Create Cell Browser directories for gene expression data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span>
-  path <span class='op'>=</span> <span class='st'>"cellbrowser/RNA"</span>,
-  recursive <span class='op'>=</span> <span class='cn'>T</span>
+  path      <span class='op'>=</span> <span class='st'>"cellbrowser"</span>,
+  recursive <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+
+<span class='co'># meta.data fields to include in browser</span>
+<span class='va'>feats</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+  <span class='st'>"Sample"</span>      <span class='op'>=</span> <span class='st'>"sample"</span>,
+  <span class='st'>"clusters"</span>    <span class='op'>=</span> <span class='st'>"RNA_clusters"</span>,
+  <span class='st'>"ADT cluster"</span> <span class='op'>=</span> <span class='st'>"ADT_clusters"</span>,
+  <span class='st'>"Cell label"</span>  <span class='op'>=</span> <span class='st'>"cell_label"</span>,
+  
+  <span class='st'>"RNA UMI count"</span>     <span class='op'>=</span> <span class='st'>"nCount_RNA"</span>,
+  <span class='st'>"Gene count"</span>        <span class='op'>=</span> <span class='st'>"nFeature_RNA"</span>,
+  <span class='st'>"Percent mito UMIs"</span> <span class='op'>=</span> <span class='st'>"percent_mito"</span>,
+  <span class='st'>"ADT UMI count"</span>     <span class='op'>=</span> <span class='st'>"nCount_ADT"</span>,
+  <span class='st'>"Antibody count"</span>    <span class='op'>=</span> <span class='st'>"nFeature_ADT"</span>,
+  <span class='st'>"HTO UMI count"</span>     <span class='op'>=</span> <span class='st'>"nCount_HTO"</span>,
+  <span class='st'>"HTO count"</span>         <span class='op'>=</span> <span class='st'>"nFeature_HTO"</span>
 <span class='op'>)</span>
 
 <span class='co'># Create Cell Browser files for gene expression data</span>
 <span class='va'>merged_so</span> <span class='op'>%&gt;%</span>
-  <span class='fu'>ExportToCellbrowser</span><span class='op'>(</span>
-    dir          <span class='op'>=</span> <span class='st'>"cellbrowser/RNA"</span>,
-    reductions   <span class='op'>=</span> <span class='st'>"umap"</span>,
-    dataset.name <span class='op'>=</span> <span class='st'>"RNA"</span>,
-
-    sample       <span class='op'>=</span> <span class='st'>"Sample"</span>,
-    RNA_clusters <span class='op'>=</span> <span class='st'>"Cluster"</span>,
-    ADT_clusters <span class='op'>=</span> <span class='st'>"ADT cluster"</span>,
-    cell_label   <span class='op'>=</span> <span class='st'>"Cell label"</span>,
-    
-    nCount_RNA   <span class='op'>=</span> <span class='st'>"RNA UMI count"</span>,
-    nFeature_RNA <span class='op'>=</span> <span class='st'>"Gene count"</span>,
-    percent_mito <span class='op'>=</span> <span class='st'>"Percent mito UMIs"</span>,
-    nCount_ADT   <span class='op'>=</span> <span class='st'>"ADT UMI count"</span>,
-    nFeature_ADT <span class='op'>=</span> <span class='st'>"Antibody count"</span>,
-    nCount_HTO   <span class='op'>=</span> <span class='st'>"HTO UMI count"</span>,
-    nFeature_HTO <span class='op'>=</span> <span class='st'>"HTO count"</span>
+  <span class='fu'>make_cellbrowser</span><span class='op'>(</span>
+    outdir      <span class='op'>=</span> <span class='st'>"cellbrowser"</span>,
+    column_list <span class='op'>=</span> <span class='va'>feats</span>,
+    embeddings  <span class='op'>=</span> <span class='st'>"umap"</span>,
+    project     <span class='op'>=</span> <span class='st'>"RNA"</span>
   <span class='op'>)</span>
 </code></pre>
 </div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Create Cell Browser directories for antibody data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span>
-  path <span class='op'>=</span> <span class='st'>"cellbrowser/ADT"</span>,
-  recursive <span class='op'>=</span> <span class='cn'>T</span>
-<span class='op'>)</span>
-
-<span class='co'># Export marker genes</span>
-<span class='va'>ADT_markers</span> <span class='op'>%&gt;%</span>
-  <span class='fu'>rename</span><span class='op'>(</span>score <span class='op'>=</span> <span class='va'>p_val_adj</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'>select</span><span class='op'>(</span><span class='va'>cluster</span>, <span class='va'>gene</span>, <span class='va'>score</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'>write_tsv</span><span class='op'>(</span><span class='st'>"cellbrowser/ADT/ADT_markers.tsv"</span><span class='op'>)</span>
-
-<span class='co'># Create Cell Browser files for antibody data</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Create Cell Browser files for antibody data</span>
 <span class='va'>merged_so</span> <span class='op'>%&gt;%</span>
-  <span class='fu'>ExportToCellbrowser</span><span class='op'>(</span>
-    dir          <span class='op'>=</span> <span class='st'>"cellbrowser/ADT"</span>,
-    reductions   <span class='op'>=</span> <span class='st'>"adt_umap"</span>,
-    dataset.name <span class='op'>=</span> <span class='st'>"ADT"</span>,
-    markers.file <span class='op'>=</span> <span class='st'>"cellbrowser/ADT/ADT_markers.tsv"</span>,
-    
-    sample       <span class='op'>=</span> <span class='st'>"Sample"</span>,
-    ADT_clusters <span class='op'>=</span> <span class='st'>"Cluster"</span>,
-    RNA_clusters <span class='op'>=</span> <span class='st'>"RNA cluster"</span>,
-    cell_label   <span class='op'>=</span> <span class='st'>"Cell label"</span>,
-    
-    nCount_RNA   <span class='op'>=</span> <span class='st'>"RNA UMI count"</span>,
-    nFeature_RNA <span class='op'>=</span> <span class='st'>"Gene count"</span>,
-    percent_mito <span class='op'>=</span> <span class='st'>"Percent mito UMIs"</span>,
-    nCount_ADT   <span class='op'>=</span> <span class='st'>"ADT UMI count"</span>,
-    nFeature_ADT <span class='op'>=</span> <span class='st'>"Antibody count"</span>,
-    nCount_HTO   <span class='op'>=</span> <span class='st'>"HTO UMI count"</span>,
-    nFeature_HTO <span class='op'>=</span> <span class='st'>"HTO count"</span>
+  <span class='fu'>make_cellbrowser</span><span class='op'>(</span>
+    outdir      <span class='op'>=</span> <span class='st'>"cellbrowser"</span>,
+    column_list <span class='op'>=</span> <span class='va'>feats</span>,
+    embeddings  <span class='op'>=</span> <span class='st'>"adt_umap"</span>,
+    project     <span class='op'>=</span> <span class='st'>"ADT"</span>
   <span class='op'>)</span>
 </code></pre>
 </div>
 </div>
 <h3 id="build-cell-browser-session">Build Cell Browser session</h3>
+<p>To build the cell browser session, install <a href="https://cellbrowser.readthedocs.io">cbBuild</a>. This tool will build the session using the configuration files generated in the previous step.</p>
 <div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a></span>
-<span id="cb12-2"><a href="#cb12-2"></a><span class="fu">mkdir</span> -p cellbrowser/html</span>
-<span id="cb12-3"><a href="#cb12-3"></a></span>
-<span id="cb12-4"><a href="#cb12-4"></a><span class="ex">cbBuild</span> \</span>
-<span id="cb12-5"><a href="#cb12-5"></a>  -i cellbrowser/RNA/cellbrowser.conf \</span>
-<span id="cb12-6"><a href="#cb12-6"></a>  -i cellbrowser/ADT/cellbrowser.conf \</span>
-<span id="cb12-7"><a href="#cb12-7"></a>  -o cellbrowser/html \</span>
-<span id="cb12-8"><a href="#cb12-8"></a>  -p 8888</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">mkdir</span> -p cellbrowser/browser</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="ex">cbBuild</span> \</span>
+<span id="cb12-4"><a href="#cb12-4"></a>  -i cellbrowser/RNA/cellbrowser.conf \</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  -i cellbrowser/ADT/cellbrowser.conf \</span>
+<span id="cb12-6"><a href="#cb12-6"></a>  -o cellbrowser/browser \</span>
+<span id="cb12-7"><a href="#cb12-7"></a>  -p 8888</span></code></pre></div>
 </div>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
