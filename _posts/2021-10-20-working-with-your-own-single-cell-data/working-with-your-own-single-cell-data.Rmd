@@ -1,0 +1,164 @@
+---
+title: "Working with your own single cell data"
+description: |
+  Guidelines for datasets to work with in the workshop, 
+  information on where to get public datasets, and 
+  examples of how to load different data formats into R. 
+author: "Kent Riemondy"
+date: 10-20-2021
+output:
+  distill::distill_article:
+    self_contained: false
+draft: false 
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Guidelines for datasets
+
+We ask that each workshop participant selects a dataset to analyze while taking the workshop. Each lecture will use standardized datasets, however we will set aside time for attendees to  discuss analysis of their datasets with the instructors. Working through your own dataset (or a relevant published dataset) will reinforce concepts taught in class. 
+
+In this article we will discuss:  
+  - Guidelines and suggestions for the format of the dataset that you will analyze  
+  - Various data repositories and other sources of public datasets   
+  - Show examples of how to load various data formats into R for analysis with Seurat
+  
+## Dataset format
+
+The data that we will work with in the workshop will be count matrices. Count matrices are generally genes as rows and cells as columns, populated with read or UMI counts. These matrices are generated from pipelines such [Cellranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) (from 10x Genomics), or tools from academic labs such as [Alevin](https://salmon.readthedocs.io/en/latest/alevin.html)  (from the Patro lab), or [Kallisto/Bustools](https://www.kallistobus.tools/) (from the Pacther lab). These pipelines will align the raw FASTQ sequencing files, identify the barcodes associated with cell containing droplets, and output count matrices in various formats. Efficiently processing single cell datasets into count matrices generally requires more memory (RAM) and CPU power than is present on most laptops so we will not perform these steps in class. These steps are usually run on large compute clusters or on servers in the cloud. 10x Genomics offers a [cloud service](https://www.10xgenomics.com/products/cloud-analysis) for running cellranger and the RBI has a [pipeline](https://github.com/rnabioco/cellrangerAWS) for running cellranger on AWS. 
+
+## Dataset size and complexity
+
+As single cell datasets are continually growing in size ([see article](https://www.nature.com/articles/nprot.2017.149)), so are the memory resources required for analyzing these datasets. A smaller dataset (e.g. ~5k cells) can be analyzed on a laptop with 8Gb of RAM without demanding too much memory. However, a dataset of ~50K cells generally maxes out the memory on a 2015 macbook pro with 16Gb of RAM.
+
+To start analyzing single cell data, it is useful to learn the basics of the analysis working with 1 sample. However, 1 sample provides limited information, and is generally an insufficient dataset for learning new biology. Your dataset can therefore contain multiple samples, however this will increase the complexity of the analysis, particularly until we discuss methods for working with multiple samples in class 4. 
+
+## Identifying public datasets 
+
+If you do not have a dataset in mind to analyze there are many sources. 
+
+- [10x genomics](https://www.10xgenomics.com/resources/datasets) 10x Genomics provides many datasets already processed through cellranger. You will need to register to gain access. The count matrix files to download, which contain only cell-associated barcodes, are called `Feature / cell matrix (filtered)`.
+
+- [UCSC cellbrowser](https://cells.ucsc.edu/): This is collection of published datsets that have been already analyzed and placed into an interactive web browser. This is a nice resource as you can use to look at the data, and compare your own analysis to this data. When you select a dataset you can click the `Data Download` tab, and download the `exprMatrix.tsv.gz` file. Some datasets also provide seurat objects for download as well (e.g. [human lung airway dataset](https://cells.ucsc.edu/?ds=lung-airway)). Note that the data included in the matrices is often already normalized, and not integer UMI counts. You will therefore want skip normalization in Seurat if you use these datasets. 
+
+- [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/). Published single cell RNA-seq experiments should have their raw data deposited into GEO. Navigating GEO to find datasets is difficult and therefore it is better to first find a publication, then link to the publications dataset. A count matrix should be included as processed data with the submission, however not all datasets have these, and the data formats and naming conventions are not standardized. An example dataset from a mouse lung injury experiment is [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE113049), with the `GSE113049_count_matrix.tsv.gz` being the relevant UMI count matrix. 
+
+- [Bioconductor package: scRNAseq](https://www.bioconductor.org/packages/release/data/experiment/html/scRNAseq.html) A curated selection of single cell datasets have been organized into a bioconductor pacakge called `scRNAseq`. These datasets are provided as `SingleCellExperiment` objects, which is the bioconductor data structure used for storing and working with single cell datasets. These can be easily converted to and from other data structures, such as Seurat, as shown in the "importing datasets into R" section. 
+
+
+```{r, eval = T, echo = TRUE}
+library(scRNAseq)
+listDatasets()
+```
+
+- [cellXgene](https://cellxgene.cziscience.com/) CellXgene is a visualation tool for single cell datasets developed by the Chan-Zuckerberg Institute. They also host a variety of public datasets, some of which can be downloaded as seurat Objects.  
+
+**Please contact the instructors if you have any difficulties finding an appropriate dataset** 
+
+## Load data from the wild into R
+
+
+### Cellranger output
+
+Cellranger produces many output files. The files in the `filtered_feature_bc_matrix` directory contain the count matrix for cell-associated barcodes in a special sparseMatrix format (matrix market format) that can be loaded into R using a few different packages. 
+
+```{r, eval = F, echo = T}
+# read into R as a sparseMatrix
+mat <- Seurat::Read10X()
+# create a seurat object from the sparseMatrix
+CreateSeuratObject(mat)
+
+# alternatively, read into R as a SingleCellExperiment object for use with bioconductor
+DropletUtils::read10xCounts()
+```
+
+### From UCSC cellbrowser
+
+Some datasets provide a Seurat object as an `.rds` file. Download this file if provided. If not, then the gene expression data will also be provided in a tsv file called `exprMatrix.tsv.gz`. 
+
+
+```{r, eval = FALSE, echo = TRUE}
+# to download and load an .rds file
+download.file("https://cells.ucsc.edu/mouse-dev-neocortex/seurat.rds", "seurat.rds")
+seurat_object <- readRDS("seurat.rds")
+seurat_object
+```
+
+```{r, eval = FALSE, echo = TRUE}
+# to download and read in a .tsv file
+#download.file("https://cells.ucsc.edu/mouse-dev-neocortex/exprMatrix.tsv.gz", "data.tsv.gz")
+
+# slow way
+mat <- read.table("data.tsv.gz")
+# faster way, requires the data.table R package
+mat <- data.table::fread("data.tsv.gz", sep = "\t", data.table = FALSE)
+
+# move column "gene" to rownames and remove 
+rownames(mat) <- mat[, 1]
+mat[, 1] <- NULL
+
+# convert to sparseMatrix to load into Seurat
+mat <- as.sparse(mat)
+
+CreateSeuratObject(mat)
+```
+
+
+
+
+### From GEO
+
+Data in GEO has no standarized format, so you will need to adapt the approach based on the files provided. Generally we try to upload data in a `.tsv`,`.csv` or a sparseMatrix format. 
+
+To load a .tsv/.csv file from a [GEO record](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE113049) you can use a similar approach as used for the `.tsv` file from the UCSC browser. 
+
+```{r, eval = FALSE, echo = TRUE}
+# to download and read in a .tsv file
+#download.file("https://ftp.ncbi.nlm.nih.gov/geo/series/GSE113nnn/GSE113049/suppl/GSE113049_count_matrix.tsv.gz", "data.tsv.gz")
+
+# faster way, requires the data.table R package
+mat <- data.table::fread("data.tsv.gz", sep = "\t", data.table = FALSE)
+
+# move column "V1" to rownames and remove 
+rownames(mat) <- mat[, 1]
+mat[, 1] <- NULL
+
+# convert to sparseMatrix to load into Seurat
+mat <- as.sparse(mat)
+
+CreateSeuratObject(mat)
+```
+
+### From the scRNAseq datasets
+
+```{r, eval = T, echo = T, showWarnings = FALSE}
+library(scRNAseq)
+library(Seurat)
+# select a dataset from listDatasets()
+
+# assign to object to load into the rsession
+sce <- ZhongPrefrontalData()
+
+# convert to Seurat object from SingleCellExperiment
+# sometimes this approach will error out.
+# seurat_object <- as.Seurat(sce)
+# alternatively just extract the raw UMI counts matrix
+mat <- counts(sce)
+CreateSeuratObject(mat)
+```
+### From the Alevin pipeline
+
+If the data was generated by the Alevin pipelines you can use the `tximport` package to load the data into R. This process can be accelerated by also installing the `fishpond` package. Alevin will generate a file called `quants_mat.gz` which is a custom binary file with the counts matrix. 
+
+
+```{r, eval = FALSE, echo = TRUE}
+#pseudocode
+files <- "path/to/alevin/quants_mat.gz"
+txi <- tximport(files, type = "alevin")
+mat <- as.sparse(txi$counts)
+CreateSeuratObect(mat)
+```
+
