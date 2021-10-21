@@ -27,6 +27,15 @@ library(scales)
 library(gridExtra)
 library(ComplexHeatmap)
 library(destiny)
+library(knitr)
+library(LaCroixColoR)
+library(viridis)
+library(RColorBrewer)
+library(harmony)
+library(ggridges)
+library(pheatmap)
+library(clusterExperiment)
+
 theme_set(theme_cowplot())
 ```
 

@@ -186,14 +186,14 @@ We have a docker image available on dockerhub that includes the packages that wi
 
 [`rstudio-scrnaseq`](https://hub.docker.com/r/kenter/rstudio-scrnaseq)
 
-You can use this image in the same manner as above, instead using `kenter/rstudio-scrnaseq`.
+You can use this image in the same manner as above, instead using `kenter/rstudio-scrnaseq:v0.2`.
 
 Try it out:
 ```bash
-docker run --rm -e PASSWORD=rna -p 8787:8787 kenter/rstudio-scrnaseq
+docker run --rm -e PASSWORD=rna -p 8787:8787 kenter/rstudio-scrnaseq:v0.2
 ```
 
-When you open rstudio you should be able to load `Seurat` and other single cell packages. We've also included a `test.Rmd` document that lists and loads all of the relevant installed packages, and tests basic Seurat commands. 
+When you open rstudio you should be able to load `Seurat` and other single cell packages. We've also included a `test-install.Rmd` document that lists and loads all of the relevant installed packages, and tests basic Seurat commands. 
  
  
 # Additional resources
