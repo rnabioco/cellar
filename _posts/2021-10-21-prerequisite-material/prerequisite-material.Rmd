@@ -19,12 +19,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This Rmarkdown document contains a series of exercises related to some R programming concepts that will be used in the workshop. After writing and executing your code please try to `knit` the Rmarkdown using the `Knit` button. We will review the answers to these questions in the pre-workshop class on Monday. 
 
-**Please download the raw [Rmarkdown from github](https://rnabioco.github.io/cellar/posts/2021-10-21-prerequisite-material/prerequiste-exercises.Rmd) to complete these exercises**
+**Please download the raw [Rmarkdown from github](https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-21-prerequisite-material/prerequiste-exercises.Rmd) to complete these exercises**
 
 
 1) We will be using many R packages in the course. Please load all of the following packages to ensure that you have the packages used in the course installed.  
 
-If you run into issues, please follow the instructions provided in the [R package installation post](https://rnabioco.github.io/cellar/posts/2021-10-14-r-installation/), contact the instructors via email (rbi.fellows@cuanschutz.edu) and/or post to the slack channel for help.   
+If you run into issues, please follow the instructions provided in the [R package installation post](https://rnabioco.github.io/cellar/-posts/2021-10-14-r-installation/), contact the instructors via email (rbi.fellows@cuanschutz.edu) and/or post to the slack channel for help.   
 
 ```{r}
 library(Seurat)

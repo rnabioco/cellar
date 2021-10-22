@@ -51,7 +51,7 @@ If you do not have a dataset in mind to analyze there are many sources.
 
 - [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/). Published single cell RNA-seq experiments should have their raw data deposited into GEO. Navigating GEO to find datasets is difficult and therefore it is better to first find a publication, then link to the publications dataset. A count matrix should be included as processed data with the submission, however not all datasets have these, and the data formats and naming conventions are not standardized. An example dataset from a mouse lung injury experiment is [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE113049), with the `GSE113049_count_matrix.tsv.gz` being the relevant UMI count matrix. 
 
-- [Bioconductor package: scRNAseq](https://www.bioconductor.org/packages/release/data/experiment/html/scRNAseq.html) A curated selection of single cell datasets have been organized into a bioconductor pacakge called `scRNAseq`. These datasets are provided as `SingleCellExperiment` objects, which is the bioconductor data structure used for storing and working with single cell datasets. These can be easily converted to and from other data structures, such as Seurat, as shown in the "importing datasets into R" section. 
+- [Bioconductor package: scRNAseq](https://www.bioconductor.org/packages/release/data/experiment/html/scRNAseq.html) A curated selection of single cell datasets have been organized into a bioconductor pacakge called `scRNAseq`. These datasets are provided as `SingleCellExperiment` objects, which is the bioconductor data structure used for storing and working with single cell datasets. These can be easily converted to and from other data structures, such as Seurat, as shown in the [load data from the wild](https://rnabioco.github.io/cellar/posts/2021-10-20-working-with-your-own-single-cell-data/#load-data-from-the-wild-into-r) section. 
 
 
 ```{r, eval = T, echo = TRUE}
@@ -59,7 +59,7 @@ library(scRNAseq)
 listDatasets()
 ```
 
-- [cellXgene](https://cellxgene.cziscience.com/) CellXgene is a visualation tool for single cell datasets developed by the Chan-Zuckerberg Institute. They also host a variety of public datasets, some of which can be downloaded as seurat Objects.  
+- [cellXgene](https://cellxgene.cziscience.com/) CellXgene is a visualation tool for single cell datasets developed by the Chan-Zuckerberg Institute. They also host a variety of public datasets, some of which can be downloaded as Seurat objects.  
 
 **Please contact the instructors if you have any difficulties finding an appropriate dataset** 
 
