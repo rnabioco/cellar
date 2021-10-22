@@ -7,4 +7,5 @@ listing:
     - 2021-10-15-running-rrstudio-with-docker
     - 2021-10-20-working-with-your-own-single-cell-data
     - 2021-10-21-prerequisite-material
+    - 2021-10-21-interacting-with-r-in-rstudio
 ---

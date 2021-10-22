@@ -1,0 +1,29 @@
+---
+title: "Interacting with R in Rstudio"
+description: |
+  A tutorial for navigating the Rstudio IDE, RMarkdown,
+  and setting up Rstudio projects to organize each class.
+author:
+  - name: "Kent Riemondy"
+    url: https://github.com/kriemo
+    affiliation: "RNA Bioscience Initiative"
+    affiliation_url: https://medschool.cuanschutz.edu/rbi
+    orcid_id: 0000-0003-0750-1273
+date: 10-21-2021
+output:
+  distill::distill_article:
+    self_contained: false
+preview: rstudio.png
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+[Rstudio](https://www.rstudio.com/) is one of the most popular Integrated Development Environments (IDE) for working in R. It provides many useful tools to help conduct, document, and manage your analyses. 
+
+If you are unfamilar with Rstudio, the Rmarkdown format, or setting up projects in Rstudio, please watch a tutorial video ([.mov format](https://www.dropbox.com/s/alrmoszei1ou6vr/intro-to-rstudio.mov?dl=0) 
+, [.mp4 to be added soon]()) (~20 min) to help you get oriented.
+
+
