@@ -28,9 +28,9 @@
     ],
     "date": "2021-10-21",
     "categories": [],
-    "contents": "\nRstudio is one of the most popular Integrated Development Environments (IDE) for working in R. It provides many useful tools to help conduct, document, and manage your analyses.\nIf you are unfamilar with Rstudio, the Rmarkdown format, or setting up projects in Rstudio, please watch a tutorial video (.mov format , .mp4 to be added soon) (~20 min) to help you get oriented.\n\n\n\n",
+    "contents": "\nRstudio is one of the most popular Integrated Development Environments (IDE) for working in R. It provides many useful tools to help conduct, document, and manage your analyses.\nIf you are unfamilar with Rstudio, the Rmarkdown format, or setting up projects in Rstudio, please watch a tutorial video (.mov format , .mp4) (~20 min) to help you get oriented.\n\n\n\n",
     "preview": "posts/2021-10-21-interacting-with-r-in-rstudio/rstudio.png",
-    "last_modified": "2021-10-22T13:03:24-06:00",
+    "last_modified": "2021-10-22T13:37:09-06:00",
     "input_file": {}
   },
   {
