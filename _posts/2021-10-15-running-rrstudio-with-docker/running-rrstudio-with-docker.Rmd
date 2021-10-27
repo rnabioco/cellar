@@ -79,7 +79,7 @@ skipping /var/run/s6/container_environment/RSTUDIO_VERSION
 [services.d] done.
 ```
 
-After running this command an rstudio instance will be running on your computer that you can access through your web browser. Open a browser and enter `http://`, followed by your ip address, followed by `:8787`. In you are on a linux or MacOS machine you can navigate to `http//localhost:8787`. If you do not know the IP address you can find it in a few ways.
+After running this command an rstudio instance will be running on your computer that you can access through your web browser. Open a browser and enter `http://`, followed by your ip address, followed by `:8787`. In you are on a linux or MacOS machine you can navigate to `http//:localhost:8787`. If you do not know the IP address you can find it in a few ways.
 
 1) If you select the container in the docker desktop app, you can directly open the container in a browser by clicking the `open in browser` button. 
 
