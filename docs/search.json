@@ -5,21 +5,21 @@
       "title": "single cell RNA-seq workshop",
       "author": [],
       "contents": "\n\n\n\n",
-      "last_modified": "2021-10-27T15:06:59-06:00"
+      "last_modified": "2021-10-27T19:37:16-06:00"
     },
     {
       "path": "index.html",
       "title": "single cell RNA-seq workshop",
       "author": [],
       "contents": "\nNovember 1st - 5th, 2021 \n5-day workshop covering methods used to analyze single cell RNA-seq data using R/RStudio. The workshop will be held remotely with lectures conducted over Zoom, with assistance available via a slack channel.\nPrerequisites\nA basic understanding of the R programming language and a single cell RNA-seq dataset to analyze. Individuals without R experience will need to complete online courses suggested by instructors. The single cell RNA-seq dataset can be from a public resource, or private data from a lab on campus. The instructors will provide specific recommendations for preferred data formats, dataset size and complexity.\nAttendees will be expected to devote time outside of the workshop lectures to review pre-class materials, and apply the concepts and techniques discussed in class to their chosen single cell dataset.\nRegister\nPlease fill out this form to indicate your interest in the workshop. Selected attendees will be notified by October 1.\nSchedule\nPre-class videos (< 30 min) with lecture and background material will be provided prior to each day’s workshop.\nSession 0 | November 1th, 9:00am - 11:00am\nCourse on-boarding session for those with questions on prerequisite material\n\nSession 1 | November 2th, 9:00am - 11:00am\nIntroduction to single cell RNA-seq\nProcessing scRNA-seq data: from FASTQ to a count matrix\nInteracting with single cell data in R\nQuality control\n\nSession 2 | November 3th, 9:00am - 11:00am\nDimensionality reduction techniques for scRNA-seq (PCA, UMAP, tSNE, etc)\nClustering scRNA-seq data\nDifferential expression and marker gene discovery\nCell-type annotation\n\nSession 3 | November 4th, 9:00am - 11:00am\nUsing pseudotime approaches to find trajectories or gene expression gradients\nWorking with multi-sample datasets and mitigating batch effects\n\nSession 4 | November 5th, 9:00am - 11:00am\nIncorporating additional single cell modalities, e.g. CITE-seq\nAdditional time to discuss personal datasets\n\nAssistance\nAn instructor will be available after class for an hour to assist with additional questions. Additional office hours may be scheduled by contacting workshop instuctors, or scheduled through the RBI office hours.\nA slack workspace will be set up for the workshop to allow attendees to seek assistance from other attendees and instructors.\nInstructors\nPlease contact the RBI fellows (rbi.fellows@cuanschutz.edu) if you have questions.\nRyan Sheridan\nCaitlin Winkler\nTyler Matheny\nKristen Wells-Wrasman\nRui Fu\nKent Riemondy\n\n\n\n",
-      "last_modified": "2021-10-27T15:07:00-06:00"
+      "last_modified": "2021-10-27T19:37:17-06:00"
     },
     {
       "path": "previous.html",
       "title": "Previous single-cell RNA-seq Workshops",
       "author": [],
       "contents": "\nNovember 10th - 13th, 2020 \nAugust 13th - 15th, 2019 \n\n\n\n",
-      "last_modified": "2021-10-27T15:07:01-06:00"
+      "last_modified": "2021-10-27T19:37:17-06:00"
     }
   ],
   "collections": ["posts/posts.json"]
