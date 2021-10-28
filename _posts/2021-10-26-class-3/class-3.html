@@ -1,0 +1,3021 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="generator" content="distill" />
+
+  <style type="text/css">
+  /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
+  body {
+    visibility: hidden;
+  }
+  </style>
+
+ <!--radix_placeholder_import_source-->
+ <!--/radix_placeholder_import_source-->
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+  <!--radix_placeholder_meta_tags-->
+  <title>Batch correction and pseudotime</title>
+  
+  <meta property="description" itemprop="description" content="This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."/>
+  
+  
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2021-10-26"/>
+  <meta property="article:created" itemprop="dateCreated" content="2021-10-26"/>
+  <meta name="article:author" content="Kristen Wells"/>
+  
+  <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
+  <meta property="og:title" content="Batch correction and pseudotime"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:description" content="This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."/>
+  <meta property="og:locale" content="en_US"/>
+  
+  <!--  https://dev.twitter.com/cards/types/summary -->
+  <meta property="twitter:card" content="summary"/>
+  <meta property="twitter:title" content="Batch correction and pseudotime"/>
+  <meta property="twitter:description" content="This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."/>
+  
+  <!--/radix_placeholder_meta_tags-->
+  <!--radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-rmarkdown-metadata">
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Batch correction and pseudotime"]},{"type":"character","attributes":{},"value":["This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Kristen Wells"]},{"type":"character","attributes":{},"value":["https://github.com/kwells4"]}]}]},{"type":"character","attributes":{},"value":["2021-10-26"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc","toc_depth","toc_float","highlight","df_print","code_folding"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[2]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["tango"]},{"type":"character","attributes":{},"value":["paged"]},{"type":"character","attributes":{},"value":["show"]}]}]}]}
+  </script>
+  <!--/radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["class-3_files/anchor-4.2.2/anchor.min.js","class-3_files/bowser-1.9.3/bowser.min.js","class-3_files/distill-2.2.21/template.v2.js","class-3_files/figure-html5/cells-batch-1.png","class-3_files/figure-html5/cells-harmony-1.png","class-3_files/figure-html5/cells-split-harmony-1.png","class-3_files/figure-html5/cells-split-indiv-harmony-1.png","class-3_files/figure-html5/cluster-10-sample-1.png","class-3_files/figure-html5/cluster-2-1.png","class-3_files/figure-html5/cluster-3-1.png","class-3_files/figure-html5/cluster1-1.png","class-3_files/figure-html5/curve1-1.png","class-3_files/figure-html5/curve2-1.png","class-3_files/figure-html5/curve3-1.png","class-3_files/figure-html5/harmony-1.png","class-3_files/figure-html5/heatmap-1.png","class-3_files/figure-html5/ident-harmony-1.png","class-3_files/figure-html5/processing-harmony-2-1.png","class-3_files/figure-html5/pseudotime-batch-1.png","class-3_files/figure-html5/pseudotime-batch-cluster-1.png","class-3_files/figure-html5/pseudotime-batch-ident-1.png","class-3_files/figure-html5/pseudotime-batch-plot-1.png","class-3_files/figure-html5/pseudotime-cd72-1.png","class-3_files/figure-html5/pseudotime-cluster-1.png","class-3_files/figure-html5/pseudotime-pmepa1-1.png","class-3_files/figure-html5/pseudotime-ptma-1.png","class-3_files/figure-html5/pseudotime-ptpn1-1.png","class-3_files/figure-html5/pseudotime-slamf8-1.png","class-3_files/figure-html5/ridge-plot-1.png","class-3_files/figure-html5/ridge-plot-batch-1.png","class-3_files/figure-html5/set-colors-batch-1.png","class-3_files/jquery-3.5.1/AUTHORS.txt","class-3_files/jquery-3.5.1/jquery-1.12.4.js","class-3_files/jquery-3.5.1/jquery-1.12.4.min.js","class-3_files/jquery-3.5.1/jquery-1.12.4.min.map","class-3_files/jquery-3.5.1/jquery-2.2.4.js","class-3_files/jquery-3.5.1/jquery-2.2.4.min.js","class-3_files/jquery-3.5.1/jquery-2.2.4.min.map","class-3_files/jquery-3.5.1/jquery-3.5.1.js","class-3_files/jquery-3.5.1/jquery-3.5.1.min.js","class-3_files/jquery-3.5.1/jquery-3.5.1.min.map","class-3_files/jquery-3.5.1/LICENSE.txt","class-3_files/popper-2.6.0/popper.min.js","class-3_files/tippy-6.2.7/tippy-bundle.umd.min.js","class-3_files/tippy-6.2.7/tippy-light-border.css","class-3_files/tippy-6.2.7/tippy.css","class-3_files/tippy-6.2.7/tippy.umd.min.js","class-3_files/webcomponents-2.0.0/webcomponents.js"]}
+  </script>
+  <!--radix_placeholder_navigation_in_header-->
+  <!--/radix_placeholder_navigation_in_header-->
+  <!--radix_placeholder_distill-->
+  
+  <style type="text/css">
+  
+  body {
+    background-color: white;
+  }
+  
+  .pandoc-table {
+    width: 100%;
+  }
+  
+  .pandoc-table>caption {
+    margin-bottom: 10px;
+  }
+  
+  .pandoc-table th:not([align]) {
+    text-align: left;
+  }
+  
+  .pagedtable-footer {
+    font-size: 15px;
+  }
+  
+  d-byline .byline {
+    grid-template-columns: 2fr 2fr;
+  }
+  
+  d-byline .byline h3 {
+    margin-block-start: 1.5em;
+  }
+  
+  d-byline .byline .authors-affiliations h3 {
+    margin-block-start: 0.5em;
+  }
+  
+  .authors-affiliations .orcid-id {
+    width: 16px;
+    height:16px;
+    margin-left: 4px;
+    margin-right: 4px;
+    vertical-align: middle;
+    padding-bottom: 2px;
+  }
+  
+  d-title .dt-tags {
+    margin-top: 1em;
+    grid-column: text;
+  }
+  
+  .dt-tags .dt-tag {
+    text-decoration: none;
+    display: inline-block;
+    color: rgba(0,0,0,0.6);
+    padding: 0em 0.4em;
+    margin-right: 0.5em;
+    margin-bottom: 0.4em;
+    font-size: 70%;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  
+  d-article table.gt_table td,
+  d-article table.gt_table th {
+    border-bottom: none;
+  }
+  
+  .html-widget {
+    margin-bottom: 2.0em;
+  }
+  
+  .l-screen-inset {
+    padding-right: 16px;
+  }
+  
+  .l-screen .caption {
+    margin-left: 10px;
+  }
+  
+  .shaded {
+    background: rgb(247, 247, 247);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .html-widget {
+    margin-bottom: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .shaded-content {
+    background: white;
+  }
+  
+  .text-output {
+    margin-top: 0;
+    line-height: 1.5em;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+  
+  d-article {
+    padding-top: 2.5rem;
+    padding-bottom: 30px;
+  }
+  
+  d-appendix {
+    padding-top: 30px;
+  }
+  
+  d-article>p>img {
+    width: 100%;
+  }
+  
+  d-article h2 {
+    margin: 1rem 0 1.5rem 0;
+  }
+  
+  d-article h3 {
+    margin-top: 1.5rem;
+  }
+  
+  d-article iframe {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.0em;
+    width: 100%;
+  }
+  
+  /* Tweak code blocks */
+  
+  d-article div.sourceCode code,
+  d-article pre code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+  
+  d-article pre,
+  d-article div.sourceCode,
+  d-article div.sourceCode pre {
+    overflow: auto;
+  }
+  
+  d-article div.sourceCode {
+    background-color: white;
+  }
+  
+  d-article div.sourceCode pre {
+    padding-left: 10px;
+    font-size: 12px;
+    border-left: 2px solid rgba(0,0,0,0.1);
+  }
+  
+  d-article pre {
+    font-size: 12px;
+    color: black;
+    background: none;
+    margin-top: 0;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  d-article pre a {
+    border-bottom: none;
+  }
+  
+  d-article pre a:hover {
+    border-bottom: none;
+    text-decoration: underline;
+  }
+  
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+  
+  @media(min-width: 768px) {
+  
+  d-article pre,
+  d-article div.sourceCode,
+  d-article div.sourceCode pre {
+    overflow: visible !important;
+  }
+  
+  d-article div.sourceCode pre {
+    padding-left: 18px;
+    font-size: 14px;
+  }
+  
+  d-article pre {
+    font-size: 14px;
+  }
+  
+  }
+  
+  figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  /* CSS for d-contents */
+  
+  .d-contents {
+    grid-column: text;
+    color: rgba(0,0,0,0.8);
+    font-size: 0.9em;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;
+    padding-left: 0.25em;
+    justify-self: start;
+  }
+  
+  @media(min-width: 1000px) {
+    .d-contents.d-contents-float {
+      height: 0;
+      grid-column-start: 1;
+      grid-column-end: 4;
+      justify-self: center;
+      padding-right: 3em;
+      padding-left: 2em;
+    }
+  }
+  
+  .d-contents nav h3 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+  
+  .d-contents li {
+    list-style-type: none
+  }
+  
+  .d-contents nav > ul {
+    padding-left: 0;
+  }
+  
+  .d-contents ul {
+    padding-left: 1em
+  }
+  
+  .d-contents nav ul li {
+    margin-top: 0.6em;
+    margin-bottom: 0.2em;
+  }
+  
+  .d-contents nav a {
+    font-size: 13px;
+    border-bottom: none;
+    text-decoration: none
+    color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .d-contents nav a:hover {
+    text-decoration: underline solid rgba(0, 0, 0, 0.6)
+  }
+  
+  .d-contents nav > ul > li > a {
+    font-weight: 600;
+  }
+  
+  .d-contents nav > ul > li > ul {
+    font-weight: inherit;
+  }
+  
+  .d-contents nav > ul > li > ul > li {
+    margin-top: 0.2em;
+  }
+  
+  
+  .d-contents nav ul {
+    margin-top: 0;
+    margin-bottom: 0.25em;
+  }
+  
+  .d-article-with-toc h2:nth-child(2) {
+    margin-top: 0;
+  }
+  
+  
+  /* Figure */
+  
+  .figure {
+    position: relative;
+    margin-bottom: 2.5em;
+    margin-top: 1.5em;
+  }
+  
+  .figure img {
+    width: 100%;
+  }
+  
+  .figure .caption {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+    line-height: 1.5em;
+  }
+  
+  .figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  .figure .caption a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .figure .caption b,
+  .figure .caption strong, {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 1.0);
+  }
+  
+  /* Citations */
+  
+  d-article .citation {
+    color: inherit;
+    cursor: inherit;
+  }
+  
+  div.hanging-indent{
+    margin-left: 1em; text-indent: -1em;
+  }
+  
+  /* Citation hover box */
+  
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+  
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
+  }
+  
+  
+  /* Tweak 1000px media break to show more text */
+  
+  @media(min-width: 1000px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 16px;
+    }
+  
+    .grid {
+      grid-column-gap: 16px;
+    }
+  
+    d-article {
+      font-size: 1.06rem;
+      line-height: 1.7em;
+    }
+    figure .caption, .figure .caption, figure figcaption {
+      font-size: 13px;
+    }
+  }
+  
+  @media(min-width: 1180px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 32px;
+    }
+  
+    .grid {
+      grid-column-gap: 32px;
+    }
+  }
+  
+  
+  /* Get the citation styles for the appendix (not auto-injected on render since
+     we do our own rendering of the citation appendix) */
+  
+  d-appendix .citation-appendix,
+  .d-appendix .citation-appendix {
+    font-size: 11px;
+    line-height: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 18px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px 18px;
+    border-radius: 3px;
+    color: rgba(150, 150, 150, 1);
+    overflow: hidden;
+    margin-top: -12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  /* Include appendix styles here so they can be overridden */
+  
+  d-appendix {
+    contain: layout style;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-top: 60px;
+    margin-bottom: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    color: rgba(0,0,0,0.5);
+    padding-top: 60px;
+    padding-bottom: 48px;
+  }
+  
+  d-appendix h3 {
+    grid-column: page-start / text-start;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 1em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.65);
+  }
+  
+  d-appendix h3 + * {
+    margin-top: 1em;
+  }
+  
+  d-appendix ol {
+    padding: 0 0 0 15px;
+  }
+  
+  @media (min-width: 768px) {
+    d-appendix ol {
+      padding: 0 0 0 30px;
+      margin-left: -30px;
+    }
+  }
+  
+  d-appendix li {
+    margin-bottom: 1em;
+  }
+  
+  d-appendix a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  d-appendix > * {
+    grid-column: text;
+  }
+  
+  d-appendix > d-footnote-list,
+  d-appendix > d-citation-list,
+  d-appendix > distill-appendix {
+    grid-column: screen;
+  }
+  
+  /* Include footnote styles here so they can be overridden */
+  
+  d-footnote-list {
+    contain: layout style;
+  }
+  
+  d-footnote-list > * {
+    grid-column: text;
+  }
+  
+  d-footnote-list a.footnote-backlink {
+    color: rgba(0,0,0,0.3);
+    padding-left: 0.5em;
+  }
+  
+  
+  
+  /* Anchor.js */
+  
+  .anchorjs-link {
+    /*transition: all .25s linear; */
+    text-decoration: none;
+    border-bottom: none;
+  }
+  *:hover > .anchorjs-link {
+    margin-left: -1.125em !important;
+    text-decoration: none;
+    border-bottom: none;
+  }
+  
+  /* Social footer */
+  
+  .social_footer {
+    margin-top: 30px;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.67);
+  }
+  
+  .disqus-comments {
+    margin-right: 30px;
+  }
+  
+  .disqus-comment-count {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+  }
+  
+  #disqus_thread {
+    margin-top: 30px;
+  }
+  
+  .article-sharing a {
+    border-bottom: none;
+    margin-right: 8px;
+  }
+  
+  .article-sharing a:hover {
+    border-bottom: none;
+  }
+  
+  .sidebar-section.subscribe {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+  
+  .subscribe p {
+    margin-bottom: 0.5em;
+  }
+  
+  
+  .article-footer .subscribe {
+    font-size: 15px;
+    margin-top: 45px;
+  }
+  
+  
+  .sidebar-section.custom {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+  
+  .custom p {
+    margin-bottom: 0.5em;
+  }
+  
+  /* Styles for listing layout (hide title) */
+  .layout-listing d-title, .layout-listing .d-title {
+    display: none;
+  }
+  
+  /* Styles for posts lists (not auto-injected) */
+  
+  
+  .posts-with-sidebar {
+    padding-left: 45px;
+    padding-right: 45px;
+  }
+  
+  .posts-list .description h2,
+  .posts-list .description p {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  }
+  
+  .posts-list .description h2 {
+    font-weight: 700;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .posts-list h2.post-tag {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding-bottom: 12px;
+  }
+  .posts-list {
+    margin-top: 60px;
+    margin-bottom: 24px;
+  }
+  
+  .posts-list .post-preview {
+    text-decoration: none;
+    overflow: hidden;
+    display: block;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 24px 0;
+  }
+  
+  .post-preview-last {
+    border-bottom: none !important;
+  }
+  
+  .posts-list .posts-list-caption {
+    grid-column: screen;
+    font-weight: 400;
+  }
+  
+  .posts-list .post-preview h2 {
+    margin: 0 0 6px 0;
+    line-height: 1.2em;
+    font-style: normal;
+    font-size: 24px;
+  }
+  
+  .posts-list .post-preview p {
+    margin: 0 0 12px 0;
+    line-height: 1.4em;
+    font-size: 16px;
+  }
+  
+  .posts-list .post-preview .thumbnail {
+    box-sizing: border-box;
+    margin-bottom: 24px;
+    position: relative;
+    max-width: 500px;
+  }
+  .posts-list .post-preview img {
+    width: 100%;
+    display: block;
+  }
+  
+  .posts-list .metadata {
+    font-size: 12px;
+    line-height: 1.4em;
+    margin-bottom: 18px;
+  }
+  
+  .posts-list .metadata > * {
+    display: inline-block;
+  }
+  
+  .posts-list .metadata .publishedDate {
+    margin-right: 2em;
+  }
+  
+  .posts-list .metadata .dt-authors {
+    display: block;
+    margin-top: 0.3em;
+    margin-right: 2em;
+  }
+  
+  .posts-list .dt-tags {
+    display: block;
+    line-height: 1em;
+  }
+  
+  .posts-list .dt-tags .dt-tag {
+    display: inline-block;
+    color: rgba(0,0,0,0.6);
+    padding: 0.3em 0.4em;
+    margin-right: 0.2em;
+    margin-bottom: 0.4em;
+    font-size: 60%;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  
+  .posts-list img {
+    opacity: 1;
+  }
+  
+  .posts-list img[data-src] {
+    opacity: 0;
+  }
+  
+  .posts-more {
+    clear: both;
+  }
+  
+  
+  .posts-sidebar {
+    font-size: 16px;
+  }
+  
+  .posts-sidebar h3 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+  
+  .sidebar-section {
+    margin-bottom: 30px;
+  }
+  
+  .categories ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .categories li {
+    color: rgba(0, 0, 0, 0.8);
+    margin-bottom: 0;
+  }
+  
+  .categories li>a {
+    border-bottom: none;
+  }
+  
+  .categories li>a:hover {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  }
+  
+  .categories .active {
+    font-weight: 600;
+  }
+  
+  .categories .category-count {
+    color: rgba(0, 0, 0, 0.4);
+  }
+  
+  
+  @media(min-width: 768px) {
+    .posts-list .post-preview h2 {
+      font-size: 26px;
+    }
+    .posts-list .post-preview .thumbnail {
+      float: right;
+      width: 30%;
+      margin-bottom: 0;
+    }
+    .posts-list .post-preview .description {
+      float: left;
+      width: 45%;
+    }
+    .posts-list .post-preview .metadata {
+      float: left;
+      width: 20%;
+      margin-top: 8px;
+    }
+    .posts-list .post-preview p {
+      margin: 0 0 12px 0;
+      line-height: 1.5em;
+      font-size: 16px;
+    }
+    .posts-with-sidebar .posts-list {
+      float: left;
+      width: 75%;
+    }
+    .posts-with-sidebar .posts-sidebar {
+      float: right;
+      width: 20%;
+      margin-top: 60px;
+      padding-top: 24px;
+      padding-bottom: 24px;
+    }
+  }
+  
+  
+  /* Improve display for browsers without grid (IE/Edge <= 15) */
+  
+  .downlevel {
+    line-height: 1.6em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+  }
+  
+  .downlevel .d-title {
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .downlevel .d-title h1 {
+    font-size: 50px;
+    font-weight: 700;
+    line-height: 1.1em;
+    margin: 0 0 0.5rem;
+  }
+  
+  .downlevel .d-title p {
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1.55em;
+    margin-top: 0;
+  }
+  
+  .downlevel .d-byline {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.8em;
+  }
+  
+  .downlevel .section-separator {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .downlevel .d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+  
+  
+  .downlevel .d-appendix {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.5);
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+  
+  .downlevel .footnotes ol {
+    padding-left: 13px;
+  }
+  
+  .downlevel .base-grid,
+  .downlevel .distill-header,
+  .downlevel .d-title,
+  .downlevel .d-abstract,
+  .downlevel .d-article,
+  .downlevel .d-appendix,
+  .downlevel .distill-appendix,
+  .downlevel .d-byline,
+  .downlevel .d-footnote-list,
+  .downlevel .d-citation-list,
+  .downlevel .distill-footer,
+  .downlevel .appendix-bottom,
+  .downlevel .posts-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  
+  @media(min-width: 768px) {
+    .downlevel .base-grid,
+    .downlevel .distill-header,
+    .downlevel .d-title,
+    .downlevel .d-abstract,
+    .downlevel .d-article,
+    .downlevel .d-appendix,
+    .downlevel .distill-appendix,
+    .downlevel .d-byline,
+    .downlevel .d-footnote-list,
+    .downlevel .d-citation-list,
+    .downlevel .distill-footer,
+    .downlevel .appendix-bottom,
+    .downlevel .posts-container {
+    padding-left: 150px;
+    padding-right: 150px;
+    max-width: 900px;
+  }
+  }
+  
+  .downlevel pre code {
+    display: block;
+    border-left: 2px solid rgba(0, 0, 0, .1);
+    padding: 0 0 0 20px;
+    font-size: 14px;
+  }
+  
+  .downlevel code, .downlevel pre {
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  .downlevel .posts-list .post-preview {
+    color: inherit;
+  }
+  
+  
+  
+  </style>
+  
+  <script type="application/javascript">
+  
+  function is_downlevel_browser() {
+    if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
+                                   window.navigator.userAgent)) {
+      return true;
+    } else {
+      return window.load_distill_framework === undefined;
+    }
+  }
+  
+  // show body when load is complete
+  function on_load_complete() {
+  
+    // add anchors
+    if (window.anchors) {
+      window.anchors.options.placement = 'left';
+      window.anchors.add('d-article > h2, d-article > h3, d-article > h4, d-article > h5');
+    }
+  
+  
+    // set body to visible
+    document.body.style.visibility = 'visible';
+  
+    // force redraw for leaflet widgets
+    if (window.HTMLWidgets) {
+      var maps = window.HTMLWidgets.findAll(".leaflet");
+      $.each(maps, function(i, el) {
+        var map = this.getMap();
+        map.invalidateSize();
+        map.eachLayer(function(layer) {
+          if (layer instanceof L.TileLayer)
+            layer.redraw();
+        });
+      });
+    }
+  
+    // trigger 'shown' so htmlwidgets resize
+    $('d-article').trigger('shown');
+  }
+  
+  function init_distill() {
+  
+    init_common();
+  
+    // create front matter
+    var front_matter = $('<d-front-matter></d-front-matter>');
+    $('#distill-front-matter').wrap(front_matter);
+  
+    // create d-title
+    $('.d-title').changeElementType('d-title');
+  
+    // create d-byline
+    var byline = $('<d-byline></d-byline>');
+    $('.d-byline').replaceWith(byline);
+  
+    // create d-article
+    var article = $('<d-article></d-article>');
+    $('.d-article').wrap(article).children().unwrap();
+  
+    // move posts container into article
+    $('.posts-container').appendTo($('d-article'));
+  
+    // create d-appendix
+    $('.d-appendix').changeElementType('d-appendix');
+  
+    // flag indicating that we have appendix items
+    var appendix = $('.appendix-bottom').children('h3').length > 0;
+  
+    // replace footnotes with <d-footnote>
+    $('.footnote-ref').each(function(i, val) {
+      appendix = true;
+      var href = $(this).attr('href');
+      var id = href.replace('#', '');
+      var fn = $('#' + id);
+      var fn_p = $('#' + id + '>p');
+      fn_p.find('.footnote-back').remove();
+      var text = fn_p.html();
+      var dtfn = $('<d-footnote></d-footnote>');
+      dtfn.html(text);
+      $(this).replaceWith(dtfn);
+    });
+    // remove footnotes
+    $('.footnotes').remove();
+  
+    // move refs into #references-listing
+    $('#references-listing').replaceWith($('#refs'));
+  
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      var id = $(this).attr('id');
+      $('.d-contents a[href="#' + id + '"]').parent().remove();
+      appendix = true;
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
+    });
+  
+    // show d-appendix if we have appendix content
+    $("d-appendix").css('display', appendix ? 'grid' : 'none');
+  
+    // localize layout chunks to just output
+    $('.layout-chunk').each(function(i, val) {
+  
+      // capture layout
+      var layout = $(this).attr('data-layout');
+  
+      // apply layout to markdown level block elements
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
+      elements.each(function(i, el) {
+        var layout_div = $('<div class="' + layout + '"></div>');
+        if (layout_div.hasClass('shaded')) {
+          var shaded_content = $('<div class="shaded-content"></div>');
+          $(this).wrap(shaded_content);
+          $(this).parent().wrap(layout_div);
+        } else {
+          $(this).wrap(layout_div);
+        }
+      });
+  
+  
+      // unwrap the layout-chunk div
+      $(this).children().unwrap();
+    });
+  
+    // remove code block used to force  highlighting css
+    $('.distill-force-highlighting-css').parent().remove();
+  
+    // remove empty line numbers inserted by pandoc when using a
+    // custom syntax highlighting theme
+    $('code.sourceCode a:empty').remove();
+  
+    // load distill framework
+    load_distill_framework();
+  
+    // wait for window.distillRunlevel == 4 to do post processing
+    function distill_post_process() {
+  
+      if (!window.distillRunlevel || window.distillRunlevel < 4)
+        return;
+  
+      // hide author/affiliations entirely if we have no authors
+      var front_matter = JSON.parse($("#distill-front-matter").html());
+      var have_authors = front_matter.authors && front_matter.authors.length > 0;
+      if (!have_authors)
+        $('d-byline').addClass('hidden');
+  
+      // article with toc class
+      $('.d-contents').parent().addClass('d-article-with-toc');
+  
+      // strip links that point to #
+      $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
+  
+      // add orcid ids
+      $('.authors-affiliations').find('.author').each(function(i, el) {
+        var orcid_id = front_matter.authors[i].orcidID;
+        if (orcid_id) {
+          var a = $('<a></a>');
+          a.attr('href', 'https://orcid.org/' + orcid_id);
+          var img = $('<img></img>');
+          img.addClass('orcid-id');
+          img.attr('alt', 'ORCID ID');
+          img.attr('src','data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg==');
+          a.append(img);
+          $(this).append(a);
+        }
+      });
+  
+      // hide elements of author/affiliations grid that have no value
+      function hide_byline_column(caption) {
+        $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
+      }
+  
+      // affiliations
+      var have_affiliations = false;
+      for (var i = 0; i<front_matter.authors.length; ++i) {
+        var author = front_matter.authors[i];
+        if (author.affiliation !== "&nbsp;") {
+          have_affiliations = true;
+          break;
+        }
+      }
+      if (!have_affiliations)
+        $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
+  
+      // published date
+      if (!front_matter.publishedDate)
+        hide_byline_column("Published");
+  
+      // document object identifier
+      var doi = $('d-byline').find('h3:contains("DOI")');
+      var doi_p = doi.next().empty();
+      if (!front_matter.doi) {
+        // if we have a citation and valid citationText then link to that
+        if ($('#citation').length > 0 && front_matter.citationText) {
+          doi.html('Citation');
+          $('<a href="#citation"></a>')
+            .text(front_matter.citationText)
+            .appendTo(doi_p);
+        } else {
+          hide_byline_column("DOI");
+        }
+      } else {
+        $('<a></a>')
+           .attr('href', "https://doi.org/" + front_matter.doi)
+           .html(front_matter.doi)
+           .appendTo(doi_p);
+      }
+  
+       // change plural form of authors/affiliations
+      if (front_matter.authors.length === 1) {
+        var grid = $('.authors-affiliations');
+        grid.children('h3:contains("Authors")').text('Author');
+        grid.children('h3:contains("Affiliations")').text('Affiliation');
+      }
+  
+      // remove d-appendix and d-footnote-list local styles
+      $('d-appendix > style:first-child').remove();
+      $('d-footnote-list > style:first-child').remove();
+  
+      // move appendix-bottom entries to the bottom
+      $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
+      $('.appendix-bottom').remove();
+  
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refs = $(this).attr('data-cites').split(" ");
+        var refHtml = refs.map(function(ref) {
+          return "<p>" + $('#ref-' + ref).html() + "</p>";
+        }).join("\n");
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
+  
+      // clear polling timer
+      clearInterval(tid);
+  
+      // show body now that everything is ready
+      on_load_complete();
+    }
+  
+    var tid = setInterval(distill_post_process, 50);
+    distill_post_process();
+  
+  }
+  
+  function init_downlevel() {
+  
+    init_common();
+  
+     // insert hr after d-title
+    $('.d-title').after($('<hr class="section-separator"/>'));
+  
+    // check if we have authors
+    var front_matter = JSON.parse($("#distill-front-matter").html());
+    var have_authors = front_matter.authors && front_matter.authors.length > 0;
+  
+    // manage byline/border
+    if (!have_authors)
+      $('.d-byline').remove();
+    $('.d-byline').after($('<hr class="section-separator"/>'));
+    $('.d-byline a').remove();
+  
+    // remove toc
+    $('.d-contents').remove();
+  
+    // move appendix elements
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
+    });
+  
+  
+    // inject headers into references and footnotes
+    var refs_header = $('<h3></h3>');
+    refs_header.text('References');
+    $('#refs').prepend(refs_header);
+  
+    var footnotes_header = $('<h3></h3');
+    footnotes_header.text('Footnotes');
+    $('.footnotes').children('hr').first().replaceWith(footnotes_header);
+  
+    // move appendix-bottom entries to the bottom
+    $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
+    $('.appendix-bottom').remove();
+  
+    // remove appendix if it's empty
+    if ($('.d-appendix').children().length === 0)
+      $('.d-appendix').remove();
+  
+    // prepend separator above appendix
+    $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
+  
+    // trim code
+    $('pre>code').each(function(i, val) {
+      $(this).html($.trim($(this).html()));
+    });
+  
+    // move posts-container right before article
+    $('.posts-container').insertBefore($('.d-article'));
+  
+    $('body').addClass('downlevel');
+  
+    on_load_complete();
+  }
+  
+  
+  function init_common() {
+  
+    // jquery plugin to change element types
+    (function($) {
+      $.fn.changeElementType = function(newType) {
+        var attrs = {};
+  
+        $.each(this[0].attributes, function(idx, attr) {
+          attrs[attr.nodeName] = attr.nodeValue;
+        });
+  
+        this.replaceWith(function() {
+          return $("<" + newType + "/>", attrs).append($(this).contents());
+        });
+      };
+    })(jQuery);
+  
+    // prevent underline for linked images
+    $('a > img').parent().css({'border-bottom' : 'none'});
+  
+    // mark non-body figures created by knitr chunks as 100% width
+    $('.layout-chunk').each(function(i, val) {
+      var figures = $(this).find('img, .html-widget');
+      if ($(this).attr('data-layout') !== "l-body") {
+        figures.css('width', '100%');
+      } else {
+        figures.css('max-width', '100%');
+        figures.filter("[width]").each(function(i, val) {
+          var fig = $(this);
+          fig.css('width', fig.attr('width') + 'px');
+        });
+  
+      }
+    });
+  
+    // auto-append index.html to post-preview links in file: protocol
+    // and in rstudio ide preview
+    $('.post-preview').each(function(i, val) {
+      if (window.location.protocol === "file:")
+        $(this).attr('href', $(this).attr('href') + "index.html");
+    });
+  
+    // get rid of index.html references in header
+    if (window.location.protocol !== "file:") {
+      $('.distill-site-header a[href]').each(function(i,val) {
+        $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
+      });
+    }
+  
+    // add class to pandoc style tables
+    $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
+    $('.kable-table').children('table').addClass('pandoc-table');
+  
+    // add figcaption style to table captions
+    $('caption').parent('table').addClass("figcaption");
+  
+    // initialize posts list
+    if (window.init_posts_list)
+      window.init_posts_list();
+  
+    // implmement disqus comment link
+    $('.disqus-comment-count').click(function() {
+      window.headroom_prevent_pin = true;
+      $('#disqus_thread').toggleClass('hidden');
+      if (!$('#disqus_thread').hasClass('hidden')) {
+        var offset = $(this).offset();
+        $(window).resize();
+        $('html, body').animate({
+          scrollTop: offset.top - 35
+        });
+      }
+    });
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    if (is_downlevel_browser())
+      init_downlevel();
+    else
+      window.addEventListener('WebComponentsReady', init_distill);
+  });
+  
+  </script>
+  
+  <!--/radix_placeholder_distill-->
+  <script src="class-3_files/jquery-3.5.1/jquery-3.5.1.min.js"></script>
+  <script src="class-3_files/popper-2.6.0/popper.min.js"></script>
+  <link href="class-3_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="class-3_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="class-3_files/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="class-3_files/anchor-4.2.2/anchor.min.js"></script>
+  <script src="class-3_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="class-3_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="class-3_files/distill-2.2.21/template.v2.js"></script>
+  <!--radix_placeholder_site_in_header-->
+  <!--/radix_placeholder_site_in_header-->
+
+
+</head>
+
+<body>
+
+<!--radix_placeholder_front_matter-->
+
+<script id="distill-front-matter" type="text/json">
+{"title":"Batch correction and pseudotime","description":"This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.","authors":[{"author":"Kristen Wells","authorURL":"https://github.com/kwells4","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2021-10-26T00:00:00.000-06:00","citationText":"Wells, 2021"}
+</script>
+
+<!--/radix_placeholder_front_matter-->
+<!--radix_placeholder_navigation_before_body-->
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="d-title">
+<h1>Batch correction and pseudotime</h1>
+<!--radix_placeholder_categories-->
+<!--/radix_placeholder_categories-->
+<p><p>This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.</p></p>
+</div>
+
+<div class="d-byline">
+  Kristen Wells <a href="https://github.com/kwells4" class="uri">https://github.com/kwells4</a> 
+  
+<br/>2021-10-26
+</div>
+
+<div class="d-article">
+<div class="d-contents d-contents-float">
+<nav class="l-text toc figcaption" id="TOC">
+<h3>Contents</h3>
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#description-of-data">Description of data</a><ul>
+<li><a href="#download-the-files-just-an-example-dont-run-today">Download the files (Just an example, don’t run today)</a></li>
+<li><a href="#download-the-files">Download the files</a></li>
+<li><a href="#read-in-the-files">Read in the files</a></li>
+</ul></li>
+<li><a href="#integration-of-samples">Integration of samples</a><ul>
+<li><a href="#merge-the-files">Merge the files</a></li>
+<li><a href="#check-for-batch">Check for batch</a></li>
+<li><a href="#correct-the-batch">Correct the batch</a></li>
+<li><a href="#marker-identification">Marker identification</a></li>
+<li><a href="#batch-correction-conclusion">Batch correction conclusion</a></li>
+</ul></li>
+<li><a href="#pseudotime">Pseudotime</a><ul>
+<li><a href="#download-provided-files">Download provided files</a></li>
+<li><a href="#read-in-provided-files">Read in provided files</a></li>
+<li><a href="#merge-the-files-1">Merge the files</a></li>
+<li><a href="#check-for-batch-1">Check for batch</a></li>
+<li><a href="#run-pseudotime">Run pseudotime</a></li>
+</ul></li>
+</ul>
+</nav>
+</div>
+<h1 id="background">Background</h1>
+<p>This script walks though the steps to correct batch effects and find pseudotemporal relationships between single cells. You can download the script which contains all of the following code and you can run yourself here <a href="https://github.com/rnabioco/cellar/tree/master/_posts/2021-10-26-class-3" class="uri">https://github.com/rnabioco/cellar/tree/master/_posts/2021-10-26-class-3</a> and download “class-3.Rmd”</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Load packages</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://satijalab.org/seurat'>Seurat</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://wilkelab.org/cowplot/'>cowplot</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://yihui.org/knitr/'>knitr</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>LaCroixColoR</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/sjmgarnier/viridis'>viridis</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>RColorBrewer</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>harmony</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>slingshot</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://wilkelab.org/ggridges/'>ggridges</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://statomics.github.io/tradeSeq/index.html'>tradeSeq</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>pheatmap</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://here.r-lib.org/'>here</a></span><span class='op'>)</span>
+
+<span class='co'># Set theme</span>
+<span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme_get.html'>theme_set</a></span><span class='op'>(</span><span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_classic</a></span><span class='op'>(</span>base_size <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>base_dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://here.r-lib.org//reference/here.html'>here</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<h1 id="description-of-data">Description of data</h1>
+<p>We will use two datasets today. The first is associated with the publication “Single-cell RNA sequencing of murine islets shows high cellular complexity at all stages of autoimmune diabetes”. In this publication, the authors were trying to characterize the immune cell response during onset of diabetes in nonobese diabetic (NOD) mice. NOD mice are an autoimmune model for Type 1 diabetes where T cells lead the destruction of insulin producing Beta cells. To characterize the development of diabetes, they performed a timecourse experiment looking at immune cells in the pancreatic islet at 4 weeks, 8 weeks, and 15 weeks of age.</p>
+<blockquote>
+<p>4 wk is about the first time that the first infiltrating T cells can be identified; 8 wk represents a time when leukocyte infiltration is prominent in most islets, still with no evidence of dysglycemia; and 15 wk is just before the time when clinical diabetes becomes evident.</p>
+</blockquote>
+<p>To further complicate their design, samples were processed in two batches, the first batch contained one 4 week, one 8 week, and one 15 week sample. The second batch contained one 4 week and one 8 week sample.</p>
+<p>We will start with just one of the 4 week samples from this dataset. The others we will include when we look at pseudotime.</p>
+<p>The second dataset is from the paper “Single-cell transcriptome analysis defines heterogeneity of the murine pancreatic ductal tree”. They isolated all islet and ductal cells, so some of the cells overlap with the first dataset and some do not. We will use all cells for this analysis.</p>
+<h2 id="download-the-files-just-an-example-dont-run-today">Download the files (Just an example, don’t run today)</h2>
+<p>All of the timecourse samples were downloaded here. <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141784" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141784</a>. This group uploaded all of the filtered csv files from cellranger for each sample. These will be downloaded if you download the GSE141784_RAW.tar file. I have alread downloaded these files for you and ran basic filtering and aligning with the provided metadata using the code below. You do not need to run anything in this section, it is just provided so you can see all of the steps to process this data.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>################################## DO NOT RUN ################################## </span>
+<span class='co'># This function will create a seurat object, filter to the cells used in the </span>
+<span class='co'># publication and add in the provided meta data.</span>
+<span class='va'>make_seurat</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>sample_list</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>sample_list</span><span class='op'>[[</span><span class='st'>"sample_full"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+  <span class='va'>sample_counts</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/Read10X.html'>Read10X</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>data_dir</span>, <span class='st'>"raw_data"</span>,
+                               <span class='va'>sample_list</span><span class='op'>[</span><span class='st'>"sample_full"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+
+  <span class='va'>sample_object</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/CreateSeuratObject.html'>CreateSeuratObject</a></span><span class='op'>(</span>counts <span class='op'>=</span> <span class='va'>sample_counts</span>,
+                                      project <span class='op'>=</span> <span class='va'>sample_list</span><span class='op'>[</span><span class='st'>"sample_full"</span><span class='op'>]</span>,
+                                      min.cells <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
+
+  <span class='co'># Subset meta data to only the current sample</span>
+  <span class='va'>meta_data_short</span> <span class='op'>&lt;-</span> <span class='va'>meta_data</span> <span class='op'>%&gt;%</span>
+    <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>Sample</span> <span class='op'>==</span> <span class='va'>sample_list</span><span class='op'>[</span><span class='st'>"sample"</span><span class='op'>]</span> <span class='op'>&amp;</span> <span class='va'>Batch</span> <span class='op'>==</span> <span class='va'>sample_list</span><span class='op'>[</span><span class='st'>"batch"</span><span class='op'>]</span><span class='op'>)</span>
+  
+  <span class='co'># Change the barcode to match each sample pre-merging</span>
+  <span class='va'>meta_data_short</span><span class='op'>$</span><span class='va'>Barcode</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>sub</a></span><span class='op'>(</span>pattern <span class='op'>=</span> <span class='st'>"-[0-9]"</span>, replacement <span class='op'>=</span> <span class='st'>"-1"</span>,
+                                 <span class='va'>meta_data_short</span><span class='op'>$</span><span class='va'>Barcode</span><span class='op'>)</span>
+
+  <span class='co'># Subset to only cells in meta data</span>
+  <span class='va'>sample_object</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span><span class='op'>(</span><span class='va'>sample_object</span>, cells <span class='op'>=</span> <span class='va'>meta_data_short</span><span class='op'>$</span><span class='va'>Barcode</span><span class='op'>)</span>
+
+  <span class='co'># Check if identical</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>meta_data_short</span><span class='op'>$</span><span class='va'>Barcode</span>, <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>sample_object</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+
+  <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>meta_data_short</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>meta_data_short</span><span class='op'>$</span><span class='va'>Barcode</span>
+
+  <span class='va'>sample_object</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/AddMetaData.html'>AddMetaData</a></span><span class='op'>(</span><span class='va'>sample_object</span>, metadata <span class='op'>=</span> <span class='va'>meta_data_short</span><span class='op'>)</span>
+
+  <span class='co'># Add mitochondrial percent</span>
+  <span class='va'>sample_object</span><span class='op'>[[</span><span class='st'>"percent.mt"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/PercentageFeatureSet.html'>PercentageFeatureSet</a></span><span class='op'>(</span><span class='va'>sample_object</span>,
+                                                    pattern <span class='op'>=</span> <span class='st'>"^mt-"</span><span class='op'>)</span>
+  
+  <span class='va'>sample_object</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/CellCycleScoring.html'>CellCycleScoring</a></span><span class='op'>(</span><span class='va'>sample_object</span>,
+                                  s.features <span class='op'>=</span> <span class='va'>s.genes</span>,
+                                  g2m.features <span class='op'>=</span> <span class='va'>g2m.genes</span>,
+                                  set.ident <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+  
+
+  <span class='co'># Normalize</span>
+  <span class='va'>sample_object</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/NormalizeData.html'>NormalizeData</a></span><span class='op'>(</span><span class='va'>sample_object</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+    <span class='fu'><a href='https://satijalab.org/seurat/reference/FindVariableFeatures.html'>FindVariableFeatures</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+    <span class='fu'><a href='https://satijalab.org/seurat/reference/ScaleData.html'>ScaleData</a></span><span class='op'>(</span><span class='op'>)</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>sample_object</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+<span class='co'># Set directories</span>
+<span class='va'>base_dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://here.r-lib.org//reference/here.html'>here</a></span><span class='op'>(</span><span class='op'>)</span>
+
+<span class='va'>data_dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span><span class='op'>)</span>
+
+<span class='co'># Read in meta data</span>
+<span class='va'>meta_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/read.table.html'>read.table</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>data_dir</span>,
+                                  <span class='st'>"GSE141784_Annotation_meta_data.txt"</span><span class='op'>)</span>,
+                        header <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span>
+<span class='co'># Set sample information</span>
+<span class='va'>sample_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>sample_full <span class='op'>=</span> <span class='st'>"NOD_15w_2734"</span>, sample <span class='op'>=</span> <span class='st'>"NOD_15w"</span>, batch <span class='op'>=</span> <span class='fl'>2734</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>sample_full <span class='op'>=</span> <span class='st'>"NOD_4w_2734"</span>, sample <span class='op'>=</span> <span class='st'>"NOD_4w"</span>, batch <span class='op'>=</span> <span class='fl'>2734</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>sample_full <span class='op'>=</span> <span class='st'>"NOD_4w_2849"</span>, sample <span class='op'>=</span> <span class='st'>"NOD_4w"</span>, batch <span class='op'>=</span> <span class='fl'>2849</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>sample_full <span class='op'>=</span> <span class='st'>"NOD_8w_2734"</span>, sample <span class='op'>=</span> <span class='st'>"NOD_8w"</span>, batch <span class='op'>=</span> <span class='fl'>2734</span><span class='op'>)</span>,
+  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>sample_full <span class='op'>=</span> <span class='st'>"NOD_8w_2849"</span>, sample <span class='op'>=</span> <span class='st'>"NOD_8w"</span>, batch <span class='op'>=</span> <span class='fl'>2849</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># Cell cycle genes (taken from seurat cc.genes and translated to mouse genes)</span>
+<span class='va'>s.genes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Exo1"</span>, <span class='st'>"Mcm4"</span>, <span class='st'>"Msh2"</span>, <span class='st'>"Gmnn"</span>, <span class='st'>"Chaf1b"</span>, <span class='st'>"Mcm2"</span>, <span class='st'>"Rrm2"</span>,
+             <span class='st'>"Rad51ap1"</span>, <span class='st'>"Gins2"</span>, <span class='st'>"Hells"</span>, <span class='st'>"Cdc6"</span>, <span class='st'>"Ubr7"</span>, <span class='st'>"Cdc45"</span>, <span class='st'>"Fen1"</span>,
+             <span class='st'>"Rpa2"</span>, <span class='st'>"Slbp"</span>, <span class='st'>"Uhrf1"</span>, <span class='st'>"Ung"</span>, <span class='st'>"Mcm5"</span>, <span class='st'>"Dtl"</span>, <span class='st'>"Casp8ap2"</span>,
+             <span class='st'>"Wdr76"</span>, <span class='st'>"Nasp"</span>, <span class='st'>"Prim1"</span>, <span class='st'>"Cdca7"</span>, <span class='st'>"Clspn"</span>, <span class='st'>"Pola1"</span>, <span class='st'>"Mcm6"</span>,
+             <span class='st'>"Blm"</span>, <span class='st'>"Dscc1"</span>, <span class='st'>"Usp1"</span>, <span class='st'>"Tipin"</span>, <span class='st'>"Rfc2"</span>, <span class='st'>"Brip1"</span>, <span class='st'>"Rrm1"</span>,
+             <span class='st'>"Rad51"</span>, <span class='st'>"Tyms"</span>, <span class='st'>"Ccne2"</span>, <span class='st'>"E2f8"</span>, <span class='st'>"Pcna"</span><span class='op'>)</span>    
+<span class='va'>g2m.genes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Ctcf"</span>, <span class='st'>"Smc4"</span>, <span class='st'>"Dlgap5"</span>, <span class='st'>"Cdc25c"</span>, <span class='st'>"Gtse1"</span>, <span class='st'>"Kif20b"</span>, <span class='st'>"Ncapd2"</span>,
+               <span class='st'>"Ttk"</span>, <span class='st'>"G2e3"</span>, <span class='st'>"Lbr"</span>,  <span class='st'>"Cks1brt"</span>, <span class='st'>"Cdca2"</span>, <span class='st'>"Tacc3"</span>, <span class='st'>"Anp32e"</span>,
+               <span class='st'>"Cdca3"</span>, <span class='st'>"Ckap2"</span>, <span class='st'>"Cks2"</span>, <span class='st'>"Hmgb2"</span>, <span class='st'>"Top2a"</span>, <span class='st'>"Tpx2"</span>, <span class='st'>"Kif23"</span>,
+               <span class='st'>"Rangap1"</span>, <span class='st'>"Psrc1"</span>, <span class='st'>"Cks1b"</span>, <span class='st'>"Aurkb"</span>, <span class='st'>"Hmmr"</span>, <span class='st'>"Cenpf"</span>, <span class='st'>"Birc5"</span>,
+               <span class='st'>"Cdca8"</span>, <span class='st'>"Ckap5"</span>, <span class='st'>"Kif2c"</span>, <span class='st'>"Kif11"</span>, <span class='st'>"Hjurp"</span>, <span class='st'>"Cenpe"</span>, <span class='st'>"Nuf2"</span>,
+               <span class='st'>"Ndc80"</span>, <span class='st'>"Nek2"</span>, <span class='st'>"Cdc20"</span>, <span class='st'>"Ect2"</span>, <span class='st'>"Anln"</span>, <span class='st'>"Tubb4b"</span>, <span class='st'>"Bub1"</span>,
+               <span class='st'>"Aurka"</span>, <span class='st'>"Ckap2l"</span>, <span class='st'>"Ccnb2"</span>, <span class='st'>"Nusap1"</span>, <span class='st'>"Mki67"</span>, <span class='st'>"Ube2c"</span>, <span class='st'>"Cenpa"</span><span class='op'>)</span>
+
+<span class='co'># Make a list of seurat objects</span>
+<span class='va'>seurat_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>sample_list</span>, <span class='va'>make_seurat</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>The files associated with the second can be downloaded here <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM4826923" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM4826923</a>. This group only uploaded their output files from 10x genomics, so I remade the object, performed the initial steps of analysis and identified celltypes by looking for clusters that shared the most marker genes with each of their identified cell types.</p>
+<h2 id="download-the-files">Download the files</h2>
+<p>I have already created processed <code>Seurat</code> objects that we will use today. This processing included finding mitochondrial percents, creating a cell cycle score, normalizing the data, finding variable genes, and scaling the data. We will skip this today, but all steps are shown in the code segment above. We can use the code below to create a “data” directory (folder) and download the files into it.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>## Make a data directory only if it doesn't already exist</span>
+<span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/base/files2.html'>dir.create</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span><span class='op'>)</span><span class='op'>)</span>, <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>## DOWNLOAD FILES if they haven't already been downloaded</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_4w_2734.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/NOD_4w_2734.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_4w_2734.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"hendley_seurat.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/hendley_seurat.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"hendley_seurat.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+</div>
+<h2 id="read-in-the-files">Read in the files</h2>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>sample_name</span> <span class='op'>&lt;-</span> <span class='st'>"NOD_4w_2734"</span>
+
+<span class='va'>sample_two_name</span> <span class='op'>&lt;-</span> <span class='st'>"hendley_seurat"</span>
+
+<span class='va'>seurat_object</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>sample_name</span>, <span class='st'>".rda"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>  
+
+<span class='va'>seurat_two</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>sample_two_name</span>, <span class='st'>".rda"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<h1 id="integration-of-samples">Integration of samples</h1>
+<p>Before we integrate samples, we first need to decide if there is a batch effect that we need to worry about. To do this, I first merge all of the samples together and use a few quick plots.</p>
+<h2 id="merge-the-files">Merge the files</h2>
+<p>We can take this list and pass it to the <code>merge</code> function from <code>Seurat</code>. This function takes one seurat object as <code>x</code> and a list of <code>Seurat</code> objects for <code>y</code>. This function automatically merges the data slots, so we won’t need to repeat normalization. We can see other options by typing <code>?merge</code></p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># merge objects</span>
+<span class='va'>seurat_merge</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/merge.html'>merge</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>seurat_object</span>,
+                      y <span class='op'>=</span> <span class='va'>seurat_two</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>Let’s now look at this new object</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>An object of class Seurat 
+18788 features across 16846 samples within 1 assay 
+Active assay: RNA (18788 features, 0 variable features)</code></pre>
+</div>
+<p>You can see that we no longer have variable features, so we will need to find new variable features and rescale the data</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Remeber if you want to regress out any variables, you can do that using ScaleData</span>
+<span class='va'>seurat_merge</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindVariableFeatures.html'>FindVariableFeatures</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/ScaleData.html'>ScaleData</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We also will need to repeat PCA and UMAP</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># It's best to set a seed before running UMAP</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>seurat_merge</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/RunPCA.html'>RunPCA</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>30</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span>resolution <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>30</span>, assay <span class='op'>=</span> <span class='st'>"RNA"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 16846
+Number of edges: 662672
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9215
+Number of communities: 31
+Elapsed time: 3 seconds</code></pre>
+</div>
+<h2 id="check-for-batch">Check for batch</h2>
+<p>Now we should check if any sort of batch correction is necessary. Let’s check by dataset. The dataset is stored as <code>orig.ident</code> in the object</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>[[</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>                      orig.ident nCount_RNA nFeature_RNA
+AAACGGGAGGAGTTTA-1_1 NOD_4w_2734        755          424
+AACCGCGAGGAGTAGA-1_1 NOD_4w_2734       1044          559
+ACATACGGTCGCATCG-1_1 NOD_4w_2734        686          465
+AGGCCACTCAAGGCTT-1_1 NOD_4w_2734       2019          994
+AGTGGGAAGGGAACGG-1_1 NOD_4w_2734       1168          607
+ATCATCTCAATCGGTT-1_1 NOD_4w_2734        779          393
+                                Barcode Cells Sample Batch Library
+AAACGGGAGGAGTTTA-1_1 AAACGGGAGGAGTTTA-1 Bcell NOD_4w  2734       6
+AACCGCGAGGAGTAGA-1_1 AACCGCGAGGAGTAGA-1 Bcell NOD_4w  2734       6
+ACATACGGTCGCATCG-1_1 ACATACGGTCGCATCG-1 Bcell NOD_4w  2734       6
+AGGCCACTCAAGGCTT-1_1 AGGCCACTCAAGGCTT-1 Bcell NOD_4w  2734       6
+AGTGGGAAGGGAACGG-1_1 AGTGGGAAGGGAACGG-1 Bcell NOD_4w  2734       6
+ATCATCTCAATCGGTT-1_1 ATCATCTCAATCGGTT-1 Bcell NOD_4w  2734       6
+                     percent.mt      S.Score    G2M.Score Phase
+AAACGGGAGGAGTTTA-1_1   2.913907 -0.009980040 -0.015109121    G1
+AACCGCGAGGAGTAGA-1_1   3.065134  0.034031936  0.030183982     S
+ACATACGGTCGCATCG-1_1   3.498542  0.065019960  0.148715782   G2M
+AGGCCACTCAAGGCTT-1_1   3.268945  0.129091816  0.235910145   G2M
+AGTGGGAAGGGAACGG-1_1   3.595890  0.003709248 -0.001416123     S
+ATCATCTCAATCGGTT-1_1   1.412067  0.015019960  0.013133401     S
+                     RNA_snn_res.0.8 seurat_clusters RNA_cluster
+AAACGGGAGGAGTTTA-1_1               2               2        &lt;NA&gt;
+AACCGCGAGGAGTAGA-1_1               9               9        &lt;NA&gt;
+ACATACGGTCGCATCG-1_1              12              12        &lt;NA&gt;
+AGGCCACTCAAGGCTT-1_1              12              12        &lt;NA&gt;
+AGTGGGAAGGGAACGG-1_1               9               9        &lt;NA&gt;
+ATCATCTCAATCGGTT-1_1               2               2        &lt;NA&gt;
+                     pANN_0.25_0.05_478
+AAACGGGAGGAGTTTA-1_1                 NA
+AACCGCGAGGAGTAGA-1_1                 NA
+ACATACGGTCGCATCG-1_1                 NA
+AGGCCACTCAAGGCTT-1_1                 NA
+AGTGGGAAGGGAACGG-1_1                 NA
+ATCATCTCAATCGGTT-1_1                 NA
+                     DF.classifications_0.25_0.05_478 Doublet_finder
+AAACGGGAGGAGTTTA-1_1                             &lt;NA&gt;           &lt;NA&gt;
+AACCGCGAGGAGTAGA-1_1                             &lt;NA&gt;           &lt;NA&gt;
+ACATACGGTCGCATCG-1_1                             &lt;NA&gt;           &lt;NA&gt;
+AGGCCACTCAAGGCTT-1_1                             &lt;NA&gt;           &lt;NA&gt;
+AGTGGGAAGGGAACGG-1_1                             &lt;NA&gt;           &lt;NA&gt;
+ATCATCTCAATCGGTT-1_1                             &lt;NA&gt;           &lt;NA&gt;
+                     RNA_snn_res.0.4
+AAACGGGAGGAGTTTA-1_1            &lt;NA&gt;
+AACCGCGAGGAGTAGA-1_1            &lt;NA&gt;
+ACATACGGTCGCATCG-1_1            &lt;NA&gt;
+AGGCCACTCAAGGCTT-1_1            &lt;NA&gt;
+AGTGGGAAGGGAACGG-1_1            &lt;NA&gt;
+ATCATCTCAATCGGTT-1_1            &lt;NA&gt;</code></pre>
+</div>
+<p>We can now plot to see if these look different, which they do. In samples with bad batch effects, like these two samples, no cells will overlap. You can see that the samples almost are a mirror image of each other.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>batch_colors</span> <span class='op'>&lt;-</span> <span class='fu'>LaCroixColoR</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/LaCroixColoR/man/lacroix_palette.html'>lacroix_palette</a></span><span class='op'>(</span><span class='st'>"Pamplemousse"</span>, <span class='fl'>2</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>batch_colors</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>$</span><span class='va'>orig.ident</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, group.by <span class='op'>=</span> <span class='st'>"orig.ident"</span>, cols <span class='op'>=</span> <span class='va'>batch_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/set-colors-batch-1.png" width="624" /></p>
+</div>
+<p>These two datasets are interesting because they contain some, but not all, of the same celltypes</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>seurat_object</span><span class='op'>$</span><span class='va'>Cells</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>
+                       Bcell                          CD4 
+                          25                          283 
+                         CD8                          cDC 
+                         148                          200 
+     Contamination_Endocrine          Contamination_Neutr 
+                          31                            1 
+Contamination_Red_blood_cell                           EC 
+                           8                         5206 
+                         gdT                         ILC2 
+                          10                            7 
+                         Mac                  Mesenchymal 
+                        1711                         1193 
+                          NK                          NKT 
+                          26                           58 
+                         pDC             Undefined_Stroma 
+                          84                           28 </code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>seurat_two</span><span class='op'>$</span><span class='va'>Cells</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>
+                  Bcell                     CD4 
+                    624                     681 
+                    CD8                     cDC 
+                    566                     305 
+           Ductal_cells                      EC 
+                   2073                     611 
+            Fibroblasts Germinal_center_B_cells 
+                     73                     232 
+                    Mac                     pDC 
+                   2533                      21 
+            Plasma_cell                 unknown 
+                     86                      22 </code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, group.by <span class='op'>=</span> <span class='st'>"Cells"</span>, split.by <span class='op'>=</span> <span class='st'>"orig.ident"</span>,
+        reduction <span class='op'>=</span> <span class='st'>"umap"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cells-batch-1.png" width="1920" /></p>
+</div>
+<h2 id="correct-the-batch">Correct the batch</h2>
+<p>I personally first use <code>harmony</code> as my batch correction tool. There are some really nice benchmarking papers for batch correction that can give you more information on the best tool to use.</p>
+<ul>
+<li><a href="https://doi.org/10.1186/s13059-019-1850-9" class="uri">https://doi.org/10.1186/s13059-019-1850-9</a></li>
+<li><a href="https://doi.org/10.1101/2020.05.22.111161" class="uri">https://doi.org/10.1101/2020.05.22.111161</a></li>
+</ul>
+<p>Harmony works by weakly clustering cells and then calculating - and iteratively refining - a dataset correction factor for each cluster. Note that Harmony only computes a new corrected dimensionality reduction - it does not calculate corrected expression values (the <code>raw.data</code>, <code>data</code> and <code>scale.data</code> slots are unmodified). This works well for most datasets, but can be be insufficient for downstream differential expression analyses in extremely divergent samples.</p>
+<p>Actually running <code>harmony</code> with a <code>seurat</code> object is quite simple, you just use a function called <code>RunHarmony</code>. We can see the inputs to this function by using <code>?RunHarmony</code></p>
+<p>We will use <code>plot_convergence = TRUE</code> so that we can ensure each iteration improves</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Here we use "orig.ident", but we can use anything from the meta data</span>
+<span class='va'>seurat_merge</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/harmony/man/RunHarmony.html'>RunHarmony</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>seurat_merge</span>,
+                           group.by.vars <span class='op'>=</span> <span class='st'>"orig.ident"</span>,
+                           plot_convergence <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/harmony-1.png" width="624" /></p>
+</div>
+<p>The objective function should be continuously improving. In this case, it’s not perfect, but probably good enough. I recomend changing the theta parameter if the function gets severely worse in later itearation.</p>
+<p>The returned object now has a new dimensional reduction called harmony.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>An object of class Seurat 
+18788 features across 16846 samples within 1 assay 
+Active assay: RNA (18788 features, 2000 variable features)
+ 3 dimensional reductions calculated: pca, umap, harmony</code></pre>
+</div>
+<p>We can use this to rerun our UMAP. I like to use a reduction key for my umap so I remember that it was made with harmony</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>seurat_merge</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>,
+                              dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>30</span>, reduction <span class='op'>=</span> <span class='st'>"harmony"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span>resolution <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>30</span>, assay <span class='op'>=</span> <span class='st'>"RNA"</span>, reduction <span class='op'>=</span> <span class='st'>"harmony"</span>,
+          reduction.key <span class='op'>=</span> <span class='st'>"harmony.UMAP_"</span>, reduction.name <span class='op'>=</span> <span class='st'>"harmony.umap"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 16846
+Number of edges: 662316
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9062
+Number of communities: 31
+Elapsed time: 2 seconds</code></pre>
+</div>
+<p>We can check with some plots. Now we need to specify the reduction. Below we can see that in many places cells overlap and in some places they don’t. If <code>harmony</code> worked, the common cell types should overlap while the unique celltypes should not</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>An object of class Seurat 
+18788 features across 16846 samples within 1 assay 
+Active assay: RNA (18788 features, 2000 variable features)
+ 4 dimensional reductions calculated: pca, umap, harmony, harmony.umap</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, group.by <span class='op'>=</span> <span class='st'>"orig.ident"</span>, cols <span class='op'>=</span> <span class='va'>batch_colors</span>,
+        reduction <span class='op'>=</span> <span class='st'>"harmony.umap"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/ident-harmony-1.png" width="624" /></p>
+</div>
+<p>Now we can check celltypes</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, group.by <span class='op'>=</span> <span class='st'>"Cells"</span>,
+        reduction <span class='op'>=</span> <span class='st'>"harmony.umap"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cells-harmony-1.png" width="1440" /></p>
+</div>
+<p>Overall, this looks great. The ductal cells should only be in one dataset which is true, same with the Mesenchymal cells. The other cell types mix nicely.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, group.by <span class='op'>=</span> <span class='st'>"Cells"</span>, split.by <span class='op'>=</span> <span class='st'>"orig.ident"</span>,
+        reduction <span class='op'>=</span> <span class='st'>"harmony.umap"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cells-split-harmony-1.png" width="1920" /></p>
+</div>
+<p>Just to visualize more clearly, we can visualize specific celltypes in each dataset.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"Cells"</span>
+<span class='va'>plots</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Bcell"</span>, <span class='st'>"CD4"</span>, <span class='st'>"CD8"</span>, <span class='st'>"Mac"</span><span class='op'>)</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, group.by <span class='op'>=</span> <span class='st'>"Cells"</span>, split.by <span class='op'>=</span> <span class='st'>"orig.ident"</span>,
+                 cells.highlight <span class='op'>=</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/CellsByIdentities.html'>CellsByIdentities</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>seurat_merge</span>,
+                                                     idents <span class='op'>=</span> <span class='va'>x</span><span class='op'>)</span>,
+                 reduction <span class='op'>=</span> <span class='st'>"harmony.umap"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://wilkelab.org/cowplot/reference/plot_grid.html'>plot_grid</a></span><span class='op'>(</span>plotlist <span class='op'>=</span> <span class='va'>plots</span>,
+          nrow <span class='op'>=</span> <span class='fl'>2</span>, ncol <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cells-split-indiv-harmony-1.png" width="960" /></p>
+</div>
+<h2 id="marker-identification">Marker identification</h2>
+<p>We can now identify markers based on this integrated dataset. We can identify markers of celltypes that are conserved in both datasets using the funciton <code>FindConservedMarkers</code>. First, we can set the identity of the cells to the celltypes. The below function takes several minutes to run, so we will skip it here. It also requires a couple of additional packages</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>################################## DO NOT RUN ################################## </span>
+<span class='fu'>BiocManager</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/BiocManager/man/install.html'>install</a></span><span class='op'>(</span><span class='st'>'multtest'</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='st'>'metap'</span><span class='op'>)</span>
+<span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"Cells"</span>
+
+<span class='va'>macrophage_markers</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindConservedMarkers.html'>FindConservedMarkers</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>,
+                                           ident.1 <span class='op'>=</span> <span class='st'>"Mac"</span>,
+                                           grouping.var <span class='op'>=</span> <span class='st'>"orig.ident"</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>macrophage_markers</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span>,<span class='op'>]</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We can also identify any differences between the macrophage populations in the two samples. This would be more interesting if one was a treatment and one was a control.</p>
+<p>First, we need to create a new column in the metadata that contains both sample information and cell type information</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>seurat_merge</span><span class='op'>$</span><span class='va'>sample_celltype</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>$</span><span class='va'>orig.ident</span>, <span class='st'>"_"</span>,
+                                       <span class='va'>seurat_merge</span><span class='op'>$</span><span class='va'>Cells</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>Now we can find markers between two populations</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"sample_celltype"</span>
+<span class='va'>mac_sample_markers</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindMarkers.html'>FindMarkers</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, ident.1 <span class='op'>=</span> <span class='st'>"NOD_4w_2734_Mac"</span>,
+                                  ident.2 <span class='op'>=</span> <span class='st'>"GSM4826923_C57BL6J_Mac"</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>mac_sample_markers</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>20</span>,<span class='op'>]</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>          p_val avg_log2FC pct.1 pct.2 p_val_adj
+Pid1          0  -1.937315 0.137 0.810         0
+Cfh           0  -2.892699 0.122 0.904         0
+Rgs1          0   3.430878 0.871 0.158         0
+Gas5          0   2.893606 0.805 0.000         0
+Mrc1          0  -4.001585 0.037 0.968         0
+Rpl35         0   1.324887 0.992 0.990         0
+Zeb2          0  -1.669259 0.428 0.930         0
+Gatm          0   2.738485 0.950 0.492         0
+Pltp          0  -1.937587 0.188 0.785         0
+Ctsz          0   1.720703 0.944 0.764         0
+Rpl22l1       0   1.551200 0.937 0.794         0
+Mbnl1         0  -2.005029 0.276 0.908         0
+Fcrls         0  -2.771061 0.016 0.855         0
+Txnip         0  -2.085770 0.205 0.873         0
+Rpsa-ps10     0   1.522140 0.469 0.000         0
+Wwp1          0  -2.726688 0.032 0.840         0
+Cd72          0   2.332359 0.756 0.196         0
+Prdx1         0   1.868586 0.969 0.884         0
+Ccdc23        0   1.602846 0.492 0.000         0
+Cela3b        0  -2.566615 0.002 0.734         0</code></pre>
+</div>
+<p>One thing to remember while looking for differences between samples is that we had to perform a batch correction. Batch correction with <code>harmony</code> only corrects the dimensional reduction, not the gene counts so here we are likely also picking up on batch differences.</p>
+<p>To save memory, we can remove the seurat objects from our enverionment</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span>list <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"seurat_merge"</span>, <span class='st'>"seurat_object"</span>, <span class='st'>"seurat_two"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/gc.html'>gc</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
+Ncells   7451162  398.0   13508872  721.5         NA  13508872  721.5
+Vcells 132954762 1014.4  420601280 3209.0      65536 420600479 3209.0</code></pre>
+</div>
+<h2 id="batch-correction-conclusion">Batch correction conclusion</h2>
+<p>While I personally prefer <code>harmony</code> as my batch correction, it only helps identify shared celltypes or clusters while not actually correcting the sequencing counts. This is fine if you want to find differences between shared celltypes within each sample, but it may not be correct if you want to compare expression differences between samples. There are other batch correction tools that do allow you to also correct the expression values. One that has received high marks recently is <code>scVI</code>, which is implemented in <code>python</code> so we won’t go into it here. Unfortunately, the creators of <code>scVI</code> don’t seem comfortable with these corrected values being used to perform differential expression analysis between samples. <code>Seurat</code> also performs an integration that corrects expression values, but those creators also suggest using the uncorrected <code>RNA</code> matrix for differential expression testing.</p>
+<p>An alternative option if you have replicates is to use <code>muscat</code> which creates pseudobulk profiles for each cell type in each sample and then runs traditional differential expression tests that can account for variation within replicates when running differential expression.</p>
+<h1 id="pseudotime">Pseudotime</h1>
+<p>We can also perform puseoditme analysis on integrated samples.</p>
+<h2 id="download-provided-files">Download provided files</h2>
+<p>I have already created processed <code>Seurat</code> objects that we will use today. This processing included finding mitochondrial percents, creating a cell cycle score, normalizing the data, finding variable genes, and scaling the data. We will skip this today, but all steps are shown in the code segment above.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>## DOWNLOAD FILES if they haven't already been downloaded</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_4w_2849.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/NOD_4w_2849.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_4w_2849.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_8w_2734.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/NOD_8w_2734.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_8w_2734.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_8w_2849.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/NOD_8w_2849.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_8w_2849.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_15w_2734.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/NOD_15w_2734.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"NOD_15w_2734.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"meta_data.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/meta_data.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"meta_data.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/files.html'>file.exists</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"mac_sce.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+       <span class='fu'><a href='https://rdrr.io/r/utils/download.file.html'>download.file</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"http://amc-sandbox.ucdenver.edu/User60/single_cell_workshop/mac_sce.rda"</span>,
+              destfile <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"mac_sce.rda"</span><span class='op'>)</span><span class='op'>)</span>,
+  <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>[1] FALSE</code></pre>
+</div>
+<h2 id="read-in-provided-files">Read in provided files</h2>
+<p>First, we need to read in all of the files associated with the first dataset. Seurat wants files as a list to merge, so let’s read them in that way using lapply</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>sample_names</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"NOD_4w_2734"</span>, <span class='st'>"NOD_4w_2849"</span>,
+                  <span class='st'>"NOD_8w_2734"</span>, <span class='st'>"NOD_8w_2849"</span>,
+                  <span class='st'>"NOD_15w_2734"</span><span class='op'>)</span>
+
+<span class='co'># I hate the default R colors, so I will also make my own</span>
+<span class='va'>colors</span> <span class='op'>&lt;-</span> <span class='fu'>RColorBrewer</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html'>brewer.pal</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='st'>"Set1"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>colors</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>sample_names</span>
+
+<span class='va'>seurat_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>sample_names</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='va'>seurat_object</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='st'>".rda"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>  
+<span class='op'>}</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<h2 id="merge-the-files-1">Merge the files</h2>
+<p>We can take this list and pass it to the <code>merge</code> function from <code>Seurat</code>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># merge objects</span>
+<span class='va'>seurat_merge</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/merge.html'>merge</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>seurat_list</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>,
+                      y <span class='op'>=</span> <span class='va'>seurat_list</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>seurat_list</span><span class='op'>)</span><span class='op'>]</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>Clean up memory</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Remove the list</span>
+<span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span>list <span class='op'>=</span> <span class='st'>"seurat_list"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/gc.html'>gc</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
+Ncells   7531176  402.3   13508872  721.5         NA  13508872  721.5
+Vcells 301128023 2297.5  903723747 6894.9      65536 739787099 5644.2</code></pre>
+</div>
+<h3 id="prepare-data">Prepare data</h3>
+<p>One important thing to remember about running pseudotime is that connections will be found between cells that are related or not. Because we know that the macrophages should not become B cells, we should first subset to only the macrophage population.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/Idents.html'>Idents</a></span><span class='op'>(</span><span class='va'>seurat_merge</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"Cells"</span>
+<span class='va'>seurat_mac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span><span class='op'>(</span><span class='va'>seurat_merge</span>, idents <span class='op'>=</span> <span class='st'>"Mac"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span>list <span class='op'>=</span> <span class='st'>"seurat_merge"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/gc.html'>gc</a></span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
+Ncells   7481384  399.6   13508872  721.5         NA  13508872  721.5
+Vcells 160809119 1226.9  722978998 5515.9      65536 739787099 5644.2</code></pre>
+</div>
+<p>After subestting, we need to repeat some of the processing steps. We need to find variable genes, scale the data, run pca, and run umap</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>seurat_mac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindVariableFeatures.html'>FindVariableFeatures</a></span><span class='op'>(</span><span class='va'>seurat_mac</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/ScaleData.html'>ScaleData</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunPCA.html'>RunPCA</a></span><span class='op'>(</span>npcs <span class='op'>=</span> <span class='fl'>30</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>15</span>, reduction <span class='op'>=</span> <span class='st'>"pca"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span>resolution <span class='op'>=</span> <span class='fl'>0.4</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>15</span>, assay <span class='op'>=</span> <span class='st'>"RNA"</span>, reduction <span class='op'>=</span> <span class='st'>"pca"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 5975
+Number of edges: 198660
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8329
+Number of communities: 8
+Elapsed time: 0 seconds</code></pre>
+</div>
+<h2 id="check-for-batch-1">Check for batch</h2>
+<p>Now we should check if any sort of batch correction is necessary. This data was processed in two batches. The cells within these two batches should only differ because of technical effects. To view these potential effects, we can first plot by batch.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>seurat_mac</span><span class='op'>[[</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>                      orig.ident nCount_RNA nFeature_RNA
+TGTGGTACAATGAAAC-1_1 NOD_4w_2734       5504         2104
+TTAGGCAGTTGTTTGG-1_1 NOD_4w_2734       7174         2452
+TTAGGCATCATCACCC-1_1 NOD_4w_2734       6893         2398
+AAACGGGAGCTGAACG-1_1 NOD_4w_2734       1306          639
+AAACGGGAGGACGAAA-1_1 NOD_4w_2734       1074          523
+AAACGGGCAAGCTGAG-1_1 NOD_4w_2734       6761         2073
+                                Barcode Cells Sample Batch Library
+TGTGGTACAATGAAAC-1_1 TGTGGTACAATGAAAC-1   Mac NOD_4w  2734       6
+TTAGGCAGTTGTTTGG-1_1 TTAGGCAGTTGTTTGG-1   Mac NOD_4w  2734       6
+TTAGGCATCATCACCC-1_1 TTAGGCATCATCACCC-1   Mac NOD_4w  2734       6
+AAACGGGAGCTGAACG-1_1 AAACGGGAGCTGAACG-1   Mac NOD_4w  2734       6
+AAACGGGAGGACGAAA-1_1 AAACGGGAGGACGAAA-1   Mac NOD_4w  2734       6
+AAACGGGCAAGCTGAG-1_1 AAACGGGCAAGCTGAG-1   Mac NOD_4w  2734       6
+                     percent.mt     S.Score    G2M.Score Phase
+TGTGGTACAATGAAAC-1_1   3.143169 -0.03649368 -0.004545299    G1
+TTAGGCAGTTGTTTGG-1_1   2.815723 -0.11072854  0.019745783   G2M
+TTAGGCATCATCACCC-1_1   3.003047 -0.01443779 -0.040919110    G1
+AAACGGGAGCTGAACG-1_1   6.125574  0.08270126  0.001381862     S
+AAACGGGAGGACGAAA-1_1   3.351955 -0.01197605  0.005858639   G2M
+AAACGGGCAAGCTGAG-1_1   3.283538 -0.03344977 -0.067185912    G1
+                     RNA_snn_res.0.4 seurat_clusters
+TGTGGTACAATGAAAC-1_1               1               1
+TTAGGCAGTTGTTTGG-1_1               1               1
+TTAGGCATCATCACCC-1_1               0               0
+AAACGGGAGCTGAACG-1_1               3               3
+AAACGGGAGGACGAAA-1_1               3               3
+AAACGGGCAAGCTGAG-1_1               1               1</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, group.by <span class='op'>=</span> <span class='st'>"Batch"</span>, cols <span class='op'>=</span> <span class='st'>"Set1"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-batch-1.png" width="624" /></p>
+</div>
+<p>While this isn’t as bad as our previous example, we should still try to remove the batch effect. Here we can include both the batch information as variable.</p>
+<p><em>Note we can also include the original identity in our batch correction. We can include as many correction factors as we want here, but I hesitate to correct beyond batch because I don’t want to remove our biological effect. In a real analysis, I would try removing just with batch and with batch and orig.ident</em></p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>seurat_mac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/harmony/man/RunHarmony.html'>RunHarmony</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, group.by.vars <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Batch"</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We can now repeat clustering and performing UMAP dimensional reduction on this new batch corrected data.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>seurat_mac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FindNeighbors.html'>FindNeighbors</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>15</span>, reduction <span class='op'>=</span> <span class='st'>"harmony"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/FindClusters.html'>FindClusters</a></span><span class='op'>(</span>resolution <span class='op'>=</span> <span class='fl'>0.4</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://satijalab.org/seurat/reference/RunUMAP.html'>RunUMAP</a></span><span class='op'>(</span>dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>15</span>, assay <span class='op'>=</span> <span class='st'>"RNA"</span>, reduction <span class='op'>=</span> <span class='st'>"harmony"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 5975
+Number of edges: 196762
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8356
+Number of communities: 6
+Elapsed time: 0 seconds</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, group.by <span class='op'>=</span> <span class='st'>"Batch"</span>, cols <span class='op'>=</span> <span class='st'>"Set1"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/processing-harmony-2-1.png" width="624" /></p>
+</div>
+<p>This looks much better. We can also check the sample and original identity. <em>If we had also used orig.ident in the correction, we may be concerned that we over-corrected the timecourse. It is always good to keep what you corrected in mind as you continue your analysis.</em></p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>samples</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>seurat_mac</span><span class='op'>$</span><span class='va'>Sample</span><span class='op'>)</span>
+<span class='va'>sample_colors</span> <span class='op'>&lt;-</span> <span class='fu'>LaCroixColoR</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/LaCroixColoR/man/lacroix_palette.html'>lacroix_palette</a></span><span class='op'>(</span><span class='st'>"Coconut"</span>, <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>sample_colors</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>samples</span>
+<span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, group.by <span class='op'>=</span> <span class='st'>"Sample"</span>, cols <span class='op'>=</span> <span class='va'>sample_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-batch-plot-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, group.by <span class='op'>=</span> <span class='st'>"orig.ident"</span>, cols <span class='op'>=</span> <span class='st'>"Set1"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-batch-ident-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, group.by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, cols <span class='op'>=</span> <span class='st'>"Set1"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-batch-cluster-1.png" width="624" /></p>
+</div>
+<p><em>Note your UMAP and clusters may look slightly different than mine. That is okay. There are random seeds used to generate UMAPs and to run other functions that are influenced by that packages and versions of packages on your system. For now, we can just run it and acknowledge that all of our output may be a bit different</em></p>
+<h2 id="run-pseudotime">Run pseudotime</h2>
+<p>As with batch correction, there are many tools for pseudotime. <code>RNA velocity</code> or <code>velocyto</code> are interesting methods that rely on intron retention to predict future cell state. Other options just use transcriptome similarity to identify cells that are likely related. With this second type, we cannot use the tool to identify the direction of cell development, but we can use known biology to infer this relationship. There are also good benchmarking papers that compare pseudotime methods.</p>
+<ul>
+<li><a href="https://doi.org/10.1038/s41587-019-0071-9" class="uri">https://doi.org/10.1038/s41587-019-0071-9</a></li>
+</ul>
+<p><code>slingshot</code> tends to do well in these benchmarking studies, so I generally start with that. But I find it is a good idea to compare a couple of methods to make sure your conclusions are robust.</p>
+<p>Now we can run <code>slingshot</code>. Slingshot runs on your dimensionality reduction. Some tutorials show this being run on the UMAP dimensions, but it is best to run this either on the PCA (or harmony) reduction. The UMAP is generally generated based on the PCA (or harmony) dimensional reduction and is only 2 dimensions. PCA or harmony can be many dimensions (ex. 50) and is a better representation of your data.</p>
+<p>First we need to pull the new harmony coordinates and cluster information from the <code>seurat</code> object. Make sure we use the same number of coordiantes we’ve used for other analysis</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>pca_coords</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/Embeddings.html'>Embeddings</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>seurat_mac</span>, reduction <span class='op'>=</span> <span class='st'>"harmony"</span><span class='op'>)</span><span class='op'>[</span> , <span class='fl'>1</span><span class='op'>:</span><span class='fl'>15</span><span class='op'>]</span>
+<span class='va'>clusters</span> <span class='op'>&lt;-</span> <span class='va'>seurat_mac</span><span class='op'>$</span><span class='va'>seurat_clusters</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We can then input these into slingshot</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>mac_slingshot</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/slingshot/man/slingshot.html'>slingshot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>pca_coords</span>, clusterLabels <span class='op'>=</span> <span class='va'>clusters</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>Looking at this object, we can see that 4 lineages were found.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>mac_slingshot</span>
+</code></pre>
+</div>
+</details>
+<pre><code>class: SlingshotDataSet 
+
+ Samples Dimensions
+    5975         15
+
+lineages: 3 
+Lineage1: 5  1  0  2  
+Lineage2: 5  1  0  3  
+Lineage3: 5  1  0  4  
+
+curves: 3 
+Curve1: Length: 43.684  Samples: 5020.65
+Curve2: Length: 62.279  Samples: 4675.3
+Curve3: Length: 78.562  Samples: 4604.8</code></pre>
+</div>
+<p>So cluster 5, 1 and 0 start all lineages.</p>
+<p>Pseudotime algorithims identify cells with similar transcriptional profiles to create a likely order of cell relationships. Unfortunately, there is no way to do this with a definite direction. For example, the curves above could either start or end at cluster 0, we don’t know.</p>
+<p>One nice thing about slingshot is that you can include known biology to improve the ability to identify correct lineages that go in the correct direction. For example, without any input, slingshot defined cluster 0 as the first cluster, but we know that the cells at the latest timepoint are in cluster 0 while the earliest is in cluster 2. We can repeat with cluster 3 as the starting cluster</p>
+<p>We can then input these into slingshot</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>mac_slingshot_2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/slingshot/man/slingshot.html'>slingshot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>pca_coords</span>, clusterLabels <span class='op'>=</span> <span class='va'>clusters</span>,
+                             start.clus <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We still find 3 lineages, but this time, all lineages start with cluster 3.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>mac_slingshot_2</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>class: SlingshotDataSet 
+
+ Samples Dimensions
+    5975         15
+
+lineages: 3 
+Lineage1: 3  0  1  5  
+Lineage2: 3  0  2  
+Lineage3: 3  0  4  
+
+curves: 3 
+Curve1: Length: 57.994  Samples: 4688.6
+Curve2: Length: 46.386  Samples: 3683.64
+Curve3: Length: 90.59   Samples: 3188.61</code></pre>
+</div>
+<p>We can extract pseudotime values using <code>slingPseudotime</code> and add this to the metadata. This is the way that you would do it if you were running your own analysis…</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>################################## DO NOT RUN ################################## </span>
+<span class='va'>pseudotime</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/slingshot/man/slingPseudotime.html'>slingPseudotime</a></span><span class='op'>(</span><span class='va'>mac_slingshot_2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>seurat_mac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/AddMetaData.html'>AddMetaData</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, metadata <span class='op'>=</span> <span class='va'>pseudotime</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>… but to keep our analysis consistent, you will add in my values here</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>seurat_meta_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"meta_data.rda"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>seurat_mac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/AddMetaData.html'>AddMetaData</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, metadata <span class='op'>=</span> <span class='va'>seurat_meta_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>And now we can visualize each curve</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, features <span class='op'>=</span> <span class='st'>"curve1"</span>, cols <span class='op'>=</span> <span class='fu'>viridis</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/viridisLite/man/viridis.html'>magma</a></span><span class='op'>(</span><span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/curve1-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, features <span class='op'>=</span> <span class='st'>"curve2"</span>, cols <span class='op'>=</span> <span class='fu'>viridis</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/viridisLite/man/viridis.html'>magma</a></span><span class='op'>(</span><span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/curve2-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://satijalab.org/seurat/reference/FeaturePlot.html'>FeaturePlot</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, features <span class='op'>=</span> <span class='st'>"curve3"</span>, cols <span class='op'>=</span> <span class='fu'>viridis</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/viridisLite/man/viridis.html'>magma</a></span><span class='op'>(</span><span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/curve3-1.png" width="624" /></p>
+</div>
+<p>We can now visualize the psuedotime across our timepoints. Below you can see that the cells nicely transition between timepoints along pseudotime.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>meta_data</span> <span class='op'>&lt;-</span> <span class='va'>seurat_mac</span><span class='op'>[[</span><span class='op'>]</span><span class='op'>]</span>
+<span class='va'>meta_data</span><span class='op'>$</span><span class='va'>Sample</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>meta_data</span><span class='op'>$</span><span class='va'>Sample</span>,
+                           levels <span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"NOD_4w"</span>, <span class='st'>"NOD_8w"</span>, <span class='st'>"NOD_15w"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># Subest to only cells with value for curve 1</span>
+<span class='va'>meta_data</span> <span class='op'>&lt;-</span> <span class='va'>meta_data</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>curve1</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>density_plot</span> <span class='op'>&lt;-</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>meta_data</span>,
+                                <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>curve1</span>,
+                                             y <span class='op'>=</span> <span class='va'>Sample</span>,
+                                             fill <span class='op'>=</span> <span class='va'>Sample</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ggridges</span><span class='fu'>::</span><span class='fu'><a href='https://wilkelab.org/ggridges/reference/geom_density_ridges.html'>geom_density_ridges</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_fill_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='va'>sample_colors</span><span class='op'>)</span>
+
+<span class='va'>density_plot</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/ridge-plot-1.png" width="624" /></p>
+</div>
+<p>As discussed before, this could be completley due to batch effect, but we can plot each batch separetly to see if there is much difference in terms of pseudotime. As you can see, the batches look nearly identical indicating that the changes we see are likely due to the timecourse.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>meta_data</span> <span class='op'>&lt;-</span> <span class='va'>seurat_mac</span><span class='op'>[[</span><span class='op'>]</span><span class='op'>]</span>
+<span class='va'>meta_data</span><span class='op'>$</span><span class='va'>orig.ident</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>meta_data</span><span class='op'>$</span><span class='va'>orig.ident</span>,
+                           levels <span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"NOD_4w_2734"</span>, <span class='st'>"NOD_4w_2849"</span>,
+                                     <span class='st'>"NOD_8w_2734"</span>, <span class='st'>"NOD_8w_2849"</span>,
+                                     <span class='st'>"NOD_15w_2734"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># Subest to only cells with value for curve 1</span>
+<span class='va'>meta_data</span> <span class='op'>&lt;-</span> <span class='va'>meta_data</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>curve1</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>density_plot</span> <span class='op'>&lt;-</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>meta_data</span>,
+                                <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>curve1</span>,
+                                             y <span class='op'>=</span> <span class='va'>orig.ident</span>,
+                                             fill <span class='op'>=</span> <span class='va'>orig.ident</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ggridges</span><span class='fu'>::</span><span class='fu'><a href='https://wilkelab.org/ggridges/reference/geom_density_ridges.html'>geom_density_ridges</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_fill_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='va'>colors</span><span class='op'>)</span>
+
+<span class='va'>density_plot</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/ridge-plot-batch-1.png" width="624" /></p>
+</div>
+<h3 id="genes-that-correlate-with-pseudotime">Genes that correlate with pseudotime</h3>
+<p>We can also identify genes with expression patterns that correlate with pseudotime.</p>
+<p>For each gene, we will fit a general additive model (GAM) using a negative binomial noise distribution to model the (potentially nonlinear) relationship between gene expression and pseudotime. We will then test for significant associations between expression and pseudotime using the <code>associationTest</code> This requires the package <code>tradeSeq</code></p>
+<p>This function takes a long time to run (about 30 minutes) so I have already run it for you. The steps are below. I only ran it on the top 2000 variable genes as these are the most likely genes to also correlate with pseudotime.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>################################## DO NOT RUN ################################## </span>
+<span class='va'>variable_features_pattern</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"^"</span>, <span class='fu'><a href='https://satijalab.org/seurat/reference/VariableFeatures.html'>VariableFeatures</a></span><span class='op'>(</span><span class='va'>seurat_mac</span><span class='op'>)</span>, <span class='st'>"$"</span><span class='op'>)</span>
+<span class='va'>genes_use</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grep</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>variable_features_pattern</span>, collapse<span class='op'>=</span><span class='st'>"|"</span><span class='op'>)</span>,
+                  <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>seurat_mac</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># fit negative binomial GAM</span>
+<span class='va'>mac_sce</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/tradeSeq/man/fitGAM.html'>fitGAM</a></span><span class='op'>(</span>counts <span class='op'>=</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/AssayData.html'>GetAssayData</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>seurat_mac</span>,
+                                                slot <span class='op'>=</span> <span class='st'>"counts"</span><span class='op'>)</span>,
+                          sds <span class='op'>=</span> <span class='va'>mac_slingshot_2</span>,
+                          genes <span class='op'>=</span> <span class='va'>genes_use</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span><span class='va'>mac_sce</span>, <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"mac_sce.rda"</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We can load in this saved object and run an association test to identify what genes correlate best with pseudotime. The output of this assocaition test is a data frame that includes p values and wald statistics for each lineage.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>mac_sce</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>base_dir</span>, <span class='st'>"data"</span>, <span class='st'>"mac_sce.rda"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>pseudotime_genes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/tradeSeq/man/associationTest.html'>associationTest</a></span><span class='op'>(</span><span class='va'>mac_sce</span>, lineages <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>pseudotime_genes</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>                waldStat df       pvalue waldStat_1 df_1     pvalue_1
+2610203C22Rik  57.393916 13 1.528750e-07 47.3931492    4 1.262831e-09
+Crispld1        1.392254 13 9.999722e-01  1.2694737    4 8.665331e-01
+Mcm3          243.363823 13 0.000000e+00  3.9649927    4 4.107643e-01
+Prim2          96.215024 13 8.992806e-15  7.2718169    4 1.222024e-01
+Arhgef4         5.729941 13 9.554316e-01  0.1094587    4 9.985559e-01
+Kansl3         11.489114 13 5.699136e-01  2.2217701    4 6.950457e-01
+              waldStat_2 df_2  pvalue_2   waldStat_3 df_3
+2610203C22Rik 5.53169442    4 0.2369575   4.46907210    5
+Crispld1      0.04703618    4 0.9997277   0.07574365    5
+Mcm3          4.95251819    4 0.2922042 234.44631244    5
+Prim2         5.11069663    4 0.2761268  83.83251057    5
+Arhgef4       0.56266118    4 0.9671211   5.05782073    5
+Kansl3        7.32038404    4 0.1198954   1.94695982    5
+                  pvalue_3 meanLogFC
+2610203C22Rik 4.840321e-01 0.3605775
+Crispld1      9.999183e-01 0.2334851
+Mcm3          0.000000e+00 0.6827228
+Prim2         1.110223e-16 0.7987538
+Arhgef4       4.088645e-01 1.3436817
+Kansl3        8.564344e-01 0.2269093</code></pre>
+</div>
+<p>Let’s first pull out the top genes associated with the first curve.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># We care about lineage one, so we use pvalue_1 to rank the genes.</span>
+<span class='va'>topgenes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>pseudotime_genes</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>pseudotime_genes</span><span class='op'>$</span><span class='va'>pvalue_1</span><span class='op'>)</span>, <span class='op'>]</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span><span class='op'>]</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We can now plot these genes in a heatmap to show the expression over time.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Get the information for curve 1 so we can find what cells to keep</span>
+<span class='va'>cell_info</span> <span class='op'>&lt;-</span> <span class='va'>seurat_mac</span><span class='op'>[[</span><span class='st'>"curve1"</span><span class='op'>]</span><span class='op'>]</span>
+
+<span class='va'>cell_info</span> <span class='op'>&lt;-</span> <span class='va'>cell_info</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>curve1</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># Get the data for all cells</span>
+<span class='va'>heatdata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/AssayData.html'>GetAssayData</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>seurat_mac</span>, slot <span class='op'>=</span> <span class='st'>"data"</span><span class='op'>)</span>
+
+<span class='co'># Subset to only genes and cells we want</span>
+<span class='va'>heatdata</span> <span class='op'>&lt;-</span> <span class='va'>heatdata</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>heatdata</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='va'>topgenes</span>,
+                     <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>heatdata</span><span class='op'>)</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>cell_info</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'># Order the data based on the pseudotime ordering of the cells</span>
+<span class='va'>heatdata</span> <span class='op'>&lt;-</span> <span class='va'>heatdata</span><span class='op'>[</span> , <span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>cell_info</span><span class='op'>$</span><span class='va'>curve1</span><span class='op'>)</span><span class='op'>]</span>
+
+<span class='co'>## Color the clusters and samples ##</span>
+<span class='co'># pull out the sample information and make cell order the same as the heatmap</span>
+<span class='co'># data</span>
+<span class='va'>sample_info</span> <span class='op'>&lt;-</span> <span class='va'>seurat_mac</span><span class='op'>[[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Sample"</span>, <span class='st'>"seurat_clusters"</span><span class='op'>)</span><span class='op'>]</span><span class='op'>]</span>
+<span class='va'>sample_info</span> <span class='op'>&lt;-</span> <span class='va'>sample_info</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>heatdata</span><span class='op'>)</span> , <span class='op'>]</span>
+
+<span class='co'># Set colors</span>
+<span class='va'>cluster_colors</span> <span class='op'>&lt;-</span> <span class='fu'>RColorBrewer</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html'>brewer.pal</a></span><span class='op'>(</span><span class='fl'>8</span>, <span class='st'>"Set1"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>cluster_colors</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>7</span><span class='op'>)</span>
+
+<span class='va'>samples</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>seurat_mac</span><span class='op'>$</span><span class='va'>Sample</span><span class='op'>)</span>
+<span class='va'>sample_colors</span> <span class='op'>&lt;-</span> <span class='fu'>LaCroixColoR</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/LaCroixColoR/man/lacroix_palette.html'>lacroix_palette</a></span><span class='op'>(</span><span class='st'>"Coconut"</span>, <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>sample_colors</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>samples</span>
+
+<span class='co'># We make a list of the colors, make sure the names match the sample info we</span>
+<span class='co'># created</span>
+<span class='va'>color_list</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>Sample <span class='op'>=</span> <span class='va'>sample_colors</span>, seurat_clusters <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+
+<span class='co'>## Prepare heatmap values ##</span>
+<span class='co'># Scale the heatmap values</span>
+<span class='va'>heatmap_scale</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/scale.html'>scale</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/t.html'>t</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='va'>heatdata</span><span class='op'>)</span><span class='op'>)</span>, scale <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># Colors for heatmap (from the ArchR package)</span>
+<span class='va'>blueYellow</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#352A86"</span>, <span class='st'>"#343DAE"</span>, <span class='st'>"#0262E0"</span>, <span class='st'>"#1389D2"</span>, <span class='st'>"#2DB7A3"</span>,
+                <span class='st'>"#A5BE6A"</span>, <span class='st'>"#F8BA43"</span>, <span class='st'>"#F6DA23"</span>, <span class='st'>"#F8FA0D"</span><span class='op'>)</span>
+
+<span class='co'># Add cutoffs for visualization. I actually stole this line of code from the</span>
+<span class='co'># Seurat heatmap functions. Without it you can only see some genes</span>
+<span class='va'>heatmap_scale</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>heatmap_scale</span> <span class='op'>&gt;</span> <span class='fl'>2.5</span>, <span class='fl'>2.5</span>, <span class='va'>heatmap_scale</span><span class='op'>)</span>
+<span class='va'>heatmap_scale</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>heatmap_scale</span> <span class='op'>&lt;</span> <span class='op'>-</span><span class='fl'>2.5</span>, <span class='op'>-</span><span class='fl'>2.5</span>, <span class='va'>heatmap_scale</span><span class='op'>)</span>
+
+<span class='co'># Make the heatmap</span>
+<span class='fu'><a href='https://rdrr.io/pkg/pheatmap/man/pheatmap.html'>pheatmap</a></span><span class='op'>(</span><span class='va'>heatmap_scale</span>, cluster_rows <span class='op'>=</span> <span class='cn'>TRUE</span>,
+         cluster_cols <span class='op'>=</span> <span class='cn'>FALSE</span>,
+         show_rownames <span class='op'>=</span> <span class='cn'>TRUE</span>,
+         show_colnames <span class='op'>=</span> <span class='cn'>FALSE</span>,
+         annotation_col <span class='op'>=</span> <span class='va'>sample_info</span>,
+         annotation_colors <span class='op'>=</span> <span class='va'>color_list</span>, color <span class='op'>=</span> <span class='va'>blueYellow</span>,
+         border_color <span class='op'>=</span> <span class='cn'>NA</span>, clustering_method <span class='op'>=</span> <span class='st'>"complete"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/heatmap-1.png" width="960" /></p>
+</div>
+<p>We can also visualize the expression of certain genes across pseudotime. I am going to write a function for this because we will do it several times. This is a quick function that could be easily improved to also be able to color by a continuous variable –&gt; feel free to take this and modify as you please.</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>plot_pseudotime</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>seurat_object</span>, <span class='va'>pseudotime_name</span>,
+                            <span class='va'>gene_name</span>, <span class='va'>col_by</span> <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>,
+                            <span class='va'>colors</span> <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='va'>plot_info</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/FetchData.html'>FetchData</a></span><span class='op'>(</span><span class='va'>seurat_object</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>pseudotime_name</span>, <span class='va'>gene_name</span>,
+                                          <span class='va'>col_by</span><span class='op'>)</span><span class='op'>)</span>
+  
+  <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>plot_info</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"pseudotime"</span>, <span class='st'>"gene"</span>, <span class='st'>"color"</span><span class='op'>)</span>
+  
+  <span class='co'># Set colors if not set already</span>
+  <span class='kw'>if</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span><span class='op'>(</span><span class='va'>colors</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='va'>colors</span> <span class='op'>&lt;-</span> <span class='fu'>RColorBrewer</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html'>brewer.pal</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>plot_info</span><span class='op'>$</span><span class='va'>color</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>colors</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>plot_info</span><span class='op'>$</span><span class='va'>color</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  
+  <span class='va'>plot</span> <span class='op'>&lt;-</span> <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>plot_info</span>, <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>pseudotime</span>,
+                                                  y <span class='op'>=</span> <span class='va'>gene</span>,
+                                                  color <span class='op'>=</span> <span class='va'>color</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_color_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='va'>colors</span>, name <span class='op'>=</span> <span class='va'>col_by</span><span class='op'>)</span> <span class='op'>+</span> 
+    <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>ylab</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>gene_name</span>, <span class='st'>" log expression"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+    <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_smooth.html'>geom_smooth</a></span><span class='op'>(</span>se <span class='op'>=</span> <span class='cn'>FALSE</span>, color <span class='op'>=</span> <span class='st'>"black"</span><span class='op'>)</span>
+  
+  <span class='kw'><a href='https://rdrr.io/r/base/function.html'>return</a></span><span class='op'>(</span><span class='va'>plot</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>Let’s run this with a few genes</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Ptma"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-ptma-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Pmepa1"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-pmepa1-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Cd72"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-cd72-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Ptpn1"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-ptpn1-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Slamf8"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-slamf8-1.png" width="624" /></p>
+</div>
+<p>With this function, we can also see expression by sample</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Slamf8"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"Sample"</span>, color <span class='op'>=</span> <span class='va'>sample_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/pseudotime-cluster-1.png" width="624" /></p>
+</div>
+<p>But maybe you are more interested in groups of genes that change. We can find clusters of genes that change using the <code>tradeSeq</code> package as well. If you could not install clusterExperiment, don’t run this secton (it’s our last section)</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>clusterExperiment</span><span class='op'>)</span>
+<span class='va'>topgenes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>pseudotime_genes</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/order.html'>order</a></span><span class='op'>(</span><span class='va'>pseudotime_genes</span><span class='op'>$</span><span class='va'>pvalue_1</span><span class='op'>)</span>, <span class='op'>]</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>250</span><span class='op'>]</span>
+
+<span class='co'># This clusters genes based on their expression across pseudotime</span>
+<span class='va'>cluster_patterns</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/tradeSeq/man/clusterExpressionPatterns.html'>clusterExpressionPatterns</a></span><span class='op'>(</span><span class='va'>mac_sce</span>, nPoints <span class='op'>=</span> <span class='fl'>20</span>,
+                                              genes <span class='op'>=</span> <span class='va'>topgenes</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>36 parameter combinations, 36 use sequential method, 36 use subsampling method
+Running Clustering on Parameter Combinations...
+done.</code></pre>
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># We can pull out the labels and map genes to labels using the yhatScaled output</span>
+<span class='va'>cluster_labels</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/clusterExperiment/man/ClusterExperiment-methods.html'>primaryCluster</a></span><span class='op'>(</span><span class='va'>cluster_patterns</span><span class='op'>$</span><span class='va'>rsec</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>cluster_labels</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>cluster_patterns</span><span class='op'>$</span><span class='va'>yhatScaled</span><span class='op'>)</span>
+
+<span class='co'># The -1 means the gene was not clustered</span>
+<span class='va'>cluster_labels</span> <span class='op'>&lt;-</span> <span class='va'>cluster_labels</span><span class='op'>[</span><span class='va'>cluster_labels</span> <span class='op'>!=</span> <span class='op'>-</span><span class='fl'>1</span><span class='op'>]</span>
+
+<span class='co'># Now let's make lists of genes based on the clusters</span>
+
+<span class='va'>cluster_genes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/unique.html'>unique</a></span><span class='op'>(</span><span class='va'>cluster_labels</span><span class='op'>)</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>cluster_labels</span><span class='op'>[</span><span class='va'>cluster_labels</span> <span class='op'>==</span> <span class='va'>x</span><span class='op'>]</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
+
+<span class='co'># We can now make module scores with all of these lists</span>
+<span class='va'>seurat_mac</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://satijalab.org/seurat/reference/AddModuleScore.html'>AddModuleScore</a></span><span class='op'>(</span><span class='va'>seurat_mac</span>, features <span class='op'>=</span> <span class='va'>cluster_genes</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+</div>
+<p>We now have module scores for each gene list</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>seurat_mac</span><span class='op'>[[</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<pre><code>                      orig.ident nCount_RNA nFeature_RNA
+TGTGGTACAATGAAAC-1_1 NOD_4w_2734       5504         2104
+TTAGGCAGTTGTTTGG-1_1 NOD_4w_2734       7174         2452
+TTAGGCATCATCACCC-1_1 NOD_4w_2734       6893         2398
+AAACGGGAGCTGAACG-1_1 NOD_4w_2734       1306          639
+AAACGGGAGGACGAAA-1_1 NOD_4w_2734       1074          523
+AAACGGGCAAGCTGAG-1_1 NOD_4w_2734       6761         2073
+                                Barcode Cells Sample Batch Library
+TGTGGTACAATGAAAC-1_1 TGTGGTACAATGAAAC-1   Mac NOD_4w  2734       6
+TTAGGCAGTTGTTTGG-1_1 TTAGGCAGTTGTTTGG-1   Mac NOD_4w  2734       6
+TTAGGCATCATCACCC-1_1 TTAGGCATCATCACCC-1   Mac NOD_4w  2734       6
+AAACGGGAGCTGAACG-1_1 AAACGGGAGCTGAACG-1   Mac NOD_4w  2734       6
+AAACGGGAGGACGAAA-1_1 AAACGGGAGGACGAAA-1   Mac NOD_4w  2734       6
+AAACGGGCAAGCTGAG-1_1 AAACGGGCAAGCTGAG-1   Mac NOD_4w  2734       6
+                     percent.mt     S.Score    G2M.Score Phase
+TGTGGTACAATGAAAC-1_1   3.143169 -0.03649368 -0.004545299    G1
+TTAGGCAGTTGTTTGG-1_1   2.815723 -0.11072854  0.019745783   G2M
+TTAGGCATCATCACCC-1_1   3.003047 -0.01443779 -0.040919110    G1
+AAACGGGAGCTGAACG-1_1   6.125574  0.08270126  0.001381862     S
+AAACGGGAGGACGAAA-1_1   3.351955 -0.01197605  0.005858639   G2M
+AAACGGGCAAGCTGAG-1_1   3.283538 -0.03344977 -0.067185912    G1
+                     RNA_snn_res.0.4 seurat_clusters   curve1
+TGTGGTACAATGAAAC-1_1               0               0 28.47263
+TTAGGCAGTTGTTTGG-1_1               0               0 27.58648
+TTAGGCATCATCACCC-1_1               1               1 37.36389
+AAACGGGAGCTGAACG-1_1               2               2       NA
+AAACGGGAGGACGAAA-1_1               2               2       NA
+AAACGGGCAAGCTGAG-1_1               0               0 26.34186
+                       curve2   curve3   curve4   Cluster1
+TGTGGTACAATGAAAC-1_1 28.49546 28.95305 5.676088 0.33377979
+TTAGGCAGTTGTTTGG-1_1 27.79235 27.71710 7.219584 0.38056921
+TTAGGCATCATCACCC-1_1       NA       NA       NA 0.28216979
+AAACGGGAGCTGAACG-1_1 43.01743       NA       NA 0.47671832
+AAACGGGAGGACGAAA-1_1 43.83676       NA       NA 0.06774771
+AAACGGGCAAGCTGAG-1_1 26.51367 26.37878 7.359532 0.56675710
+                        Cluster2    Cluster3    Cluster4   Cluster5
+TGTGGTACAATGAAAC-1_1 -0.23338713 -0.10060188 -0.23857820 0.41524500
+TTAGGCAGTTGTTTGG-1_1 -0.23831449 -0.12499315  0.22431976 0.10885173
+TTAGGCATCATCACCC-1_1  0.62293815 -0.01931329  0.04288274 0.42151581
+AAACGGGAGCTGAACG-1_1  0.16418156 -0.20755213 -0.22779036 1.29609586
+AAACGGGAGGACGAAA-1_1 -0.15662373 -0.06056986 -0.22113347 0.63430366
+AAACGGGCAAGCTGAG-1_1 -0.01334378 -0.17748735  0.19737181 0.07542681
+                        Cluster6    Cluster7    Cluster8   Cluster9
+TGTGGTACAATGAAAC-1_1  0.13847398  0.03839144  0.11999734 -0.2470514
+TTAGGCAGTTGTTTGG-1_1 -0.08947706  0.04199360 -0.20888382 -0.1627223
+TTAGGCATCATCACCC-1_1 -0.19591516  0.05584320 -0.00663408 -0.0650443
+AAACGGGAGCTGAACG-1_1 -0.46639265 -0.65554214 -0.17521994 -0.4202507
+AAACGGGAGGACGAAA-1_1 -0.38300833 -0.85337909 -0.10676373 -0.1782299
+AAACGGGCAAGCTGAG-1_1 -0.24384909  0.10882146 -0.17399804 -0.0341841
+                     Cluster10    Cluster11   Cluster12  Cluster13
+TGTGGTACAATGAAAC-1_1 0.9955797 -0.314083542 -0.48168935 -0.1045330
+TTAGGCAGTTGTTTGG-1_1 0.4621835 -0.132375413 -0.26626727  0.2829529
+TTAGGCATCATCACCC-1_1 0.4400951 -0.004010838 -0.56302972 -0.3860754
+AAACGGGAGCTGAACG-1_1 1.4501060  0.071832631  0.04211701 -0.3410378
+AAACGGGAGGACGAAA-1_1 0.6367916 -0.115808177 -0.78597350  0.5741420
+AAACGGGCAAGCTGAG-1_1 0.4356141 -0.073272605  0.03863495  0.3324352
+                       Cluster14  Cluster15
+TGTGGTACAATGAAAC-1_1 -0.32764880 0.30151699
+TTAGGCAGTTGTTTGG-1_1 -0.30099317 0.19211639
+TTAGGCATCATCACCC-1_1 -0.14009347 0.04622538
+AAACGGGAGCTGAACG-1_1  0.04676656 0.23903855
+AAACGGGAGGACGAAA-1_1  0.57718761 0.34490931
+AAACGGGCAAGCTGAG-1_1  0.47818854 0.18783371</code></pre>
+</div>
+<p>We can plot these the same way we plotted the genes</p>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Cluster1"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cluster1-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Cluster2"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cluster-2-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Cluster10"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"seurat_clusters"</span>, color <span class='op'>=</span> <span class='va'>cluster_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cluster-3-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<details>
+<summary>show</summary>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>plot_pseudotime</span><span class='op'>(</span><span class='va'>seurat_mac</span>, pseudotime_name <span class='op'>=</span> <span class='st'>"curve1"</span>, gene_name <span class='op'>=</span> <span class='st'>"Cluster10"</span>,
+                col_by <span class='op'>=</span> <span class='st'>"Sample"</span>, color <span class='op'>=</span> <span class='va'>sample_colors</span><span class='op'>)</span>
+</code></pre>
+</div>
+</details>
+<p><img src="class-3_files/figure-html5/cluster-10-sample-1.png" width="624" /></p>
+</div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<!--radix_placeholder_article_footer-->
+<!--/radix_placeholder_article_footer-->
+</div>
+
+<div class="d-appendix">
+</div>
+
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_appendices-->
+<div class="appendix-bottom"></div>
+<!--/radix_placeholder_appendices-->
+<!--radix_placeholder_navigation_after_body-->
+<!--/radix_placeholder_navigation_after_body-->
+
+</body>
+
+</html>
