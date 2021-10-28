@@ -1,5 +1,7 @@
 ---
 title: "single cell RNA-seq workshop"
 site: distill::distill_website
-listing: posts
+listing:
+  posts:
+    - 2021-10-13-multi-modal
 ---
