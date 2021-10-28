@@ -1,0 +1,125 @@
+---
+title: "Installing R"
+author: "Kent Riemondy RBI"
+output:
+  distill::distill_article:
+    toc: false  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Setting up your computer for using R/Rstudio
+
+This article will explain how to install R, Rstudio, and how to install packages into R. 
+
+# Download R
+
+Download R from CRAN. Go to the cran homepage https://cran.r-project.org/. Select your operating system. 
+
+## MacOS
+
+Select the newest R version, download the `.pkg` file, then open and install. 
+
+
+## Windows
+
+Select the `base` link, then click download to download the `.exe` file. Open this file to install R. Rui Fu has the most experience with windows. 
+
+## Linux
+
+If you are on linux, then follow the documentation for your linux OS. Ryan Sheridan is the resident linux expert. 
+  
+# Download compiler tools  
+
+## MacOS
+
+You may need to install the xcode command line tools if a package requires compilation. Open the Terminal from `/Applications/Utilities/` (or use the search tool to search for terminal)
+     
+Type the following into Terminal: 
+
+```bash
+xcode-select --install
+```
+
+Press “Install” and verify installation by typing into terminal:
+
+```bash
+gcc --version
+```
+
+Which should print something similar to this:  
+
+```bash
+#' gcc (GCC) 4.8.5
+#' Copyright (C) 2015 Free Software Foundation, Inc.
+#' This is free software; see the source for copying conditions.  There is NO
+#' warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+```
+
+Here's a [youtube video explainer](https://www.youtube.com/watch?v=Z01lzHNrSdU&feature=emb_title) 
+    
+Next you need to install `gfortran`. Follow this [link](https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/) and go to the "INSTALL OS-SPECIFIC GFORTRAN BINARY" section. Select the download link based on your macOS version. This will supply an installer. 
+    
+## Windows
+
+You need to install `Rtools` from CRAN. Go to this link and download the exe installer for your OS: https://cran.r-project.org/bin/windows/Rtools/
+     
+## Linux
+  You probably have a compiler already?
+  
+# Download Rstudio
+
+Go to the [Rstudio website](https://rstudio.com/products/rstudio/download/#download) and download the installer for your OS. 
+
+# Installing packages
+
+Once you have R and Rstudio set up, open up rstudio, then we will install various packages. 
+
+In general there are 3 common places that you can get R packages from:
+
+1) CRAN, this is the official R package repository. CRAN has 16,000+  packages, including the tidyverse (ggplot2, dplyr, etc) and Seurat. Packages are installed using the `install.packages()` function. A successful install only needs to be done once. 
+
+In your console execute the following:
+
+```r
+install.packages("tidyverse")
+```
+
+```r
+install.packages("Seurat")
+```
+
+
+Test package installation once complete by loading the package(s)
+
+```r
+library(tidyverse)
+library(Seurat)
+```
+
+2) [Bioconductor](https://bioconductor.org/), which generally has bioinformatics related packages, such as clustifyr, DESeq2, ComplexHeatmap, etc. 
+
+To install bioconductor packages you should use the CRAN package `BiocManager`. BiocManager has a function called `install()` to install bioconductor packages. For example to install `clustifyyr`
+
+```r
+install.packages("BiocManager")
+```
+
+```r
+library(BiocManager)
+install("clustifyr")
+# or equivalently you could run BiocManager::install("clustifyr")
+```
+
+3) [Github](https://github.com/) hosts open-source code from millions of projects. R packages hosted on github can be installed using the `remotes` package. `Presto` or `djvdj` are examples of single cell RNA-seq analysis packages on github. You'll need to find the organization name and the repository name on github to install. 
+
+```r
+install.packages("remotes")
+```
+
+```r
+remotes::install_github('rnabioco/djvdj')
+remotes::install_github('immunogenomics/presto')
+```

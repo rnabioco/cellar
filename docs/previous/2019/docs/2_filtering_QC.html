@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="generator" content="distill" />
+
+  <style type="text/css">
+  /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
+  body {
+    visibility: hidden;
+  }
+  </style>
+
+ <!--radix_placeholder_import_source-->
+ <!--/radix_placeholder_import_source-->
+
+  <!--radix_placeholder_meta_tags-->
+  <title>Single-cell RNA-seq Workshop: &lt;b style="font-size:45px;"&gt;Data Filtering and Quality Control&lt;/b&gt;</title>
+  
+  
+  <link rel="icon" type="image/png" href="img/logo.png"/>
+  
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2019-08-13"/>
+  <meta property="article:created" itemprop="dateCreated" content="2019-08-13"/>
+  <meta name="article:author" content="Ryan Sheridan"/>
+  
+  <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
+  <meta property="og:title" content="Single-cell RNA-seq Workshop: &lt;b style=&quot;font-size:45px;&quot;&gt;Data Filtering and Quality Control&lt;/b&gt;"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:site_name" content="Single-cell RNA-seq Workshop"/>
+  
+  <!--  https://dev.twitter.com/cards/types/summary -->
+  <meta property="twitter:card" content="summary"/>
+  <meta property="twitter:title" content="Single-cell RNA-seq Workshop: &lt;b style=&quot;font-size:45px;&quot;&gt;Data Filtering and Quality Control&lt;/b&gt;"/>
+  <meta property="twitter:site" content="@rnabioco"/>
+  
+  <!--/radix_placeholder_meta_tags-->
+  <!--radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-rmarkdown-metadata">
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["<b style=\"font-size:45px;\">Data Filtering and Quality Control<\/b>"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Ryan Sheridan"]}]}]},{"type":"character","attributes":{},"value":["August 13<sup>th<\/sup>, 2019"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["toc"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
+  </script>
+  <!--/radix_placeholder_rmarkdown_metadata-->
+  <!--radix_placeholder_navigation_in_header-->
+  
+  <script type="application/javascript">
+  
+    window.headroom_prevent_pin = false;
+  
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+  
+      // initialize headroom for banner
+      var header = $('header').get(0);
+      var headerHeight = header.offsetHeight;
+      var headroom = new Headroom(header, {
+        onPin : function() {
+          if (window.headroom_prevent_pin) {
+            window.headroom_prevent_pin = false;
+            headroom.unpin();
+          }
+        }
+      });
+      headroom.init();
+      if(window.location.hash)
+        headroom.unpin();
+      $(header).addClass('headroom--transition');
+  
+      // offset scroll location for banner on hash change
+      // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
+      window.addEventListener("hashchange", function(event) {
+        window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
+      });
+  
+      // responsive menu
+      $('.distill-site-header').each(function(i, val) {
+        var topnav = $(this);
+        var toggle = topnav.find('.nav-toggle');
+        toggle.on('click', function() {
+          topnav.toggleClass('responsive');
+        });
+      });
+  
+      // nav dropdowns
+      $('.nav-dropbtn').click(function(e) {
+        $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
+        $(this).parent().siblings('.nav-dropdown')
+           .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
+      });
+      $("body").click(function(e){
+        $('.nav-dropdown-content').removeClass('nav-dropdown-active');
+      });
+      $(".nav-dropdown").click(function(e){
+        e.stopPropagation();
+      });
+    });
+  </script>
+  
+  <style type="text/css">
+  
+  /* Theme (user-documented overrideables for nav appearance) */
+  
+  .distill-site-nav {
+    color: rgba(255, 255, 255, 0.8);
+    background-color: #455a64;
+    font-size: 15px;
+    font-weight: 300;
+  }
+  
+  .distill-site-nav a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .distill-site-nav a:hover {
+    color: white;
+  }
+  
+  @media print {
+    .distill-site-nav {
+      display: none;
+    }
+  }
+  
+  .distill-site-header {
+  
+  }
+  
+  .distill-site-footer {
+  
+  }
+  
+  
+  /* Site Header */
+  
+  .distill-site-header {
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 3;
+  }
+  
+  .distill-site-header .nav-left {
+    display: inline-block;
+    margin-left: 8px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header .nav-left {
+      margin-left: 0;
+    }
+  }
+  
+  
+  .distill-site-header .nav-right {
+    float: right;
+    margin-right: 8px;
+  }
+  
+  .distill-site-header a,
+  .distill-site-header .title {
+    display: inline-block;
+    text-align: center;
+    padding: 14px 10px 14px 10px;
+  }
+  
+  .distill-site-header .title {
+    font-size: 18px;
+  }
+  
+  .distill-site-header .logo {
+    padding: 0;
+  }
+  
+  .distill-site-header .logo img {
+    display: none;
+    max-height: 20px;
+    width: auto;
+    margin-bottom: -4px;
+  }
+  
+  .distill-site-header .nav-image img {
+    max-height: 18px;
+    width: auto;
+    display: inline-block;
+    margin-bottom: -3px;
+  }
+  
+  
+  
+  @media screen and (min-width: 1000px) {
+    .distill-site-header .logo img {
+      display: inline-block;
+    }
+    .distill-site-header .nav-left {
+      margin-left: 20px;
+    }
+    .distill-site-header .nav-right {
+      margin-right: 20px;
+    }
+    .distill-site-header .title {
+      padding-left: 12px;
+    }
+  }
+  
+  
+  .distill-site-header .nav-toggle {
+    display: none;
+  }
+  
+  .nav-dropdown {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .nav-dropdown .nav-dropbtn {
+    border: none;
+    outline: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 16px 10px;
+    background-color: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+    margin-top: 1px;
+    z-index: 2;
+  }
+  
+  .nav-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 200px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+    z-index: 1;
+    margin-top: 2px;
+    white-space: nowrap;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  
+  .nav-dropdown-content hr {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-dropdown-active {
+    display: block;
+  }
+  
+  .nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
+    color: black;
+    padding: 6px 24px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+  }
+  
+  .nav-dropdown-content .nav-dropdown-header {
+    display: block;
+    padding: 5px 24px;
+    padding-bottom: 0;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #999999;
+    white-space: nowrap;
+  }
+  
+  .nav-dropdown:hover .nav-dropbtn {
+    color: white;
+  }
+  
+  .nav-dropdown-content a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .nav-right .nav-dropdown-content {
+    margin-left: -45%;
+    right: 0;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
+    .distill-site-header a.nav-toggle {
+      float: right;
+      display: block;
+    }
+    .distill-site-header .title {
+      margin-left: 0;
+    }
+    .distill-site-header .nav-right {
+      margin-right: 0;
+    }
+    .distill-site-header {
+      overflow: hidden;
+    }
+    .nav-right .nav-dropdown-content {
+      margin-left: 0;
+    }
+  }
+  
+  
+  @media screen and (max-width: 768px) {
+    .distill-site-header.responsive {position: relative;}
+    .distill-site-header.responsive a.nav-toggle {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    .distill-site-header.responsive a,
+    .distill-site-header.responsive .nav-dropdown {
+      display: block;
+      text-align: left;
+    }
+    .distill-site-header.responsive .nav-left,
+    .distill-site-header.responsive .nav-right {
+      width: 100%;
+    }
+    .distill-site-header.responsive .nav-dropdown {float: none;}
+    .distill-site-header.responsive .nav-dropdown-content {position: relative;}
+    .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+  }
+  
+  /* Site Footer */
+  
+  .distill-site-footer {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 3;
+    margin-top: 30px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    text-align: center;
+  }
+  
+  /* Headroom */
+  
+  d-title {
+    padding-top: 6rem;
+  }
+  
+  @media print {
+    d-title {
+      padding-top: 4rem;
+    }
+  }
+  
+  .headroom {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  
+  .headroom--transition {
+    transition: all .4s ease-in-out;
+  }
+  
+  .headroom--unpinned {
+    top: -100px;
+  }
+  
+  .headroom--pinned {
+    top: 0;
+  }
+  
+  </style>
+  
+  <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
+  <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
+  <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
+  <!--/radix_placeholder_navigation_in_header-->
+  <!--radix_placeholder_distill-->
+  
+  <style type="text/css">
+  
+  body {
+    background-color: white;
+  }
+  
+  .pandoc-table {
+    width: 100%;
+  }
+  
+  .pandoc-table>caption {
+    margin-bottom: 10px;
+  }
+  
+  .pandoc-table th:not([align]) {
+    text-align: left;
+  }
+  
+  .pagedtable-footer {
+    font-size: 15px;
+  }
+  
+  .html-widget {
+    margin-bottom: 2.0em;
+  }
+  
+  .l-screen-inset {
+    padding-right: 16px;
+  }
+  
+  .l-screen .caption {
+    margin-left: 10px;
+  }
+  
+  .shaded {
+    background: rgb(247, 247, 247);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .html-widget {
+    margin-bottom: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .shaded .shaded-content {
+    background: white;
+  }
+  
+  .text-output {
+    margin-top: 0;
+    line-height: 1.5em;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+  
+  d-article {
+    padding-bottom: 30px;
+  }
+  
+  d-appendix {
+    padding-top: 30px;
+  }
+  
+  d-article>p>img {
+    width: 100%;
+  }
+  
+  d-article iframe {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.0em;
+    width: 100%;
+  }
+  
+  figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  /* CSS for table of contents */
+  
+  .d-toc {
+    color: rgba(0,0,0,0.8);
+    font-size: 0.8em;
+    line-height: 1em;
+  }
+  
+  .d-toc-header {
+    font-size: 0.6rem;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 1.3em;
+  }
+  
+  .d-toc a {
+    border-bottom: none;
+  }
+  
+  .d-toc ul {
+    padding-left: 0;
+  }
+  
+  .d-toc li>ul {
+    padding-top: 0.8em;
+    padding-left: 16px;
+    margin-bottom: 0.6em;
+  }
+  
+  .d-toc ul,
+  .d-toc li {
+    list-style-type: none;
+  }
+  
+  .d-toc li {
+    margin-bottom: 0.9em;
+  }
+  
+  .d-toc-separator {
+    margin-top: 20px;
+    margin-bottom: 2em;
+  }
+  
+  .d-article-with-toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  
+  
+  
+  /* Tweak code blocks (note that this CSS is repeated above in an injection
+     into the d-code shadow dom) */
+  
+  d-code {
+    overflow-x: auto !important;
+  }
+  
+  pre.d-code code.d-code {
+    padding-left: 10px;
+    font-size: 12px;
+    border-left: 2px solid rgba(0,0,0,0.1);
+  }
+  
+  pre.text-output {
+  
+    font-size: 12px;
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  @media(min-width: 768px) {
+  
+  d-code {
+    overflow-x: visible !important;
+  }
+  
+  pre.d-code code.d-code  {
+      padding-left: 18px;
+      font-size: 14px;
+  }
+  pre.text-output {
+    font-size: 14px;
+  }
+  }
+  
+  /* Figure */
+  
+  .figure {
+    position: relative;
+    margin-bottom: 2.5em;
+    margin-top: 1.5em;
+  }
+  
+  .figure img {
+    width: 100%;
+  }
+  
+  .figure .caption {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+    line-height: 1.5em;
+  }
+  
+  .figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  
+  .figure .caption a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .figure .caption b,
+  .figure .caption strong, {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 1.0);
+  }
+  
+  
+  
+  /* Tweak 1000px media break to show more text */
+  
+  @media(min-width: 1000px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 16px;
+    }
+  
+    .grid {
+      grid-column-gap: 16px;
+    }
+  
+    d-article {
+      font-size: 1.06rem;
+      line-height: 1.7em;
+    }
+    figure .caption, .figure .caption, figure figcaption {
+      font-size: 13px;
+    }
+  }
+  
+  @media(min-width: 1180px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 32px;
+    }
+  
+    .grid {
+      grid-column-gap: 32px;
+    }
+  }
+  
+  
+  /* Get the citation styles for the appendix (not auto-injected on render since
+     we do our own rendering of the citation appendix) */
+  
+  d-appendix .citation-appendix,
+  .d-appendix .citation-appendix {
+    font-size: 11px;
+    line-height: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 18px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px 18px;
+    border-radius: 3px;
+    color: rgba(150, 150, 150, 1);
+    overflow: hidden;
+    margin-top: -12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  
+  /* Social footer */
+  
+  .social_footer {
+    margin-top: 30px;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.67);
+  }
+  
+  .disqus-comments {
+    margin-right: 30px;
+  }
+  
+  .disqus-comment-count {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+  }
+  
+  #disqus_thread {
+    margin-top: 30px;
+  }
+  
+  .article-sharing a {
+    border-bottom: none;
+    margin-right: 8px;
+  }
+  
+  .article-sharing a:hover {
+    border-bottom: none;
+  }
+  
+  .sidebar-section.subscribe {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+  
+  .subscribe p {
+    margin-bottom: 0.5em;
+  }
+  
+  
+  .article-footer .subscribe {
+    font-size: 15px;
+    margin-top: 45px;
+  }
+  
+  
+  /* Improve display for browsers without grid (IE/Edge <= 15) */
+  
+  .downlevel {
+    line-height: 1.6em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+  }
+  
+  .downlevel .d-title {
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .downlevel .d-title h1 {
+    font-size: 50px;
+    font-weight: 700;
+    line-height: 1.1em;
+    margin: 0 0 0.5rem;
+  }
+  
+  .downlevel .d-title p {
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1.55em;
+    margin-top: 0;
+  }
+  
+  .downlevel .d-byline {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.8em;
+  }
+  
+  .downlevel .section-separator {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .downlevel .d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+  
+  
+  .downlevel .d-appendix {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.5);
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+  
+  .downlevel .footnotes ol {
+    padding-left: 13px;
+  }
+  
+  .downlevel .base-grid,
+  .downlevel .distill-header,
+  .downlevel .d-title,
+  .downlevel .d-abstract,
+  .downlevel .d-article,
+  .downlevel .d-appendix,
+  .downlevel .distill-appendix,
+  .downlevel .d-byline,
+  .downlevel .d-footnote-list,
+  .downlevel .d-citation-list,
+  .downlevel .distill-footer,
+  .downlevel .appendix-bottom,
+  .downlevel .posts-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  
+  @media(min-width: 768px) {
+    .downlevel .base-grid,
+    .downlevel .distill-header,
+    .downlevel .d-title,
+    .downlevel .d-abstract,
+    .downlevel .d-article,
+    .downlevel .d-appendix,
+    .downlevel .distill-appendix,
+    .downlevel .d-byline,
+    .downlevel .d-footnote-list,
+    .downlevel .d-citation-list,
+    .downlevel .distill-footer,
+    .downlevel .appendix-bottom,
+    .downlevel .posts-container {
+    padding-left: 150px;
+    padding-right: 150px;
+    max-width: 900px;
+  }
+  }
+  
+  .downlevel pre code {
+    display: block;
+    border-left: 2px solid rgba(0, 0, 0, .1);
+    padding: 0 0 0 20px;
+    font-size: 14px;
+  }
+  
+  .downlevel code, .downlevel pre {
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+  
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+  
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  </style>
+  
+  <script type="application/javascript">
+  
+  function is_downlevel_browser() {
+    if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
+                                   window.navigator.userAgent)) {
+      return true;
+    } else {
+      return window.load_distill_framework === undefined;
+    }
+  }
+  
+  // show body when load is complete
+  function on_load_complete() {
+  
+    // set body to visible
+    document.body.style.visibility = 'visible';
+  
+    // force redraw for leaflet widgets
+    if (window.HTMLWidgets) {
+      var maps = window.HTMLWidgets.findAll(".leaflet");
+      $.each(maps, function(i, el) {
+        var map = this.getMap();
+        map.invalidateSize();
+        map.eachLayer(function(layer) {
+          if (layer instanceof L.TileLayer)
+            layer.redraw();
+        });
+      });
+    }
+  
+    // trigger 'shown' so htmlwidgets resize
+    $('d-article').trigger('shown');
+  }
+  
+  function init_distill() {
+  
+    init_common();
+  
+    // create front matter
+    var front_matter = $('<d-front-matter></d-front-matter>');
+    $('#distill-front-matter').wrap(front_matter);
+  
+    // create d-title
+    $('.d-title').changeElementType('d-title');
+  
+    // create d-byline
+    var byline = $('<d-byline></d-byline>');
+    $('.d-byline').replaceWith(byline);
+  
+    // create d-article
+    var article = $('<d-article></d-article>');
+    $('.d-article').wrap(article).children().unwrap();
+  
+    // move posts container into article
+    $('.posts-container').appendTo($('d-article'));
+  
+    // create d-appendix
+    $('.d-appendix').changeElementType('d-appendix');
+  
+    // create d-bibliography
+    var bibliography = $('<d-bibliography></d-bibliography>');
+    $('#distill-bibliography').wrap(bibliography);
+  
+    // flag indicating that we have appendix items
+    var appendix = $('.appendix-bottom').children('h3').length > 0;
+  
+    // replace citations with <d-cite>
+    $('.citation').each(function(i, val) {
+      appendix = true;
+      var cites = $(this).attr('data-cites').split(" ");
+      var dt_cite = $('<d-cite></d-cite>');
+      dt_cite.attr('key', cites.join());
+      $(this).replaceWith(dt_cite);
+    });
+    // remove refs
+    $('#refs').remove();
+  
+    // replace footnotes with <d-footnote>
+    $('.footnote-ref').each(function(i, val) {
+      appendix = true;
+      var href = $(this).attr('href');
+      var id = href.replace('#', '');
+      var fn = $('#' + id);
+      var fn_p = $('#' + id + '>p');
+      fn_p.find('.footnote-back').remove();
+      var text = fn_p.html();
+      var dtfn = $('<d-footnote></d-footnote>');
+      dtfn.html(text);
+      $(this).replaceWith(dtfn);
+    });
+    // remove footnotes
+    $('.footnotes').remove();
+  
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      var id = $(this).attr('id');
+      $('.d-toc a[href="#' + id + '"]').parent().remove();
+      appendix = true;
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
+    });
+  
+    // show d-appendix if we have appendix content
+    $("d-appendix").css('display', appendix ? 'grid' : 'none');
+  
+    // replace code blocks with d-code
+    $('pre>code').each(function(i, val) {
+      var code = $(this);
+      var pre = code.parent();
+      var clz = "";
+      var language = pre.attr('class');
+      if (language) {
+        // map unknown languages to "clike" (without this they just dissapear)
+        if ($.inArray(language, ["bash", "clike", "css", "go", "html",
+                                 "javascript", "js", "julia", "lua", "markdown",
+                                 "markup", "mathml", "python", "svg", "xml"]) == -1)
+          language = "clike";
+        language = ' language="' + language + '"';
+        var dt_code = $('<d-code block' + language + clz + '></d-code>');
+        dt_code.text(code.text());
+        pre.replaceWith(dt_code);
+      } else {
+        code.addClass('text-output').unwrap().changeElementType('pre');
+      }
+    });
+  
+    // localize layout chunks to just output
+    $('.layout-chunk').each(function(i, val) {
+  
+      // capture layout
+      var layout = $(this).attr('data-layout');
+  
+      // apply layout to markdown level block elements
+      var elements = $(this).children().not('d-code, pre.text-output, script');
+      elements.each(function(i, el) {
+        var layout_div = $('<div class="' + layout + '"></div>');
+        if (layout_div.hasClass('shaded')) {
+          var shaded_content = $('<div class="shaded-content"></div>');
+          $(this).wrap(shaded_content);
+          $(this).parent().wrap(layout_div);
+        } else {
+          $(this).wrap(layout_div);
+        }
+      });
+  
+  
+      // unwrap the layout-chunk div
+      $(this).children().unwrap();
+    });
+  
+    // load distill framework
+    load_distill_framework();
+  
+    // wait for window.distillRunlevel == 4 to do post processing
+    function distill_post_process() {
+  
+      if (!window.distillRunlevel || window.distillRunlevel < 4)
+        return;
+  
+      // hide author/affiliations entirely if we have no authors
+      var front_matter = JSON.parse($("#distill-front-matter").html());
+      var have_authors = front_matter.authors && front_matter.authors.length > 0;
+      if (!have_authors)
+        $('d-byline').addClass('hidden');
+  
+      // table of contents
+      if (have_authors) // adjust border if we are in authors
+        $('.d-toc').parent().addClass('d-article-with-toc');
+  
+      // strip links that point to #
+      $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
+  
+      // hide elements of author/affiliations grid that have no value
+      function hide_byline_column(caption) {
+        $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
+      }
+  
+      // affiliations
+      var have_affiliations = false;
+      for (var i = 0; i<front_matter.authors.length; ++i) {
+        var author = front_matter.authors[i];
+        if (author.affiliation !== "&nbsp;") {
+          have_affiliations = true;
+          break;
+        }
+      }
+      if (!have_affiliations)
+        $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
+  
+      // published date
+      if (!front_matter.publishedDate)
+        hide_byline_column("Published");
+  
+      // document object identifier
+      var doi = $('d-byline').find('h3:contains("DOI")');
+      var doi_p = doi.next().empty();
+      if (!front_matter.doi) {
+        // if we have a citation and valid citationText then link to that
+        if ($('#citation').length > 0 && front_matter.citationText) {
+          doi.html('Citation');
+          $('<a href="#citation"></a>')
+            .text(front_matter.citationText)
+            .appendTo(doi_p);
+        } else {
+          hide_byline_column("DOI");
+        }
+      } else {
+        $('<a></a>')
+           .attr('href', "https://doi.org/" + front_matter.doi)
+           .html(front_matter.doi)
+           .appendTo(doi_p);
+      }
+  
+       // change plural form of authors/affiliations
+      if (front_matter.authors.length === 1) {
+        var grid = $('.authors-affiliations');
+        grid.children('h3:contains("Authors")').text('Author');
+        grid.children('h3:contains("Affiliations")').text('Affiliation');
+      }
+  
+      // inject pre code styles (can't do this with a global stylesheet b/c a shadow root is used)
+      $('d-code').each(function(i, val) {
+        var style = document.createElement('style');
+        style.innerHTML = 'pre code { padding-left: 10px; font-size: 12px; border-left: 2px solid rgba(0,0,0,0.1); } ' +
+                          '@media(min-width: 768px) { pre code { padding-left: 18px; font-size: 14px; } }';
+        if (this.shadowRoot)
+          this.shadowRoot.appendChild(style);
+      });
+  
+      // move appendix-bottom entries to the bottom
+      $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
+      $('.appendix-bottom').remove();
+  
+      // clear polling timer
+      clearInterval(tid);
+  
+      // show body now that everything is ready
+      on_load_complete();
+    }
+  
+    var tid = setInterval(distill_post_process, 50);
+    distill_post_process();
+  
+  }
+  
+  function init_downlevel() {
+  
+    init_common();
+  
+     // insert hr after d-title
+    $('.d-title').after($('<hr class="section-separator"/>'));
+  
+    // check if we have authors
+    var front_matter = JSON.parse($("#distill-front-matter").html());
+    var have_authors = front_matter.authors && front_matter.authors.length > 0;
+  
+    // manage byline/border
+    if (!have_authors)
+      $('.d-byline').remove();
+    $('.d-byline').after($('<hr class="section-separator"/>'));
+    $('.d-byline a').remove();
+  
+    // remove toc
+    $('.d-toc-header').remove();
+    $('.d-toc').remove();
+    $('.d-toc-separator').remove();
+  
+    // move appendix elements
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
+    });
+  
+  
+    // inject headers into references and footnotes
+    var refs_header = $('<h3></h3>');
+    refs_header.text('References');
+    $('#refs').prepend(refs_header);
+  
+    var footnotes_header = $('<h3></h3');
+    footnotes_header.text('Footnotes');
+    $('.footnotes').children('hr').first().replaceWith(footnotes_header);
+  
+    // move appendix-bottom entries to the bottom
+    $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
+    $('.appendix-bottom').remove();
+  
+    // remove appendix if it's empty
+    if ($('.d-appendix').children().length === 0)
+      $('.d-appendix').remove();
+  
+    // prepend separator above appendix
+    $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
+  
+    // trim code
+    $('pre>code').each(function(i, val) {
+      $(this).html($.trim($(this).html()));
+    });
+  
+    // move posts-container right before article
+    $('.posts-container').insertBefore($('.d-article'));
+  
+    $('body').addClass('downlevel');
+  
+    on_load_complete();
+  }
+  
+  
+  function init_common() {
+  
+    // jquery plugin to change element types
+    (function($) {
+      $.fn.changeElementType = function(newType) {
+        var attrs = {};
+  
+        $.each(this[0].attributes, function(idx, attr) {
+          attrs[attr.nodeName] = attr.nodeValue;
+        });
+  
+        this.replaceWith(function() {
+          return $("<" + newType + "/>", attrs).append($(this).contents());
+        });
+      };
+    })(jQuery);
+  
+    // prevent underline for linked images
+    $('a > img').parent().css({'border-bottom' : 'none'});
+  
+    // mark non-body figures created by knitr chunks as 100% width
+    $('.layout-chunk').each(function(i, val) {
+      var figures = $(this).find('img, .html-widget');
+      if ($(this).attr('data-layout') !== "l-body") {
+        figures.css('width', '100%');
+      } else {
+        figures.css('max-width', '100%');
+        figures.filter("[width]").each(function(i, val) {
+          var fig = $(this);
+          fig.css('width', fig.attr('width') + 'px');
+        });
+  
+      }
+    });
+  
+    // auto-append index.html to post-preview links in file: protocol
+    // and in rstudio ide preview
+    $('.post-preview').each(function(i, val) {
+      if (window.location.protocol === "file:")
+        $(this).attr('href', $(this).attr('href') + "index.html");
+    });
+  
+    // get rid of index.html references in header
+    if (window.location.protocol !== "file:") {
+      $('.distill-site-header a[href]').each(function(i,val) {
+        $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
+      });
+    }
+  
+    // add class to pandoc style tables
+    $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
+    $('.kable-table').children('table').addClass('pandoc-table');
+  
+    // add figcaption style to table captions
+    $('caption').parent('table').addClass("figcaption");
+  
+    // initialize posts list
+    if (window.init_posts_list)
+      window.init_posts_list();
+  
+    // implmement disqus comment link
+    $('.disqus-comment-count').click(function() {
+      window.headroom_prevent_pin = true;
+      $('#disqus_thread').toggleClass('hidden');
+      if (!$('#disqus_thread').hasClass('hidden')) {
+        var offset = $(this).offset();
+        $(window).resize();
+        $('html, body').animate({
+          scrollTop: offset.top - 35
+        });
+      }
+    });
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    if (is_downlevel_browser())
+      init_downlevel();
+    else
+      window.addEventListener('WebComponentsReady', init_distill);
+  });
+  
+  </script>
+  
+  <!--/radix_placeholder_distill-->
+  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
+  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
+  <!--radix_placeholder_site_in_header-->
+  <style type="text/css">
+  .distill-site-nav {
+    color: rgba(255, 255, 255, 0.8);
+    background-color: #000000;
+      font-size: 15px;
+    font-weight: 300;
+  }
+  
+  .distill-site-nav a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .distill-site-nav a:hover {
+    color: white;
+    text-decoration:underline;
+  }
+  
+  .distill-site-header {
+  }
+  
+  .distill-site-footer {
+  }
+  
+  @media print {
+    .distill-site-nav {
+      display: none;
+    }
+  }
+  
+  .l-body {
+    display: none;
+  }
+  
+  @media screen and (min-width: 768px) {
+    .l-body {display: inline;}
+  }
+  
+  </style>
+  <!--/radix_placeholder_site_in_header-->
+
+  <link rel="stylesheet" href="styles.css" type="text/css"/>
+
+</head>
+
+<body>
+
+<!--radix_placeholder_front_matter-->
+
+<script id="distill-front-matter" type="text/json">
+{"title":"<b style=\"font-size:45px;\">Data Filtering and Quality Control<\/b>","authors":[{"author":"Ryan Sheridan","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2019-08-13T00:00:00.000-06:00","citationText":"Sheridan, 2019"}
+</script>
+
+<!--/radix_placeholder_front_matter-->
+<!--radix_placeholder_navigation_before_body-->
+<header class="header header--fixed" role="banner">
+<nav class="distill-site-nav distill-site-header">
+<div class="nav-left">
+<a href="index.html" class="title">Single-cell RNA-seq Workshop</a>
+<a href="1_intro.html">Introduction</a>
+<a href="2_filtering_QC.html">Quality Control</a>
+<a href="3_norm_viz_clustering.html">Clustering</a>
+<a href="4_markers.html">Cell Type Annotation</a>
+<a href="5_trajectories.html">Pseudotime</a>
+<a href="6_alignment.html">Dataset Alignment</a>
+<a href="7_multimodal.html">Multi-modal Data</a>
+<a href="8_imputation.html">Imputation Methods</a>
+</div>
+<div class="nav-right">
+<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
+</div>
+</nav>
+</header>
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="d-title">
+<h1>Data Filtering and Quality Control</h1>
+
+</div>
+
+<div class="d-byline">
+  
+  Ryan Sheridan
+  
+<br/>August 13<sup>th</sup>, 2019
+</div>
+
+<div class="d-article">
+<h2 id="creating-a-seurat-object">Creating a Seurat object</h2>
+<p>Single-cell RNA-seq counts are usually stored as a sparse matrix due to the high percentage of zeros. In a sparse matrix zeros are removed and only non-zero values are stored, which saves memory and speeds up operations.</p>
+<p>The <code>Read10X</code> function can be used with the output directory generated by Cell Ranger to load the counts data as a sparse matrix. However, our data is saved as a comma-separated table, which can be loaded as a data.frame and then converted to a sparse matrix.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Import matrix of counts
+data_url &lt;- &quot;https://scrnaseq-workshop.s3-us-west-2.amazonaws.com&quot;
+
+pbmc_mtx &lt;- file.path(data_url, &quot;PBMC_cDNA.csv.gz&quot;) %&gt;%
+  read_csv() %&gt;%
+  column_to_rownames(&quot;X1&quot;) %&gt;%
+  as.sparse()
+
+pbmc_mtx[1:10, 1:10]</code></pre>
+<pre><code>
+#&gt; 10 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .
+#&gt; PLEKHN1       . . . . . . . . . .
+#&gt; HES4          . . . . . 2 . . . .
+#&gt; ISG15         . . . . . 4 . 1 . 2
+#&gt; AGRN          . . . . . . . . . .
+#&gt; C1orf159      . . . . . . . . . .</code></pre>
+<pre class="r"><code>
+# Calculate fraction of zeros
+n_zeros &lt;- pbmc_mtx[pbmc_mtx == 0] %&gt;%
+  length()
+
+n_zeros / length(pbmc_mtx)</code></pre>
+<pre><code>
+#&gt; [1] 0.9328582</code></pre>
+</div>
+<p>Analysis using <code>Seurat</code> is centered around the <code>Seurat</code> object, which serves as a container to store the input data and any results that are generated. A <code>Seurat</code> object can be created from our sparse matrix using the <code>CreateSeuratObject</code> function.</p>
+<p>When processing multiple scRNA-seq samples with <code>cellranger aggr</code>, the cell barcodes will be labeled with a sample number. This sample number can be easily extracted and saved using the <code>names.field</code> and <code>names.delim</code> options.</p>
+<p>The <code>CreateSeuratObject</code> function also allows us to perform some initial QC filtering. The <code>min.cells</code> option filters features (genes) to only include those that are present in a minimum number of cells.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Create Seurat object using gene expression data
+sobj &lt;- pbmc_mtx %&gt;%
+  CreateSeuratObject(
+    min.cells   = 5,  # Remove genes that are detected in &lt;5 cells
+    names.delim = &quot;-&quot;,
+    names.field = 2
+  )</code></pre>
+</div>
+<h2 id="interacting-with-the-seurat-object">Interacting with the Seurat object</h2>
+<h3 id="handling-multiple-assays">Handling multiple assays</h3>
+<p>The <code>Seurat</code> object is organized into a heirarchy of data structures with the outermost layer including a number of “slots”, which can be accessed using the <code>@</code> operator.</p>
+<p>With <code>Seurat</code> v3.0, the <code>Seurat</code> object has been modified to allow users to easily store multiple scRNA-seq assays (CITE-seq, cell hashing, etc.) in the same object. The data from each assay is stored as a list in the <code>assays</code> slot. To switch between different assays users can change the value stored in the <code>active.assay</code> slot. We can also view the current default assay using the <code>DefaultAssay</code> function. Many <code>Seurat</code> functions also include an <code>assay</code> argument that lets users specify the desired assay.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Assays are stored as a list in the &quot;assays&quot; slot
+sobj@assays</code></pre>
+<pre><code>
+#&gt; $RNA
+#&gt; Assay data with 12572 features for 2700 cells
+#&gt; First 10 features:
+#&gt;  AL627309.1, RP11-206L10.2, LINC00115, NOC2L, KLHL17, PLEKHN1,
+#&gt; HES4, ISG15, AGRN, C1orf159</code></pre>
+<pre class="r"><code>
+# The Seurat object stores the current default assay
+sobj@active.assay</code></pre>
+<pre><code>
+#&gt; [1] &quot;RNA&quot;</code></pre>
+<pre class="r"><code>
+DefaultAssay(sobj)</code></pre>
+<pre><code>
+#&gt; [1] &quot;RNA&quot;</code></pre>
+</div>
+<h3 id="retrieving-raw-and-normalized-counts">Retrieving raw and normalized counts</h3>
+<p>The data from each assay is stored as separate <code>Assay</code> objects that are also divided into slots that store the raw and normalized counts along with other downstream results. We can use the <code>GetAssayData</code> function to retrieve the raw and normalized counts matrices.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Raw counts
+sobj@assays$RNA@counts[1:5, 1:10]</code></pre>
+<pre><code>
+#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+<pre class="r"><code>
+sobj %&gt;%
+  GetAssayData(slot = &quot;counts&quot;) %&gt;%
+  .[1:5, 1:10]</code></pre>
+<pre><code>
+#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+<pre class="r"><code>
+# Normalized counts
+# This matrix is the same as counts since we haven&#39;t normalized the data yet
+sobj@assays$RNA@data[1:5, 1:10]</code></pre>
+<pre><code>
+#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+<pre class="r"><code>
+sobj %&gt;%
+  GetAssayData(slot = &quot;data&quot;) %&gt;%
+  .[1:5, 1:10]</code></pre>
+<pre><code>
+#&gt; 5 x 10 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                  
+#&gt; AL627309.1    . . . . . . . . . .
+#&gt; RP11-206L10.2 . . . . . . . . . .
+#&gt; LINC00115     . . . . . . . . . .
+#&gt; NOC2L         . . . . . . . . 1 .
+#&gt; KLHL17        . . . . . . . . . .</code></pre>
+</div>
+<h3 id="retrieving-cell-and-features-names">Retrieving cell and features names</h3>
+<p>Cell barcodes and gene names can be retrieved from the <code>Seurat</code> object using the <code>colnames</code> and <code>rownames</code> functions, respectively. We can run these functions directly on the <code>Seurat</code> object to automatically retrieve information for the default assay.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Get cell names
+sobj@assays$RNA@counts %&gt;%
+  colnames() %&gt;%
+  head(20)</code></pre>
+<pre><code>
+#&gt;  [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+#&gt;  [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot; &quot;AAATCATGACCACA-1&quot;
+#&gt;  [7] &quot;AACATTGATGGGAG-1&quot; &quot;AACCGATGCTCCCA-1&quot; &quot;AACCGCCTCTACGA-1&quot;
+#&gt; [10] &quot;AACCTTACGCGAGA-1&quot; &quot;AACTCACTCAAGCT-1&quot; &quot;AACTCGGAAAGTGA-1&quot;
+#&gt; [13] &quot;AAGATGGAGATAAG-1&quot; &quot;AAGCCATGTCTCGC-1&quot; &quot;AAGCGTACGTCTTT-1&quot;
+#&gt; [16] &quot;AAGGTCTGACAGTC-1&quot; &quot;AAGTCTCTCGGAGA-1&quot; &quot;AATAGGGAGAATGA-1&quot;
+#&gt; [19] &quot;AATGGAGAATCGTG-1&quot; &quot;AATGGCTGTAAAGG-1&quot;</code></pre>
+<pre class="r"><code>
+sobj %&gt;%
+  Cells() %&gt;%
+  head(20)</code></pre>
+<pre><code>
+#&gt;  [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+#&gt;  [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot; &quot;AAATCATGACCACA-1&quot;
+#&gt;  [7] &quot;AACATTGATGGGAG-1&quot; &quot;AACCGATGCTCCCA-1&quot; &quot;AACCGCCTCTACGA-1&quot;
+#&gt; [10] &quot;AACCTTACGCGAGA-1&quot; &quot;AACTCACTCAAGCT-1&quot; &quot;AACTCGGAAAGTGA-1&quot;
+#&gt; [13] &quot;AAGATGGAGATAAG-1&quot; &quot;AAGCCATGTCTCGC-1&quot; &quot;AAGCGTACGTCTTT-1&quot;
+#&gt; [16] &quot;AAGGTCTGACAGTC-1&quot; &quot;AAGTCTCTCGGAGA-1&quot; &quot;AATAGGGAGAATGA-1&quot;
+#&gt; [19] &quot;AATGGAGAATCGTG-1&quot; &quot;AATGGCTGTAAAGG-1&quot;</code></pre>
+<pre class="r"><code>
+sobj %&gt;%
+  colnames() %&gt;%
+  head(20)</code></pre>
+<pre><code>
+#&gt;  [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACGCTGACCAGT-1&quot;
+#&gt;  [4] &quot;AAACGCTGGTTCTT-1&quot; &quot;AAAGTTTGATCACG-1&quot; &quot;AAATCATGACCACA-1&quot;
+#&gt;  [7] &quot;AACATTGATGGGAG-1&quot; &quot;AACCGATGCTCCCA-1&quot; &quot;AACCGCCTCTACGA-1&quot;
+#&gt; [10] &quot;AACCTTACGCGAGA-1&quot; &quot;AACTCACTCAAGCT-1&quot; &quot;AACTCGGAAAGTGA-1&quot;
+#&gt; [13] &quot;AAGATGGAGATAAG-1&quot; &quot;AAGCCATGTCTCGC-1&quot; &quot;AAGCGTACGTCTTT-1&quot;
+#&gt; [16] &quot;AAGGTCTGACAGTC-1&quot; &quot;AAGTCTCTCGGAGA-1&quot; &quot;AATAGGGAGAATGA-1&quot;
+#&gt; [19] &quot;AATGGAGAATCGTG-1&quot; &quot;AATGGCTGTAAAGG-1&quot;</code></pre>
+<pre class="r"><code>
+# Get feature names
+sobj@assays$RNA@counts %&gt;%
+  rownames() %&gt;%
+  head(20)</code></pre>
+<pre><code>
+#&gt;  [1] &quot;AL627309.1&quot;    &quot;RP11-206L10.2&quot; &quot;LINC00115&quot;     &quot;NOC2L&quot;        
+#&gt;  [5] &quot;KLHL17&quot;        &quot;PLEKHN1&quot;       &quot;HES4&quot;          &quot;ISG15&quot;        
+#&gt;  [9] &quot;AGRN&quot;          &quot;C1orf159&quot;      &quot;TNFRSF18&quot;      &quot;TNFRSF4&quot;      
+#&gt; [13] &quot;SDF4&quot;          &quot;B3GALT6&quot;       &quot;UBE2J2&quot;        &quot;ACAP3&quot;        
+#&gt; [17] &quot;PUSL1&quot;         &quot;CPSF3L&quot;        &quot;GLTPD1&quot;        &quot;DVL1&quot;</code></pre>
+<pre class="r"><code>
+sobj %&gt;%
+  rownames() %&gt;%
+  head(20)</code></pre>
+<pre><code>
+#&gt;  [1] &quot;AL627309.1&quot;    &quot;RP11-206L10.2&quot; &quot;LINC00115&quot;     &quot;NOC2L&quot;        
+#&gt;  [5] &quot;KLHL17&quot;        &quot;PLEKHN1&quot;       &quot;HES4&quot;          &quot;ISG15&quot;        
+#&gt;  [9] &quot;AGRN&quot;          &quot;C1orf159&quot;      &quot;TNFRSF18&quot;      &quot;TNFRSF4&quot;      
+#&gt; [13] &quot;SDF4&quot;          &quot;B3GALT6&quot;       &quot;UBE2J2&quot;        &quot;ACAP3&quot;        
+#&gt; [17] &quot;PUSL1&quot;         &quot;CPSF3L&quot;        &quot;GLTPD1&quot;        &quot;DVL1&quot;</code></pre>
+<pre class="r"><code>
+# Get cell (colums) and feature (rows) counts
+ncol(sobj)</code></pre>
+<pre><code>
+#&gt; [1] 2700</code></pre>
+<pre class="r"><code>
+nrow(sobj)</code></pre>
+<pre><code>
+#&gt; [1] 12572</code></pre>
+</div>
+<h3 id="accessing-project-meta.data">Accessing project meta.data</h3>
+<p>The <code>Seurat</code> object includes a data.frame that contains cell meta data for all of the assays present in the <code>Seurat</code> object. This data.frame is stored in the <code>meta.data</code> slot and can be accessed using double brackets (<code>[[]]</code>) or the <code>FetchData</code> function. As we move through our analysis, information will be automatically added to the meta.data. We can also manually add or modify information stored in the meta.data, which is useful when creating custom plots.</p>
+<p>Initially the meta.data table will include the number of counts for each cell and the number of genes (or other features) detected for each cell. There is also an <code>orig.ident</code> column which contains the original cell labels (identities). Since we used the <code>names.field</code> argument when creating our <code>Seurat</code> object, this column will include the sample number.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# The meta.data table contains stats for each cell
+sobj@meta.data %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt; AAACATACAACCAC-1          1       2419          779
+#&gt; AAACATTGAGCTAC-1          1       4901         1350
+#&gt; AAACGCTGACCAGT-1          1       2174          781
+#&gt; AAACGCTGGTTCTT-1          1       2259          789
+#&gt; AAAGTTTGATCACG-1          1       1265          441
+#&gt; AAATCATGACCACA-1          1       4125         1365</code></pre>
+<pre class="r"><code>
+sobj[[&quot;nCount_RNA&quot;]] %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt;                  nCount_RNA
+#&gt; AAACATACAACCAC-1       2419
+#&gt; AAACATTGAGCTAC-1       4901
+#&gt; AAACGCTGACCAGT-1       2174
+#&gt; AAACGCTGGTTCTT-1       2259
+#&gt; AAAGTTTGATCACG-1       1265
+#&gt; AAATCATGACCACA-1       4125</code></pre>
+<pre class="r"><code>
+sobj %&gt;%
+  FetchData(vars = &quot;nCount_RNA&quot;) %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt;                  nCount_RNA
+#&gt; AAACATACAACCAC-1       2419
+#&gt; AAACATTGAGCTAC-1       4901
+#&gt; AAACGCTGACCAGT-1       2174
+#&gt; AAACGCTGGTTCTT-1       2259
+#&gt; AAAGTTTGATCACG-1       1265
+#&gt; AAATCATGACCACA-1       4125</code></pre>
+<pre class="r"><code>
+# FetchData can also be used to retrieve other data from the Seurat object
+sobj %&gt;%
+  FetchData(
+    vars = &quot;CD8A&quot;, 
+    slot = &quot;counts&quot;
+  ) %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt;                  CD8A
+#&gt; AAACATACAACCAC-1    1
+#&gt; AAACATTGAGCTAC-1    0
+#&gt; AAACGCTGACCAGT-1    0
+#&gt; AAACGCTGGTTCTT-1    1
+#&gt; AAAGTTTGATCACG-1    0
+#&gt; AAATCATGACCACA-1    0</code></pre>
+</div>
+<h3 id="setting-cell-identities">Setting cell identities</h3>
+<p>The cell identities are used by various functions when grouping and plotting cells. When first creating a <code>Seurat</code> object, the cell identities will be set to the same values present in the <code>orig.ident</code> column in the meta.data table. The current cell identities are stored in the <code>active.ident</code> slot and can be accessed using the <code>Idents</code> function. Cell identities can be renamed using the <code>RenameIdents</code> function. Changing the cell identites will not alter the names stored in the meta.data table or vice versa. To update the meta.data table, we can use the <code>AddMetaData</code> function.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# By default the cell identity is set to the project name
+sobj@active.ident %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;                1                1                1                1 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;                1                1 
+#&gt; Levels: 1 2</code></pre>
+<pre class="r"><code>
+sobj %&gt;%
+  Idents() %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;                1                1                1                1 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;                1                1 
+#&gt; Levels: 1 2</code></pre>
+<pre class="r"><code>
+# Rename cell identities
+sobj &lt;- sobj %&gt;%
+  RenameIdents(
+    &quot;1&quot; = &quot;control&quot;,
+    &quot;2&quot; = &quot;treated&quot;
+  )
+
+sobj %&gt;%
+  Idents() %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACGCTGACCAGT-1 AAACGCTGGTTCTT-1 
+#&gt;          control          control          control          control 
+#&gt; AAAGTTTGATCACG-1 AAATCATGACCACA-1 
+#&gt;          control          control 
+#&gt; Levels: control treated</code></pre>
+<pre class="r"><code>
+# Add cell identities to the meta.data table
+sobj &lt;- sobj %&gt;%
+  AddMetaData(
+    metadata = Idents(sobj),
+    col.name = &quot;orig.ident&quot;
+  )
+
+sobj@meta.data %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt; AAACATACAACCAC-1    control       2419          779
+#&gt; AAACATTGAGCTAC-1    control       4901         1350
+#&gt; AAACGCTGACCAGT-1    control       2174          781
+#&gt; AAACGCTGGTTCTT-1    control       2259          789
+#&gt; AAAGTTTGATCACG-1    control       1265          441
+#&gt; AAATCATGACCACA-1    control       4125         1365</code></pre>
+</div>
+<h3 id="subsetting-the-seurat-object">Subsetting the Seurat object</h3>
+<p>The cells and features present in the <code>Seurat</code> object can be filtering using the <code>subset</code> function.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Subset based on gene expression
+sobj %&gt;%
+  subset(subset = CD8A &gt; 1) %&gt;%
+  ncol()</code></pre>
+<pre><code>
+#&gt; [1] 107</code></pre>
+<pre class="r"><code>
+# Subset based on cell identity
+sobj %&gt;%
+  subset(idents = &quot;control&quot;) %&gt;%
+  ncol()</code></pre>
+<pre><code>
+#&gt; [1] 1342</code></pre>
+<pre class="r"><code>
+# Subset with vector of features
+sobj %&gt;%
+  subset(features = c(&quot;CD4&quot;, &quot;CD8A&quot;)) %&gt;%
+  rownames()</code></pre>
+<pre><code>
+#&gt; [1] &quot;CD8A&quot; &quot;CD4&quot;</code></pre>
+<pre class="r"><code>
+# Subset with vector of cell barcodes
+sobj %&gt;%
+  subset(cells = c(&quot;AAACGCTGACCAGT-1&quot;, &quot;AAATCATGACCACA-1&quot;, &quot;TTTCGAACACCTGA-2&quot;)) %&gt;%
+  colnames()</code></pre>
+<pre><code>
+#&gt; [1] &quot;AAACGCTGACCAGT-1&quot; &quot;AAATCATGACCACA-1&quot; &quot;TTTCGAACACCTGA-2&quot;</code></pre>
+<pre class="r"><code>
+# Subset using multiple criteria
+sobj %&gt;%
+  subset(CD8A &gt; 1, idents = &quot;control&quot;) %&gt;%
+  ncol()</code></pre>
+<pre><code>
+#&gt; [1] 56</code></pre>
+<pre class="r"><code>
+# Subset based on meta.data columns
+sobj %&gt;%
+  subset(nFeature_RNA &gt; 250)</code></pre>
+<pre><code>
+#&gt; An object of class Seurat 
+#&gt; 12572 features across 2697 samples within 1 assay 
+#&gt; Active assay: RNA (12572 features)</code></pre>
+</div>
+<h3 id="other-data-slots">Other data slots</h3>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+sobj@reductions
+sobj@graphs</code></pre>
+</div>
+<h2 id="assessing-quality-and-filtering">Assessing quality and filtering</h2>
+<p>Metrics that are commonly used to assess cell quality include:</p>
+<ul>
+<li>Number of counts per cell barcode</li>
+<li>Number of genes per barcode</li>
+<li>The percentage of counts from mitochondrial genes per barcode</li>
+</ul>
+<p>A low number of counts, a low number of detected genes, and a high percentage of mitochondrial counts suggests that the cell had a broken membrane and the cytoplasmic mRNA leaked out. Conversely, an abnormally high number of counts and detected genes could indicate the presence of a doublet.</p>
+<h3 id="quantify-mitochondrial-counts">Quantify mitochondrial counts</h3>
+<p>To calculate the percentage of mitochondrial counts for each cell we can use the <code>PercentageFeatureSet</code> function.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Calculate percentage of mitochondrial reads for each cell
+sobj &lt;- sobj %&gt;%
+  PercentageFeatureSet(
+    pattern  = &quot;^MT-&quot;, 
+    col.name = &quot;percent_mito&quot;
+  )
+
+sobj@meta.data %&gt;%
+  head()</code></pre>
+<pre><code>
+#&gt;                  orig.ident nCount_RNA nFeature_RNA percent_mito
+#&gt; AAACATACAACCAC-1    control       2419          779     3.017776
+#&gt; AAACATTGAGCTAC-1    control       4901         1350     3.795144
+#&gt; AAACGCTGACCAGT-1    control       2174          781     3.817847
+#&gt; AAACGCTGGTTCTT-1    control       2259          789     3.098716
+#&gt; AAAGTTTGATCACG-1    control       1265          441     3.478261
+#&gt; AAATCATGACCACA-1    control       4125         1365     4.581818</code></pre>
+</div>
+<h3 id="exercise-create-violinbox-plots-comparing-cell-metrics">EXERCISE: Create violin/box plots comparing cell metrics</h3>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Create violin/boxplots comparing nCount, nFeature, and percent_mito for each sample
+
+# sobj@meta.data %&gt;%</code></pre>
+</div>
+<h3 id="answer">ANSWER</h3>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="2_filtering_QC_files/figure-html5/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<h3 id="exercise-create-scatter-plots-comparing-cell-metrics">EXERCISE: Create scatter plots comparing cell metrics</h3>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Create a scatter plot comparing nCount and percent_mito
+
+# sobj@meta.data %&gt;%
+
+
+
+# Create a scatter plot comparing nCount and nFeature
+
+# sobj@meta.data %&gt;%</code></pre>
+</div>
+<h3 id="answer-1">ANSWER</h3>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="2_filtering_QC_files/figure-html5/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<h3 id="filtering-cells">Filtering cells</h3>
+<p>To filter cells we can use the <code>subset</code> function.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+# Filter cells based on number of genes and percent mito UMIs
+sobj &lt;- sobj %&gt;%
+  subset(
+    nFeature_RNA &gt; 250 &amp;   # Remove cells with &lt;250 detected genes
+    nFeature_RNA &lt; 2500 &amp;  # Remove cells with &gt;2500 detected genes (could be doublets)
+    percent_mito &lt; 10      # Remove cells with &gt;10% mitochondrial reads
+  )
+
+# Add filtering cutoffs on original scatter plots
+p_1 &lt;- p_1 +
+  geom_hline(yintercept = 10, linetype = 2)
+
+p_2 &lt;- p_2 +
+  geom_hline(yintercept = c(250, 2500), linetype = 2)
+
+CombinePlots(
+  plots = list(p_1, p_2), 
+  nrow  = 2
+)</code></pre>
+<p><img src="2_filtering_QC_files/figure-html5/Filtering%20cells-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>
+# How many cells were removed?
+ncol(sobj)</code></pre>
+<pre><code>
+#&gt; [1] 2686</code></pre>
+</div>
+<h3 id="saving-your-seurat-object">Saving your Seurat object</h3>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+dir.create(&quot;data&quot;, showWarnings = FALSE)
+
+write_rds(sobj, path = &quot;data/filtered_sobj.rds&quot;)</code></pre>
+</div>
+<!--radix_placeholder_article_footer-->
+<!--/radix_placeholder_article_footer-->
+</div>
+
+<div class="d-appendix">
+</div>
+
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_appendices-->
+<div class="appendix-bottom">
+<h3 id="updates-and-corrections">Corrections</h3>
+<p>If you see mistakes or want to suggest changes, please <a href="https://github.com/rnabioco/cellar/issues/new">create an issue</a> on the source repository.</p>
+</div>
+<!--/radix_placeholder_appendices-->
+<!--radix_placeholder_navigation_after_body-->
+<!--/radix_placeholder_navigation_after_body-->
+
+</body>
+
+</html>
