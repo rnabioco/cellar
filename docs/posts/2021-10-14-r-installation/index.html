@@ -460,7 +460,7 @@ d-title {
 
 </style>
 
-<script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="../../site_libs/jquery-3.5.1/jquery-3.5.1.min.js"></script>
 <link href="../../site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
 <link href="../../site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
 <script src="../../site_libs/headroom-0.9.4/headroom.min.js"></script>
@@ -1608,7 +1608,10 @@ function init_distill() {
 
     // hoverable references
     $('span.citation[data-cites]').each(function() {
-      var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+      var refs = $(this).attr('data-cites').split(" ");
+      var refHtml = refs.map(function(ref) {
+        return "<p>" + $('#ref-' + ref).html() + "</p>";
+      }).join("\n");
       window.tippy(this, {
         allowHTML: true,
         content: refHtml,
@@ -1800,7 +1803,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"R installation","authors":[{"author":"Kent Riemondy","authorURL":"https://github.com/kriemo","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-0750-1273"}],"publishedDate":"2021-10-27T00:00:00.000+00:00","citationText":"Riemondy, 2021"}
+{"title":"R installation","authors":[{"author":"Kent Riemondy","authorURL":"https://github.com/kriemo","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-0750-1273"}],"publishedDate":"2021-10-27T00:00:00.000-06:00","citationText":"Riemondy, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
