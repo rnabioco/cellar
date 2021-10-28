@@ -1,0 +1,59 @@
+---
+title: "Test out packages"
+author: "Kent Riemondy RBI"
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+
+```{r, message = FALSE}
+library(Seurat)
+library(scran)
+library(SingleCellExperiment)
+library(tidyverse)
+library(scDblFinder)
+library(ComplexHeatmap)
+library(limma)
+library(clustifyr)
+library(slingshot)
+library(tradeSeq)
+library(cowplot)
+library(scales)
+library(gridExtra)
+library(ComplexHeatmap)
+library(destiny)
+library(knitr)
+library(LaCroixColoR)
+library(viridis)
+library(RColorBrewer)
+library(harmony)
+library(ggridges)
+library(pheatmap)
+library(clusterExperiment)
+
+theme_set(theme_cowplot())
+```
+
+```{r}
+sobj <- pbmc_small
+sobj <- NormalizeData(sobj)
+sobj <- FindVariableFeatures(sobj)
+sobj <- ScaleData(sobj)
+sobj <- RunPCA(sobj, verbose = FALSE)
+sobj <- RunUMAP(sobj, dims = 1:5)
+Idents(sobj) <- "cell_type1"
+
+# plot the PCA reduction
+DimPlot(sobj, reduction = "umap")
+```
+
+```{r}
+sobj@meta.data %>%
+  ggplot(aes(nFeature_RNA, nCount_RNA)) +
+  geom_point()
+```

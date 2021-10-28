@@ -1,7 +1,7 @@
 ---
-title: "class-3"
+title: "Batch correction and pseudotime"
 description: |
-  A short description of the post.
+  This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.
 author:
   - name: Kristen Wells
     url: https://github.com/kwells4
@@ -15,8 +15,10 @@ output:
     highlight: "tango"
     df_print: "paged"
     code_folding: "show"
-draft: true
 ---
+
+# Background
+This script walks though the steps to correct batch effects and find pseudotemporal relationships between single cells. You can download the script which contains all of the following code and you can run yourself here https://github.com/rnabioco/cellar/tree/master/_posts/2021-10-26-class-3 and download "class-3.Rmd"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
