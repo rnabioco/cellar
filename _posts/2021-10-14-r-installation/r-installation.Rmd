@@ -1,5 +1,11 @@
 ---
 title: "R installation"
+author:
+  - name: "Kent Riemondy"
+    url: https://github.com/kriemo
+    affiliation: "RNA Bioscience Initiative"
+    affiliation_url: https://medschool.cuanschutz.edu/rbi
+    orcid_id: 0000-0003-0750-1273
 output:
   distill::distill_article:
     self_contained: false
@@ -129,7 +135,7 @@ From CRAN:
   - Seurat  
   - rmarkdown  
   - cowplot  
-  - colorblindr  
+  - pheatmap  
   - markdown  
   
                   
@@ -138,7 +144,7 @@ install.packages(c('tidyverse',
                    'rmarkdown',
                    'Seurat',
                    'cowplot',
-                   'colorblindr',
+                   'pheatmap',
                    'markdown'))
 ```
 
@@ -150,6 +156,7 @@ From Bioconductor:
   - clustifyr  
   - slingshot  
   - tradeSeq   
+  - clusterExperiment
   
   
 ```{r, echo = T, eval = F}
@@ -159,16 +166,21 @@ BiocManager::install(c('ComplexHeatmap',
                        'limma',
                        'clustifyr',
                        'slingshot',
-                       'tradeSeq'))
+                       'tradeSeq',
+                       'clusterExperiment'))
 ```
 
 
 From github:  
   - destiny (hosted on bioconductor typically but not building correctly right now)
+  - harmony (batch correction approach)
+  - LaCroixColoR (pretty color palette)
   
 ```{r, echo = T, eval = F}
 remotes::install_github('theislab/destiny')
+remotes::install_github('immunogenomics/harmony')
+remotes::install_github('johannesbjork/LaCroixColoR')
 ```
 
-If you'd like to test the installation, please run [this test Rmarkdown](https://raw.githubusercontent.com/rnabioco/cellar/master/docker/test.Rmd) hosted on github. 
+To test the installation, run the [prerequisite Rmarkdown](https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-21-prerequisite-material/prerequiste-exercises.Rmd) which will load all of these packages.
 

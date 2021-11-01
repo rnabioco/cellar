@@ -79,7 +79,7 @@ skipping /var/run/s6/container_environment/RSTUDIO_VERSION
 [services.d] done.
 ```
 
-After running this command an rstudio instance will be running on your computer that you can access through your web browser. Open a browser and enter `http://`, followed by your ip address, followed by `:8787`. In you are on a linux or MacOS machine you can navigate to `http//localhost:8787`. If you do not know the IP address you can find it in a few ways.
+After running this command an rstudio instance will be running on your computer that you can access through your web browser. Open a browser and enter `http://`, followed by your ip address, followed by `:8787`. In you are on a linux or MacOS machine you can navigate to `http//:localhost:8787`. If you do not know the IP address you can find it in a few ways.
 
 1) If you select the container in the docker desktop app, you can directly open the container in a browser by clicking the `open in browser` button. 
 
@@ -186,14 +186,14 @@ We have a docker image available on dockerhub that includes the packages that wi
 
 [`rstudio-scrnaseq`](https://hub.docker.com/r/kenter/rstudio-scrnaseq)
 
-You can use this image in the same manner as above, instead using `kenter/rstudio-scrnaseq`.
+You can use this image in the same manner as above, instead using `kenter/rstudio-scrnaseq:v0.2`.
 
 Try it out:
 ```bash
-docker run --rm -e PASSWORD=rna -p 8787:8787 kenter/rstudio-scrnaseq
+docker run --rm -e PASSWORD=rna -p 8787:8787 kenter/rstudio-scrnaseq:v0.2
 ```
 
-When you open rstudio you should be able to load `Seurat` and other single cell packages. We've also included a `test.Rmd` document that lists and loads all of the relevant installed packages, and tests basic Seurat commands. 
+When you open rstudio you should be able to load `Seurat` and other single cell packages. We've also included a `test-install.Rmd` document that lists and loads all of the relevant installed packages, and tests basic Seurat commands. 
  
  
 # Additional resources

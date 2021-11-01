@@ -13,3 +13,5 @@ index.md
 *.pdf
 data
 */data
+.Rprofile
+renv*

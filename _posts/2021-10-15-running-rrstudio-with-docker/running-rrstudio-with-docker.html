@@ -116,7 +116,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["img/docker-hello.png","img/open-in-browser.png","img/rstudio-interface.png","img/rstudio-login.png","img/save-files-in-docker.png","running-rrstudio-with-docker_files/anchor-4.2.2/anchor.min.js","running-rrstudio-with-docker_files/bowser-1.9.3/bowser.min.js","running-rrstudio-with-docker_files/distill-2.2.21/template.v2.js","running-rrstudio-with-docker_files/header-attrs-2.11/header-attrs.js","running-rrstudio-with-docker_files/jquery-3.6.0/jquery-3.6.0.js","running-rrstudio-with-docker_files/jquery-3.6.0/jquery-3.6.0.min.js","running-rrstudio-with-docker_files/jquery-3.6.0/jquery-3.6.0.min.map","running-rrstudio-with-docker_files/popper-2.6.0/popper.min.js","running-rrstudio-with-docker_files/tippy-6.2.7/tippy-bundle.umd.min.js","running-rrstudio-with-docker_files/tippy-6.2.7/tippy-light-border.css","running-rrstudio-with-docker_files/tippy-6.2.7/tippy.css","running-rrstudio-with-docker_files/tippy-6.2.7/tippy.umd.min.js","running-rrstudio-with-docker_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["img/docker-hello.png","img/open-in-browser.png","img/rstudio-interface.png","img/rstudio-login.png","img/save-files-in-docker.png"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1581,10 +1581,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <h1 id="using-docker-for-workshop">Using docker for workshop</h1>
 <p>We have a docker image available on dockerhub that includes the packages that will be used in the class.</p>
 <p><a href="https://hub.docker.com/r/kenter/rstudio-scrnaseq"><code>rstudio-scrnaseq</code></a></p>
-<p>You can use this image in the same manner as above, instead using <code>kenter/rstudio-scrnaseq</code>.</p>
+<p>You can use this image in the same manner as above, instead using <code>kenter/rstudio-scrnaseq:v0.2</code>.</p>
 <p>Try it out:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-e</span> PASSWORD=rna <span class="at">-p</span> 8787:8787 kenter/rstudio-scrnaseq</span></code></pre></div>
-<p>When you open rstudio you should be able to load <code>Seurat</code> and other single cell packages. We’ve also included a <code>test.Rmd</code> document that lists and loads all of the relevant installed packages, and tests basic Seurat commands.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-e</span> PASSWORD=rna <span class="at">-p</span> 8787:8787 kenter/rstudio-scrnaseq:v0.2</span></code></pre></div>
+<p>When you open rstudio you should be able to load <code>Seurat</code> and other single cell packages. We’ve also included a <code>test-install.Rmd</code> document that lists and loads all of the relevant installed packages, and tests basic Seurat commands.</p>
 <h1 id="additional-resources">Additional resources</h1>
 <p>If you’ve never used docker here are some useful tutorials on using docker:</p>
 <p><a href="https://bioconductor.org/help/docker/#quickstart" class="uri">https://bioconductor.org/help/docker/#quickstart</a><br />

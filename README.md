@@ -21,7 +21,7 @@ library(distill)
 create_post("class-1", draft = TRUE)
 ```
 
-Navigate to the Rmarkdown in the `_posts` subdirectory, add content, then knit and check output html file. If the content looks ready to publish, remove `draft: True`from the header, reknit, then rebuild the site using the `Build website` button under the `Build` tab in Rstudio. `Build website` will update the classes listed in the `Classes` tab, unless `draft: True` is set. Also note that `Build website` will copy all files in the project into `docs` unless you list the files/directories to ignore in the `_site.yml`.
+Navigate to the Rmarkdown in the `_posts` subdirectory, add content, then knit and check output html file. If the content looks ready to publish, remove `draft: True`from the header, add the post directory to the list of posts in the `yaml` header of `classes.Rmd`, reknit the post, then rebuild the site using the `Build website` button under the `Build` tab in Rstudio. `Build website` will update the classes listed in the `Classes` tab, unless `draft: True` is set. Also note that `Build website` will copy all files in the project into `docs` unless you list the files/directories to ignore in the `_site.yml`.
 
 E.g. exclude: ["data"] 
 

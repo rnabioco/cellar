@@ -91,8 +91,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 
   <!--  https://schema.org/Article -->
-  <meta property="article:published" itemprop="datePublished" content="2021-10-15"/>
-  <meta property="article:created" itemprop="dateCreated" content="2021-10-15"/>
+  <meta property="article:published" itemprop="datePublished" content="2021-10-27"/>
+  <meta property="article:created" itemprop="dateCreated" content="2021-10-27"/>
+  <meta name="article:author" content="Kent Riemondy"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
   <meta property="og:title" content="R installation"/>
@@ -107,7 +108,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","output","draft","date"]}},"value":[{"type":"character","attributes":{},"value":["R installation"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["10-15-2021"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","output","draft","date"]}},"value":[{"type":"character","attributes":{},"value":["R installation"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]},{"type":"character","attributes":{},"value":["https://github.com/kriemo"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-0750-1273"]}]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["10-27-2021"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
@@ -1451,7 +1452,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"R installation","authors":[],"publishedDate":"2021-10-15T00:00:00.000+00:00"}
+{"title":"R installation","authors":[{"author":"Kent Riemondy","authorURL":"https://github.com/kriemo","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-0750-1273"}],"publishedDate":"2021-10-27T00:00:00.000+00:00","citationText":"Riemondy, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1467,6 +1468,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 </div>
 
+<div class="d-byline">
+  Kent Riemondy <a href="https://github.com/kriemo" class="uri">https://github.com/kriemo</a> (RNA Bioscience Initiative)<a href="https://medschool.cuanschutz.edu/rbi" class="uri">https://medschool.cuanschutz.edu/rbi</a>
+  
+<br/>10-27-2021
+</div>
 
 <div class="d-article">
 <p>This article will explain how to install R, Rstudio, and packages in R.If you are already familar with this material, skip to the <strong>Install packages for workshop</strong> section to see the packages that we will use in the workshop.</p>
@@ -1531,7 +1537,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 - Seurat<br />
 - rmarkdown<br />
 - cowplot<br />
-- colorblindr<br />
+- pheatmap<br />
 - markdown</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -1539,7 +1545,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
                    <span class='st'>'rmarkdown'</span>,
                    <span class='st'>'Seurat'</span>,
                    <span class='st'>'cowplot'</span>,
-                   <span class='st'>'colorblindr'</span>,
+                   <span class='st'>'pheatmap'</span>,
                    <span class='st'>'markdown'</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -1551,7 +1557,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 - limma<br />
 - clustifyr<br />
 - slingshot<br />
-- tradeSeq</p>
+- tradeSeq<br />
+- clusterExperiment</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>BiocManager</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/BiocManager/man/install.html'>install</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'ComplexHeatmap'</span>, 
@@ -1560,19 +1567,22 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
                        <span class='st'>'limma'</span>,
                        <span class='st'>'clustifyr'</span>,
                        <span class='st'>'slingshot'</span>,
-                       <span class='st'>'tradeSeq'</span><span class='op'>)</span><span class='op'>)</span>
+                       <span class='st'>'tradeSeq'</span>,
+                       <span class='st'>'clusterExperiment'</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
 <p>From github:<br />
-- destiny (hosted on bioconductor typically but not building correctly right now)</p>
+- destiny (hosted on bioconductor typically but not building correctly right now) - harmony (batch correction approach) - LaCroixColoR (pretty color palette)</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>remotes</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/remotes/man/install_github.html'>install_github</a></span><span class='op'>(</span><span class='st'>'theislab/destiny'</span><span class='op'>)</span>
+<span class='fu'>remotes</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/remotes/man/install_github.html'>install_github</a></span><span class='op'>(</span><span class='st'>'immunogenomics/harmony'</span><span class='op'>)</span>
+<span class='fu'>remotes</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/remotes/man/install_github.html'>install_github</a></span><span class='op'>(</span><span class='st'>'johannesbjork/LaCroixColoR'</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
-<p>If you’d like to test the installation, please run <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/docker/test.Rmd">this test Rmarkdown</a> hosted on github.</p>
+<p>To test the installation, run the <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-21-prerequisite-material/prerequiste-exercises.Rmd">prerequisite Rmarkdown</a> which will load all of these packages.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
