@@ -20,10 +20,10 @@ knitr::opts_chunk$set(message   = FALSE,
 ## Topics for this session:
 
 - Normalization and dimensionality reduction methods
-- Discuss visualization strategies well-suited to single cell seq data
-- Introduce clustering methods commonly used for single cell data
+- Visualization strategies well-suited to single cell seq data
+- Clustering methods commonly used for single cell data
 - Differential gene expression discovery
-- Cell identitiy assignment
+- Cell identity assignment
 
 ## Common analysis paradigm for scRNA-seq
 
@@ -32,20 +32,20 @@ knitr::opts_chunk$set(message   = FALSE,
 3) Run PCA to reduce the dimensionality of the dataset
 4) Identify clusters using the PCA reduced data
 5) Project the data into 2-D using UMAP/tSNE or just PCA to visualize
-6) Find marker genes enriched in clusters.
+6) Find marker genes enriched in clusters
 7) Define cell types
-8) Repeat Steps 4-7 until satisfied with data
+8) Repeat Steps 4-7 until satisfied
 
 Seurat accomplishes these steps using a succinct set of functions provided by `Seurat`:
 
 ```{r eval = FALSE, echo = TRUE}
-NormalizeData()
-ScaleData()
-RunPCA()
-RunUMAP()
-FindNeighbors()
-FindClusters()
-FindMarkers()
+?Seurat::NormalizeData
+?Seurat::ScaleData
+?Seurat::RunPCA
+?Seurat::RunUMAP
+?Seurat::FindNeighbors
+?Seurat::FindClusters
+?Seurat::FindMarkers
 ```
 
 ## Reloading saved objects
@@ -100,7 +100,7 @@ so@assays$RNA@var.features[1:10]
 VariableFeatures(so)[1:10]
 ```
 
-An alternative approach uses the Bioconductor package [`M3Drop`](https://www.bioconductor.org/packages/release/bioc/html/M3Drop.html). This approach does not model the variance in the data, but rather uses the information about dropouts to identify genes that have high variance. Specifically there is a clear relationship between the dropout rate and the abundance of a gene.
+An alternative approach uses the Bioconductor package [`M3Drop`](https://www.bioconductor.org/packages/release/bioc/html/M3Drop.html). This approach does not model the variance in the data, but rather uses the information about dropouts to identify genes that have high variance. Specifically, there is a clear relationship between the dropout rate and the abundance of a gene.
 
 ## Scaling
 
@@ -108,13 +108,13 @@ Next, we will scale the normalized expression values. The scaled values will onl
 
 Single cell data sets often contain various types of 'uninteresting' variation. These can include technical noise, batch effects and confounding biological variation (such as cell cycle stage). We can use modeling to regress these signals out of the analysis using `ScaleData`. Variables present in the `meta.data` can be supplied as variables to regress. A linear model is fit between the the supplied variables (i.e `nUMI`, `proportion.mito`, etc.) and gene expression value. The residuals from this model are then scaled instead of the normalized gene expression.
 
-In general we recommend performing exploratory data analysis first without regressing any nuisance variables. Later, if you discover a nuisance variable (i.e. batch or cell cycle), then you can regress it out. 
+In general, we recommend performing exploratory data analysis first without regressing any nuisance variables. Later, if you discover a nuisance variable (i.e. batch or cell cycle), then you can regress it out. 
 
 ```{r scale}
 # scale all of the data, useful if you want to make heatmaps later
 so <- ScaleData(object = so, features = rownames(so))
 # for large datasets, just scale the variable genes:
-#so <- ScaleData(object = so, 
+# so <- ScaleData(object = so, 
 #                 features = VariableFeatures(so))
 ```
 
@@ -135,7 +135,7 @@ Dimensionality reduction techniques are used in single cell data analysis genera
 
 1) Provide visualizations in 2 dimensions that convey information about relationships between cells.
 
-2) Reduce the computational burden of working with 20K dimenions to a smaller set of dimensions that capture signal.
+2) Reduce the computational burden of working with 20K dimensions to a smaller set of dimensions that capture signal.
 
 By identifying the highly variable genes we've already reduced the dimensions from 20K to ~1500. Next we will use [Principal Component Analysis](http://setosa.io/ev/principal-component-analysis/) to identify a smaller subset of dimensions (10-100) that will be used for clustering and visualization. 
 
@@ -153,7 +153,7 @@ The `RunPCA` function will calculate the top 50 principal components using a mod
 **Note** 
 Some functions in Seurat (`RunPCA`, `RunTSNE`, `RunUMAP`, `FindClusters`), have a non-deterministic component that will give different results (usually slightly) each run due to a randomization step in the algorithm. However, you can set an integer seed to make the output reproducible. This is useful so that you get the same clustering results if you rerun your analysis code. In many functions seurat has done this for you with the `seed.use` parameter, set to `42`. If you set this to NULL you will get a non-deterministic result. 
 
-Shown in the tabs are 2 dimensional plots showing the prinicpal component scores of cells. 
+Shown in the tabs are 2 dimensional plots showing the principal component scores of cells. 
   
 ```{r pc_plots, results ='asis'}
 pcs <- list(
@@ -221,6 +221,7 @@ plot_pca(so, c("CST3", "NKG7"))
 # or use ggplot directly if need more custom viz
 var_df <- FetchData(so, c("PC_1", "PC_2", "CD19", "CD8A")) %>% 
   gather(gene, expr, -PC_1, -PC_2)
+
 ggplot(var_df, aes(PC_1, PC_2)) +
   geom_point(aes(color = expr)) +
   scale_color_gradientn(colours = RColorBrewer::brewer.pal(9, "Reds")) + 
@@ -238,7 +239,7 @@ plot_pca(so, c("PPBP", "NKG7"), dims = c(2,3))
 
 The first two dimensions of PCA are not sufficient to capture the variation in these data due to the complexity. However, PCA is useful in identifying a new set of dimensions (10-100) that capture most of the interesting variation in the data. This is useful because now with this reduced dataset we can use newer visualization technique to examine relationships between cells in 2 dimensions. 
 
-[`UMAP`](https://umap-learn.readthedocs.io/en/latest/parameters.html) is a newer algorithm for projecting data in 2D (or higher) and has become very popular for single cell visualization. The UMAP algorithm derives from topological methods for data analysis, and is nicely desribed by the authors in the UMAP [documentation](https://umap-learn.readthedocs.io/en/latest/how_umap_works.html).  
+[`UMAP`](https://umap-learn.readthedocs.io/en/latest/parameters.html) is a newer algorithm for projecting data in 2D (or higher) and has become very popular for single cell visualization. The UMAP algorithm derives from topological methods for data analysis, and is nicely described by the authors in the UMAP [documentation](https://umap-learn.readthedocs.io/en/latest/how_umap_works.html).  
 
 ```{r umap}
 so <- RunUMAP(so, dims = 1:15)
@@ -254,8 +255,6 @@ Graph based clustering methods are commonly used for single cell data, because t
 1) construct a K-nearest (KNN) neighbor matrix.
 2) calculate shared nearest neighbors (SNN) using the jaccard index. 
 3) use the [Louvain](https://en.wikipedia.org/wiki/Louvain_modularity) community detection algorithm to assign clusters. 
-
-This general approach was originally adopted in the single cell community in the PhenoGraph algorithm developed by [Levain et al 2015](https://doi.org/10.1016/j.cell.2015.05.047).
 
 In Seurat the clustering is done using two functions:`FindNeighbors` which computes the KNN and SNN graphs, and `FindClusters` which finds clusters.
 
@@ -280,7 +279,7 @@ Some guidelines:
 
 1) Cluster the data into a small number of clusters to identify cell types, then recluster to generate additional clusters to define sub-populations of cell types. 
 
-2) To determine if the data is overclustered examine differentially expressed genes between clusters. If the clusters have few or no differentially expressed genes then the data is overclustered. Similar clusters can be merged post-hoc if necessary as sometimes it is difficult to use 1 clustering approach for many diverse cell populations.
+2) To determine if the data is overclustered, examine differentially expressed genes between clusters. If the clusters have few or no differentially expressed genes then the data is overclustered. Similar clusters can be merged post-hoc if necessary as sometimes it is difficult to use one clustering approach for many diverse cell populations.
 
 ## Assessing relationships between clusters
 
@@ -292,9 +291,7 @@ so <- BuildClusterTree(so)
 PlotClusterTree(so)
 ```
 
-
 The [`clustree`](https://lazappi.github.io/clustree/index.html) package provides a nice plotting utility to visualize the relationship of cells at different resolution settings. 
-
 
 ```{r clustree, fig.height = 6}
 library(clustree)
@@ -311,7 +308,7 @@ so$clusters <- so$RNA_snn_res.0.5
 
 ## Save object and metadata
 
-It's always a good idea to store the cell metadata, particularly the clustering and projections, as these may change with reruns of the same data, for example if a package is updated or if the `seed.use` argument changes. Further down the road, when sequencing data is submitted to NCBI GEO, depositing metadata will help future bioinformaticians reproduce/reanalyse findings.
+It's always a good idea to store the cell metadata, particularly the clustering and projections, as these may change with reruns of the same data, for example if a package is updated or if the `seed.use` argument changes. Further down the road, when sequencing data is submitted to NCBI GEO, depositing metadata will help future bioinformaticians reproduce/reanalyze findings.
 
 ```{r save, eval = FALSE}
 dir.create("data", showWarnings = FALSE)
@@ -368,7 +365,7 @@ And save tables to disk with `write_csv`.
 ```{r "saving files",eval=F}
 write_csv(markers_df, "data/allmarkers.csv")
 markers_df <- read_csv("data/allmarkers.csv")
-markers_df %>% head() # lost rownames, tidyverse strikes again
+markers_df %>% head()
 ```
 
 Consider the equivalent but faster way, using `presto::wilcoxauc`.
@@ -480,7 +477,7 @@ so <- StashIdent(object = so, save.name = "cluster_name")
 `clustifyr` works by comparing the average gene expression in each cluster to a reference matrix that contains average gene signatures of reference cell types. The reference can be built from other single cell data, bulk rna-seq, microarray data, or other sources. Ranked Spearman correlation is used to compare the reference to the clusters. Only the highly variable genes are used for the correlation. 
 
 ### cell type composition
-Insight into different samples can be gained from the proportion of cells that fall into each cell type. Unfortunately, no dedicated tools are available for statistical testing.
+Insight into different samples can be gained from the proportion of cells that fall into each cell type.
 
 ```{r "evaluate composition"}
 tab1 <- so@meta.data %>%
