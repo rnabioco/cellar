@@ -3,7 +3,6 @@ title: "Intro_scRNAseq_QC_PCA"
 description: 'The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA'
 author:
   - name: Tyler Matheny
-    url: {}
 date: 2021-11-01
 output:
   distill::distill_article:

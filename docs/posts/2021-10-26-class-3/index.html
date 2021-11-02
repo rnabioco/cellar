@@ -1611,7 +1611,10 @@ function init_distill() {
 
     // hoverable references
     $('span.citation[data-cites]').each(function() {
-      var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+      var refs = $(this).attr('data-cites').split(" ");
+      var refHtml = refs.map(function(ref) {
+        return "<p>" + $('#ref-' + ref).html() + "</p>";
+      }).join("\n");
       window.tippy(this, {
         allowHTML: true,
         content: refHtml,
@@ -1802,7 +1805,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Class 3: Batch correction and pseudotime","description":"This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.","authors":[{"author":"Kristen Wells","authorURL":"https://github.com/kwells4","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0002-7466-8164"}],"publishedDate":"2021-10-26T00:00:00.000+00:00","citationText":"Wells, 2021"}
+{"title":"Class 3: Batch correction and pseudotime","description":"This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.","authors":[{"author":"Kristen Wells","authorURL":"https://github.com/kwells4","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0002-7466-8164"}],"publishedDate":"2021-10-26T00:00:00.000-06:00","citationText":"Wells, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
