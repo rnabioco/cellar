@@ -22,7 +22,7 @@ output:
 
 This script walks though the steps to correct batch effects and find pseudotemporal relationships between single cells.
 
-**Please download the raw [Rmarkdown from github](https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-26-class-3/class-3_studnet_copy.Rmd)**
+**Please download the raw [Rmarkdown from github](https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-26-class-3/class-3_student_copy.Rmd)**
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
