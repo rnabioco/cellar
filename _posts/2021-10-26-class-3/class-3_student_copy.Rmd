@@ -1,28 +1,10 @@
 ---
-title: "Class 3: Batch correction and pseudotime"
-description: |
-  This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.
-author:
-  - name: Kristen Wells
-    url: https://github.com/kwells4
-    affiliation: "RNA Bioscience Initiative"
-    affiliation_url: https://medschool.cuanschutz.edu/rbi
-    orcid_id: 0000-0002-7466-8164
-date: 2021-10-26
-output:
-  distill::distill_article:
-    self_contained: false
-    toc: true
-    toc_depth: 2
-    toc_float: true
-    highlight: "tango"
-    df_print: "paged"
-    code_folding: "show"
+title: "Batch correction and pseudotime"
+output: html_document
 ---
 
 This script walks though the steps to correct batch effects and find pseudotemporal relationships between single cells.
 
-**Please download the raw [Rmarkdown from github](https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-26-class-3/class-3_studnet_copy.Rmd)**
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -70,7 +52,7 @@ The second dataset is from the paper "Single-cell transcriptome analysis defines
 
 
 ## Download the files (Just an example, don't run today)
-All of the timecourse samples were downloaded [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141784). This group uploaded all of the filtered csv files from cellranger for each sample. These will be downloaded if you download the GSE141784_RAW.tar file. I have alread downloaded these files for you and ran basic filtering and aligning with the provided metadata using the code below. You do not need to run anything in this section, it is just provided so you can see all of the steps to process this data.
+All of the timecourse samples were downloaded here. https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141784. This group uploaded all of the filtered csv files from cellranger for each sample. These will be downloaded if you download the GSE141784_RAW.tar file. I have alread downloaded these files for you and ran basic filtering and aligning with the provided metadata using the code below. You do not need to run anything in this section, it is just provided so you can see all of the steps to process this data.
 
 
 ```{r, eval = FALSE}
@@ -159,7 +141,7 @@ seurat_list <- lapply(sample_list, make_seurat)
 ```
 
 
-The files associated with the second can be downloaded [here](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM4826923). This group only uploaded their output files from 10x genomics, so I remade the object, performed the initial steps of analysis and identified celltypes by looking for clusters that shared the most marker genes with each of their identified cell types.
+The files associated with the second can be downloaded here https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM4826923. This group only uploaded their output files from 10x genomics, so I remade the object, performed the initial steps of analysis and identified celltypes by looking for clusters that shared the most marker genes with each of their identified cell types.
 
 
 ## Download the files
