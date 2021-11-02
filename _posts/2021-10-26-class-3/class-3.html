@@ -1507,7 +1507,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </nav>
 </div>
 <p>This script walks though the steps to correct batch effects and find pseudotemporal relationships between single cells.</p>
-<p><strong>Please download the raw <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-26-class-3/class-3_studnet_copy.Rmd">Rmarkdown from github</a></strong></p>
+<p><strong>Please download the raw <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-26-class-3/class-3_student_copy.Rmd">Rmarkdown from github</a></strong></p>
 <div class="layout-chunk" data-layout="l-body">
 <details>
 <summary>show</summary>
@@ -2100,8 +2100,8 @@ Cela3b        0  -2.566615 0.002 0.734         0</code></pre>
 </div>
 </details>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells   7451169  398.0   13508918  721.5         NA  13508918  721.5
-Vcells 132954848 1014.4  420601427 3209.0      65536 420598064 3209.0</code></pre>
+Ncells   7451174  398.0   13508754  721.5         NA  13508754  721.5
+Vcells 132954848 1014.4  420601427 3209.0      65536 420600975 3209.0</code></pre>
 </div>
 <h2 id="batch-correction-conclusion">Batch correction conclusion</h2>
 <p>While I personally prefer <code>harmony</code> as my batch correction, it only helps identify shared celltypes or clusters while not actually correcting the sequencing counts. This is fine if you want to find differences between shared celltypes within each sample, but it may not be correct if you want to compare expression differences between samples. There are other batch correction tools that do allow you to also correct the expression values. One that has received high marks recently is <code>scVI</code>, which is implemented in <code>python</code> so we won’t go into it here. Unfortunately, the creators of <code>scVI</code> don’t seem comfortable with these corrected values being used to perform differential expression analysis between samples. <code>Seurat</code> also performs an integration that corrects expression values, but those creators also suggest using the uncorrected <code>RNA</code> matrix for differential expression testing.</p>
@@ -2232,7 +2232,7 @@ Vcells 132954848 1014.4  420601427 3209.0      65536 420598064 3209.0</code></pr
 </div>
 </details>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells   7531183  402.3   13508918  721.5         NA  13508918  721.5
+Ncells   7531188  402.3   13508754  721.5         NA  13508754  721.5
 Vcells 301128109 2297.5  903723896 6894.9      65536 739787185 5644.2</code></pre>
 </div>
 <h3 id="prepare-data">Prepare data</h3>
@@ -2257,7 +2257,7 @@ Vcells 301128109 2297.5  903723896 6894.9      65536 739787185 5644.2</code></pr
 </div>
 </details>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells   7481391  399.6   13508918  721.5         NA  13508918  721.5
+Ncells   7481396  399.6   13508754  721.5         NA  13508754  721.5
 Vcells 160809205 1226.9  722979117 5515.9      65536 739787185 5644.2</code></pre>
 </div>
 <p>After subestting, we need to repeat some of the processing steps. We need to find variable genes, scale the data, run pca, and run umap</p>
