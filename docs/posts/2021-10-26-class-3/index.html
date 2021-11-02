@@ -86,7 +86,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
 
   <!--radix_placeholder_meta_tags-->
-<title>single cell RNA-seq workshop: Batch correction and pseudotime</title>
+<title>single cell RNA-seq workshop: Class 3: Batch correction and pseudotime</title>
 
 <meta property="description" itemprop="description" content="This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."/>
 
@@ -97,7 +97,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <meta name="article:author" content="Kristen Wells"/>
 
 <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-<meta property="og:title" content="single cell RNA-seq workshop: Batch correction and pseudotime"/>
+<meta property="og:title" content="single cell RNA-seq workshop: Class 3: Batch correction and pseudotime"/>
 <meta property="og:type" content="article"/>
 <meta property="og:description" content="This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."/>
 <meta property="og:locale" content="en_US"/>
@@ -105,14 +105,14 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
 <!--  https://dev.twitter.com/cards/types/summary -->
 <meta property="twitter:card" content="summary"/>
-<meta property="twitter:title" content="single cell RNA-seq workshop: Batch correction and pseudotime"/>
+<meta property="twitter:title" content="single cell RNA-seq workshop: Class 3: Batch correction and pseudotime"/>
 <meta property="twitter:description" content="This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."/>
 
 <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
 <script type="text/json" id="radix-rmarkdown-metadata">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Batch correction and pseudotime"]},{"type":"character","attributes":{},"value":["This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Kristen Wells"]},{"type":"character","attributes":{},"value":["https://github.com/kwells4"]}]}]},{"type":"character","attributes":{},"value":["2021-10-26"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc","toc_depth","toc_float","highlight","df_print","code_folding"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[2]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["tango"]},{"type":"character","attributes":{},"value":["paged"]},{"type":"character","attributes":{},"value":["show"]}]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Class 3: Batch correction and pseudotime"]},{"type":"character","attributes":{},"value":["This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Kristen Wells"]},{"type":"character","attributes":{},"value":["https://github.com/kwells4"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0002-7466-8164"]}]}]},{"type":"character","attributes":{},"value":["2021-10-26"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc","toc_depth","toc_float","highlight","df_print","code_folding"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]},{"type":"integer","attributes":{},"value":[2]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["tango"]},{"type":"character","attributes":{},"value":["paged"]},{"type":"character","attributes":{},"value":["show"]}]}]}]}
 </script>
 <!--/radix_placeholder_rmarkdown_metadata-->
   
@@ -463,7 +463,7 @@ d-title {
 
 </style>
 
-<script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="../../site_libs/jquery-3.5.1/jquery-3.5.1.min.js"></script>
 <link href="../../site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
 <link href="../../site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
 <script src="../../site_libs/headroom-0.9.4/headroom.min.js"></script>
@@ -1805,7 +1805,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Batch correction and pseudotime","description":"This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.","authors":[{"author":"Kristen Wells","authorURL":"https://github.com/kwells4","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2021-10-26T00:00:00.000-06:00","citationText":"Wells, 2021"}
+{"title":"Class 3: Batch correction and pseudotime","description":"This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.","authors":[{"author":"Kristen Wells","authorURL":"https://github.com/kwells4","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0002-7466-8164"}],"publishedDate":"2021-10-26T00:00:00.000-06:00","citationText":"Wells, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1834,14 +1834,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>Batch correction and pseudotime</h1>
+<h1>Class 3: Batch correction and pseudotime</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
 <p><p>This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.</p></p>
 </div>
 
 <div class="d-byline">
-  Kristen Wells <a href="https://github.com/kwells4" class="uri">https://github.com/kwells4</a> 
+  Kristen Wells <a href="https://github.com/kwells4" class="uri">https://github.com/kwells4</a> (RNA Bioscience Initiative)<a href="https://medschool.cuanschutz.edu/rbi" class="uri">https://medschool.cuanschutz.edu/rbi</a>
   
 <br/>2021-10-26
 </div>
@@ -1851,7 +1851,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <nav class="l-text toc figcaption" id="TOC">
 <h3>Contents</h3>
 <ul>
-<li><a href="#background">Background</a></li>
 <li><a href="#description-of-data">Description of data</a><ul>
 <li><a href="#download-the-files-just-an-example-dont-run-today">Download the files (Just an example, don’t run today)</a></li>
 <li><a href="#download-the-files">Download the files</a></li>
@@ -1874,8 +1873,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </ul>
 </nav>
 </div>
-<h1 id="background">Background</h1>
-<p>This script walks though the steps to correct batch effects and find pseudotemporal relationships between single cells. You can download the script which contains all of the following code and you can run yourself here <a href="https://github.com/rnabioco/cellar/tree/master/_posts/2021-10-26-class-3" class="uri">https://github.com/rnabioco/cellar/tree/master/_posts/2021-10-26-class-3</a> and download “class-3.Rmd”</p>
+<p>This script walks though the steps to correct batch effects and find pseudotemporal relationships between single cells.</p>
+<p><strong>Please download the raw <a href="https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-26-class-3/class-3_studnet_copy.Rmd">Rmarkdown from github</a></strong></p>
 <div class="layout-chunk" data-layout="l-body">
 <details>
 <summary>show</summary>
@@ -1912,7 +1911,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <p>We will start with just one of the 4 week samples from this dataset. The others we will include when we look at pseudotime.</p>
 <p>The second dataset is from the paper “Single-cell transcriptome analysis defines heterogeneity of the murine pancreatic ductal tree”. They isolated all islet and ductal cells, so some of the cells overlap with the first dataset and some do not. We will use all cells for this analysis.</p>
 <h2 id="download-the-files-just-an-example-dont-run-today">Download the files (Just an example, don’t run today)</h2>
-<p>All of the timecourse samples were downloaded here. <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141784" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141784</a>. This group uploaded all of the filtered csv files from cellranger for each sample. These will be downloaded if you download the GSE141784_RAW.tar file. I have alread downloaded these files for you and ran basic filtering and aligning with the provided metadata using the code below. You do not need to run anything in this section, it is just provided so you can see all of the steps to process this data.</p>
+<p>All of the timecourse samples were downloaded <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE141784">here</a>. This group uploaded all of the filtered csv files from cellranger for each sample. These will be downloaded if you download the GSE141784_RAW.tar file. I have alread downloaded these files for you and ran basic filtering and aligning with the provided metadata using the code below. You do not need to run anything in this section, it is just provided so you can see all of the steps to process this data.</p>
 <div class="layout-chunk" data-layout="l-body">
 <details>
 <summary>show</summary>
@@ -2002,7 +2001,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 </details>
 </div>
-<p>The files associated with the second can be downloaded here <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM4826923" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM4826923</a>. This group only uploaded their output files from 10x genomics, so I remade the object, performed the initial steps of analysis and identified celltypes by looking for clusters that shared the most marker genes with each of their identified cell types.</p>
+<p>The files associated with the second can be downloaded <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM4826923">here</a>. This group only uploaded their output files from 10x genomics, so I remade the object, performed the initial steps of analysis and identified celltypes by looking for clusters that shared the most marker genes with each of their identified cell types.</p>
 <h2 id="download-the-files">Download the files</h2>
 <p>I have already created processed <code>Seurat</code> objects that we will use today. This processing included finding mitochondrial percents, creating a cell cycle score, normalizing the data, finding variable genes, and scaling the data. We will skip this today, but all steps are shown in the code segment above. We can use the code below to create a “data” directory (folder) and download the files into it.</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -2123,7 +2122,7 @@ Number of edges: 662672
 Running Louvain algorithm...
 Maximum modularity in 10 random starts: 0.9215
 Number of communities: 31
-Elapsed time: 3 seconds</code></pre>
+Elapsed time: 2 seconds</code></pre>
 </div>
 <h2 id="check-for-batch">Check for batch</h2>
 <p>Now we should check if any sort of batch correction is necessary. Let’s check by dataset. The dataset is stored as <code>orig.ident</code> in the object</p>
@@ -2468,8 +2467,8 @@ Cela3b        0  -2.566615 0.002 0.734         0</code></pre>
 </div>
 </details>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells   7451162  398.0   13508872  721.5         NA  13508872  721.5
-Vcells 132954762 1014.4  420601280 3209.0      65536 420600479 3209.0</code></pre>
+Ncells   7451169  398.0   13508918  721.5         NA  13508918  721.5
+Vcells 132954848 1014.4  420601427 3209.0      65536 420598064 3209.0</code></pre>
 </div>
 <h2 id="batch-correction-conclusion">Batch correction conclusion</h2>
 <p>While I personally prefer <code>harmony</code> as my batch correction, it only helps identify shared celltypes or clusters while not actually correcting the sequencing counts. This is fine if you want to find differences between shared celltypes within each sample, but it may not be correct if you want to compare expression differences between samples. There are other batch correction tools that do allow you to also correct the expression values. One that has received high marks recently is <code>scVI</code>, which is implemented in <code>python</code> so we won’t go into it here. Unfortunately, the creators of <code>scVI</code> don’t seem comfortable with these corrected values being used to perform differential expression analysis between samples. <code>Seurat</code> also performs an integration that corrects expression values, but those creators also suggest using the uncorrected <code>RNA</code> matrix for differential expression testing.</p>
@@ -2600,8 +2599,8 @@ Vcells 132954762 1014.4  420601280 3209.0      65536 420600479 3209.0</code></pr
 </div>
 </details>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells   7531176  402.3   13508872  721.5         NA  13508872  721.5
-Vcells 301128023 2297.5  903723747 6894.9      65536 739787099 5644.2</code></pre>
+Ncells   7531183  402.3   13508918  721.5         NA  13508918  721.5
+Vcells 301128109 2297.5  903723896 6894.9      65536 739787185 5644.2</code></pre>
 </div>
 <h3 id="prepare-data">Prepare data</h3>
 <p>One important thing to remember about running pseudotime is that connections will be found between cells that are related or not. Because we know that the macrophages should not become B cells, we should first subset to only the macrophage population.</p>
@@ -2625,8 +2624,8 @@ Vcells 301128023 2297.5  903723747 6894.9      65536 739787099 5644.2</code></pr
 </div>
 </details>
 <pre><code>            used   (Mb) gc trigger   (Mb) limit (Mb)  max used   (Mb)
-Ncells   7481384  399.6   13508872  721.5         NA  13508872  721.5
-Vcells 160809119 1226.9  722978998 5515.9      65536 739787099 5644.2</code></pre>
+Ncells   7481391  399.6   13508918  721.5         NA  13508918  721.5
+Vcells 160809205 1226.9  722979117 5515.9      65536 739787185 5644.2</code></pre>
 </div>
 <p>After subestting, we need to repeat some of the processing steps. We need to find variable genes, scale the data, run pca, and run umap</p>
 <div class="layout-chunk" data-layout="l-body">
