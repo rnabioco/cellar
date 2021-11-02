@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="generator" content="distill" />
+
+  <style type="text/css">
+  /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
+  body {
+    visibility: hidden;
+  }
+  </style>
+
+ <!--radix_placeholder_import_source-->
+ <!--/radix_placeholder_import_source-->
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ad0000; } /* Alert */
+code span.an { color: #5e5e5e; } /* Annotation */
+code span.at { color: #20794d; } /* Attribute */
+code span.bn { color: #ad0000; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007ba5; } /* ControlFlow */
+code span.ch { color: #20794d; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #5e5e5e; } /* Comment */
+code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+code span.dt { color: #ad0000; } /* DataType */
+code span.dv { color: #ad0000; } /* DecVal */
+code span.er { color: #ad0000; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #ad0000; } /* Float */
+code span.fu { color: #4758ab; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #5e5e5e; } /* Information */
+code span.kw { color: #007ba5; } /* Keyword */
+code span.op { color: #5e5e5e; } /* Operator */
+code span.ot { color: #007ba5; } /* Other */
+code span.pp { color: #ad0000; } /* Preprocessor */
+code span.sc { color: #20794d; } /* SpecialChar */
+code span.ss { color: #20794d; } /* SpecialString */
+code span.st { color: #20794d; } /* String */
+code span.va { color: #111111; } /* Variable */
+code span.vs { color: #20794d; } /* VerbatimString */
+code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+</style>
+
+  <!--radix_placeholder_meta_tags-->
+  <title>Intro_scRNAseq_QC_PCA</title>
+
+  <meta property="description" itemprop="description" content="The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA"/>
+
+
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2021-11-01"/>
+  <meta property="article:created" itemprop="dateCreated" content="2021-11-01"/>
+  <meta name="article:author" content="Tyler Matheny"/>
+
+  <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
+  <meta property="og:title" content="Intro_scRNAseq_QC_PCA"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:description" content="The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA"/>
+  <meta property="og:locale" content="en_US"/>
+
+  <!--  https://dev.twitter.com/cards/types/summary -->
+  <meta property="twitter:card" content="summary"/>
+  <meta property="twitter:title" content="Intro_scRNAseq_QC_PCA"/>
+  <meta property="twitter:description" content="The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA"/>
+
+  <!--/radix_placeholder_meta_tags-->
+  <!--radix_placeholder_rmarkdown_metadata-->
+
+  <script type="text/json" id="radix-rmarkdown-metadata">
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Intro_scRNAseq_QC_PCA"]},{"type":"character","attributes":{},"value":["The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Tyler Matheny"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]}]}]},{"type":"character","attributes":{},"value":["2021-11-01"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
+  </script>
+  <!--/radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["1class_files/anchor-4.2.2/anchor.min.js","1class_files/bowser-1.9.3/bowser.min.js","1class_files/distill-2.2.21/template.v2.js","1class_files/figure-html5/unnamed-chunk-14-1.png","1class_files/figure-html5/unnamed-chunk-16-1.png","1class_files/figure-html5/unnamed-chunk-17-1.png","1class_files/figure-html5/unnamed-chunk-19-1.png","1class_files/figure-html5/unnamed-chunk-20-1.png","1class_files/figure-html5/unnamed-chunk-21-1.png","1class_files/figure-html5/unnamed-chunk-22-1.png","1class_files/figure-html5/unnamed-chunk-23-1.png","1class_files/figure-html5/unnamed-chunk-24-1.png","1class_files/figure-html5/unnamed-chunk-25-1.png","1class_files/figure-html5/unnamed-chunk-26-1.png","1class_files/figure-html5/unnamed-chunk-27-1.png","1class_files/figure-html5/unnamed-chunk-28-1.png","1class_files/figure-html5/unnamed-chunk-3-1.png","1class_files/jquery-3.6.0/jquery-3.6.0.js","1class_files/jquery-3.6.0/jquery-3.6.0.min.js","1class_files/jquery-3.6.0/jquery-3.6.0.min.map","1class_files/popper-2.6.0/popper.min.js","1class_files/tippy-6.2.7/tippy-bundle.umd.min.js","1class_files/tippy-6.2.7/tippy-light-border.css","1class_files/tippy-6.2.7/tippy.css","1class_files/tippy-6.2.7/tippy.umd.min.js","1class_files/webcomponents-2.0.0/webcomponents.js","filtered_gene_bc_matrices/hg19/barcodes.tsv","filtered_gene_bc_matrices/hg19/genes.tsv","filtered_gene_bc_matrices/hg19/matrix.mtx","img/10xV3_seq.png","img/elbowcomp.png","img/slide1.png","img/slide10.jpg","img/slide2.png","img/slide3.png","img/slide4.png","img/slide5.png","img/slide6.png","img/slide7.png","img/slide8.jpg","img/slide9.png"]}
+  </script>
+  <!--radix_placeholder_navigation_in_header-->
+  <!--/radix_placeholder_navigation_in_header-->
+  <!--radix_placeholder_distill-->
+
+  <style type="text/css">
+
+  body {
+    background-color: white;
+  }
+
+  .pandoc-table {
+    width: 100%;
+  }
+
+  .pandoc-table>caption {
+    margin-bottom: 10px;
+  }
+
+  .pandoc-table th:not([align]) {
+    text-align: left;
+  }
+
+  .pagedtable-footer {
+    font-size: 15px;
+  }
+
+  d-byline .byline {
+    grid-template-columns: 2fr 2fr;
+  }
+
+  d-byline .byline h3 {
+    margin-block-start: 1.5em;
+  }
+
+  d-byline .byline .authors-affiliations h3 {
+    margin-block-start: 0.5em;
+  }
+
+  .authors-affiliations .orcid-id {
+    width: 16px;
+    height:16px;
+    margin-left: 4px;
+    margin-right: 4px;
+    vertical-align: middle;
+    padding-bottom: 2px;
+  }
+
+  d-title .dt-tags {
+    margin-top: 1em;
+    grid-column: text;
+  }
+
+  .dt-tags .dt-tag {
+    text-decoration: none;
+    display: inline-block;
+    color: rgba(0,0,0,0.6);
+    padding: 0em 0.4em;
+    margin-right: 0.5em;
+    margin-bottom: 0.4em;
+    font-size: 70%;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  d-article table.gt_table td,
+  d-article table.gt_table th {
+    border-bottom: none;
+  }
+
+  .html-widget {
+    margin-bottom: 2.0em;
+  }
+
+  .l-screen-inset {
+    padding-right: 16px;
+  }
+
+  .l-screen .caption {
+    margin-left: 10px;
+  }
+
+  .shaded {
+    background: rgb(247, 247, 247);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .shaded .html-widget {
+    margin-bottom: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .shaded .shaded-content {
+    background: white;
+  }
+
+  .text-output {
+    margin-top: 0;
+    line-height: 1.5em;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  d-article {
+    padding-top: 2.5rem;
+    padding-bottom: 30px;
+  }
+
+  d-appendix {
+    padding-top: 30px;
+  }
+
+  d-article>p>img {
+    width: 100%;
+  }
+
+  d-article h2 {
+    margin: 1rem 0 1.5rem 0;
+  }
+
+  d-article h3 {
+    margin-top: 1.5rem;
+  }
+
+  d-article iframe {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.0em;
+    width: 100%;
+  }
+
+  /* Tweak code blocks */
+
+  d-article div.sourceCode code,
+  d-article pre code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  d-article pre,
+  d-article div.sourceCode,
+  d-article div.sourceCode pre {
+    overflow: auto;
+  }
+
+  d-article div.sourceCode {
+    background-color: white;
+  }
+
+  d-article div.sourceCode pre {
+    padding-left: 10px;
+    font-size: 12px;
+    border-left: 2px solid rgba(0,0,0,0.1);
+  }
+
+  d-article pre {
+    font-size: 12px;
+    color: black;
+    background: none;
+    margin-top: 0;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+
+  d-article pre a {
+    border-bottom: none;
+  }
+
+  d-article pre a:hover {
+    border-bottom: none;
+    text-decoration: underline;
+  }
+
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
+  @media(min-width: 768px) {
+
+  d-article pre,
+  d-article div.sourceCode,
+  d-article div.sourceCode pre {
+    overflow: visible !important;
+  }
+
+  d-article div.sourceCode pre {
+    padding-left: 18px;
+    font-size: 14px;
+  }
+
+  d-article pre {
+    font-size: 14px;
+  }
+
+  }
+
+  figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+
+  /* CSS for d-contents */
+
+  .d-contents {
+    grid-column: text;
+    color: rgba(0,0,0,0.8);
+    font-size: 0.9em;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;
+    padding-left: 0.25em;
+    justify-self: start;
+  }
+
+  @media(min-width: 1000px) {
+    .d-contents.d-contents-float {
+      height: 0;
+      grid-column-start: 1;
+      grid-column-end: 4;
+      justify-self: center;
+      padding-right: 3em;
+      padding-left: 2em;
+    }
+  }
+
+  .d-contents nav h3 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+
+  .d-contents li {
+    list-style-type: none
+  }
+
+  .d-contents nav > ul {
+    padding-left: 0;
+  }
+
+  .d-contents ul {
+    padding-left: 1em
+  }
+
+  .d-contents nav ul li {
+    margin-top: 0.6em;
+    margin-bottom: 0.2em;
+  }
+
+  .d-contents nav a {
+    font-size: 13px;
+    border-bottom: none;
+    text-decoration: none
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .d-contents nav a:hover {
+    text-decoration: underline solid rgba(0, 0, 0, 0.6)
+  }
+
+  .d-contents nav > ul > li > a {
+    font-weight: 600;
+  }
+
+  .d-contents nav > ul > li > ul {
+    font-weight: inherit;
+  }
+
+  .d-contents nav > ul > li > ul > li {
+    margin-top: 0.2em;
+  }
+
+
+  .d-contents nav ul {
+    margin-top: 0;
+    margin-bottom: 0.25em;
+  }
+
+  .d-article-with-toc h2:nth-child(2) {
+    margin-top: 0;
+  }
+
+
+  /* Figure */
+
+  .figure {
+    position: relative;
+    margin-bottom: 2.5em;
+    margin-top: 1.5em;
+  }
+
+  .figure img {
+    width: 100%;
+  }
+
+  .figure .caption {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+    line-height: 1.5em;
+  }
+
+  .figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+
+  .figure .caption a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .figure .caption b,
+  .figure .caption strong, {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 1.0);
+  }
+
+  /* Citations */
+
+  d-article .citation {
+    color: inherit;
+    cursor: inherit;
+  }
+
+  div.hanging-indent{
+    margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
+  }
+
+
+  /* Tweak 1000px media break to show more text */
+
+  @media(min-width: 1000px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 16px;
+    }
+
+    .grid {
+      grid-column-gap: 16px;
+    }
+
+    d-article {
+      font-size: 1.06rem;
+      line-height: 1.7em;
+    }
+    figure .caption, .figure .caption, figure figcaption {
+      font-size: 13px;
+    }
+  }
+
+  @media(min-width: 1180px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 32px;
+    }
+
+    .grid {
+      grid-column-gap: 32px;
+    }
+  }
+
+
+  /* Get the citation styles for the appendix (not auto-injected on render since
+     we do our own rendering of the citation appendix) */
+
+  d-appendix .citation-appendix,
+  .d-appendix .citation-appendix {
+    font-size: 11px;
+    line-height: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 18px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px 18px;
+    border-radius: 3px;
+    color: rgba(150, 150, 150, 1);
+    overflow: hidden;
+    margin-top: -12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* Include appendix styles here so they can be overridden */
+
+  d-appendix {
+    contain: layout style;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-top: 60px;
+    margin-bottom: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    color: rgba(0,0,0,0.5);
+    padding-top: 60px;
+    padding-bottom: 48px;
+  }
+
+  d-appendix h3 {
+    grid-column: page-start / text-start;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 1em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.65);
+  }
+
+  d-appendix h3 + * {
+    margin-top: 1em;
+  }
+
+  d-appendix ol {
+    padding: 0 0 0 15px;
+  }
+
+  @media (min-width: 768px) {
+    d-appendix ol {
+      padding: 0 0 0 30px;
+      margin-left: -30px;
+    }
+  }
+
+  d-appendix li {
+    margin-bottom: 1em;
+  }
+
+  d-appendix a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  d-appendix > * {
+    grid-column: text;
+  }
+
+  d-appendix > d-footnote-list,
+  d-appendix > d-citation-list,
+  d-appendix > distill-appendix {
+    grid-column: screen;
+  }
+
+  /* Include footnote styles here so they can be overridden */
+
+  d-footnote-list {
+    contain: layout style;
+  }
+
+  d-footnote-list > * {
+    grid-column: text;
+  }
+
+  d-footnote-list a.footnote-backlink {
+    color: rgba(0,0,0,0.3);
+    padding-left: 0.5em;
+  }
+
+
+
+  /* Anchor.js */
+
+  .anchorjs-link {
+    /*transition: all .25s linear; */
+    text-decoration: none;
+    border-bottom: none;
+  }
+  *:hover > .anchorjs-link {
+    margin-left: -1.125em !important;
+    text-decoration: none;
+    border-bottom: none;
+  }
+
+  /* Social footer */
+
+  .social_footer {
+    margin-top: 30px;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.67);
+  }
+
+  .disqus-comments {
+    margin-right: 30px;
+  }
+
+  .disqus-comment-count {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+  }
+
+  #disqus_thread {
+    margin-top: 30px;
+  }
+
+  .article-sharing a {
+    border-bottom: none;
+    margin-right: 8px;
+  }
+
+  .article-sharing a:hover {
+    border-bottom: none;
+  }
+
+  .sidebar-section.subscribe {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+
+  .subscribe p {
+    margin-bottom: 0.5em;
+  }
+
+
+  .article-footer .subscribe {
+    font-size: 15px;
+    margin-top: 45px;
+  }
+
+
+  .sidebar-section.custom {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+
+  .custom p {
+    margin-bottom: 0.5em;
+  }
+
+  /* Styles for listing layout (hide title) */
+  .layout-listing d-title, .layout-listing .d-title {
+    display: none;
+  }
+
+  /* Styles for posts lists (not auto-injected) */
+
+
+  .posts-with-sidebar {
+    padding-left: 45px;
+    padding-right: 45px;
+  }
+
+  .posts-list .description h2,
+  .posts-list .description p {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .posts-list .description h2 {
+    font-weight: 700;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .posts-list h2.post-tag {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding-bottom: 12px;
+  }
+  .posts-list {
+    margin-top: 60px;
+    margin-bottom: 24px;
+  }
+
+  .posts-list .post-preview {
+    text-decoration: none;
+    overflow: hidden;
+    display: block;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 24px 0;
+  }
+
+  .post-preview-last {
+    border-bottom: none !important;
+  }
+
+  .posts-list .posts-list-caption {
+    grid-column: screen;
+    font-weight: 400;
+  }
+
+  .posts-list .post-preview h2 {
+    margin: 0 0 6px 0;
+    line-height: 1.2em;
+    font-style: normal;
+    font-size: 24px;
+  }
+
+  .posts-list .post-preview p {
+    margin: 0 0 12px 0;
+    line-height: 1.4em;
+    font-size: 16px;
+  }
+
+  .posts-list .post-preview .thumbnail {
+    box-sizing: border-box;
+    margin-bottom: 24px;
+    position: relative;
+    max-width: 500px;
+  }
+  .posts-list .post-preview img {
+    width: 100%;
+    display: block;
+  }
+
+  .posts-list .metadata {
+    font-size: 12px;
+    line-height: 1.4em;
+    margin-bottom: 18px;
+  }
+
+  .posts-list .metadata > * {
+    display: inline-block;
+  }
+
+  .posts-list .metadata .publishedDate {
+    margin-right: 2em;
+  }
+
+  .posts-list .metadata .dt-authors {
+    display: block;
+    margin-top: 0.3em;
+    margin-right: 2em;
+  }
+
+  .posts-list .dt-tags {
+    display: block;
+    line-height: 1em;
+  }
+
+  .posts-list .dt-tags .dt-tag {
+    display: inline-block;
+    color: rgba(0,0,0,0.6);
+    padding: 0.3em 0.4em;
+    margin-right: 0.2em;
+    margin-bottom: 0.4em;
+    font-size: 60%;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .posts-list img {
+    opacity: 1;
+  }
+
+  .posts-list img[data-src] {
+    opacity: 0;
+  }
+
+  .posts-more {
+    clear: both;
+  }
+
+
+  .posts-sidebar {
+    font-size: 16px;
+  }
+
+  .posts-sidebar h3 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+
+  .sidebar-section {
+    margin-bottom: 30px;
+  }
+
+  .categories ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .categories li {
+    color: rgba(0, 0, 0, 0.8);
+    margin-bottom: 0;
+  }
+
+  .categories li>a {
+    border-bottom: none;
+  }
+
+  .categories li>a:hover {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  }
+
+  .categories .active {
+    font-weight: 600;
+  }
+
+  .categories .category-count {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+
+  @media(min-width: 768px) {
+    .posts-list .post-preview h2 {
+      font-size: 26px;
+    }
+    .posts-list .post-preview .thumbnail {
+      float: right;
+      width: 30%;
+      margin-bottom: 0;
+    }
+    .posts-list .post-preview .description {
+      float: left;
+      width: 45%;
+    }
+    .posts-list .post-preview .metadata {
+      float: left;
+      width: 20%;
+      margin-top: 8px;
+    }
+    .posts-list .post-preview p {
+      margin: 0 0 12px 0;
+      line-height: 1.5em;
+      font-size: 16px;
+    }
+    .posts-with-sidebar .posts-list {
+      float: left;
+      width: 75%;
+    }
+    .posts-with-sidebar .posts-sidebar {
+      float: right;
+      width: 20%;
+      margin-top: 60px;
+      padding-top: 24px;
+      padding-bottom: 24px;
+    }
+  }
+
+
+  /* Improve display for browsers without grid (IE/Edge <= 15) */
+
+  .downlevel {
+    line-height: 1.6em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+  }
+
+  .downlevel .d-title {
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .downlevel .d-title h1 {
+    font-size: 50px;
+    font-weight: 700;
+    line-height: 1.1em;
+    margin: 0 0 0.5rem;
+  }
+
+  .downlevel .d-title p {
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1.55em;
+    margin-top: 0;
+  }
+
+  .downlevel .d-byline {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.8em;
+  }
+
+  .downlevel .section-separator {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .downlevel .d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+
+
+  .downlevel .d-appendix {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.5);
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+
+  .downlevel .footnotes ol {
+    padding-left: 13px;
+  }
+
+  .downlevel .base-grid,
+  .downlevel .distill-header,
+  .downlevel .d-title,
+  .downlevel .d-abstract,
+  .downlevel .d-article,
+  .downlevel .d-appendix,
+  .downlevel .distill-appendix,
+  .downlevel .d-byline,
+  .downlevel .d-footnote-list,
+  .downlevel .d-citation-list,
+  .downlevel .distill-footer,
+  .downlevel .appendix-bottom,
+  .downlevel .posts-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  @media(min-width: 768px) {
+    .downlevel .base-grid,
+    .downlevel .distill-header,
+    .downlevel .d-title,
+    .downlevel .d-abstract,
+    .downlevel .d-article,
+    .downlevel .d-appendix,
+    .downlevel .distill-appendix,
+    .downlevel .d-byline,
+    .downlevel .d-footnote-list,
+    .downlevel .d-citation-list,
+    .downlevel .distill-footer,
+    .downlevel .appendix-bottom,
+    .downlevel .posts-container {
+    padding-left: 150px;
+    padding-right: 150px;
+    max-width: 900px;
+  }
+  }
+
+  .downlevel pre code {
+    display: block;
+    border-left: 2px solid rgba(0, 0, 0, .1);
+    padding: 0 0 0 20px;
+    font-size: 14px;
+  }
+
+  .downlevel code, .downlevel pre {
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+
+  .downlevel .posts-list .post-preview {
+    color: inherit;
+  }
+
+
+
+  </style>
+
+  <script type="application/javascript">
+
+  function is_downlevel_browser() {
+    if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
+                                   window.navigator.userAgent)) {
+      return true;
+    } else {
+      return window.load_distill_framework === undefined;
+    }
+  }
+
+  // show body when load is complete
+  function on_load_complete() {
+
+    // add anchors
+    if (window.anchors) {
+      window.anchors.options.placement = 'left';
+      window.anchors.add('d-article > h2, d-article > h3, d-article > h4, d-article > h5');
+    }
+
+
+    // set body to visible
+    document.body.style.visibility = 'visible';
+
+    // force redraw for leaflet widgets
+    if (window.HTMLWidgets) {
+      var maps = window.HTMLWidgets.findAll(".leaflet");
+      $.each(maps, function(i, el) {
+        var map = this.getMap();
+        map.invalidateSize();
+        map.eachLayer(function(layer) {
+          if (layer instanceof L.TileLayer)
+            layer.redraw();
+        });
+      });
+    }
+
+    // trigger 'shown' so htmlwidgets resize
+    $('d-article').trigger('shown');
+  }
+
+  function init_distill() {
+
+    init_common();
+
+    // create front matter
+    var front_matter = $('<d-front-matter></d-front-matter>');
+    $('#distill-front-matter').wrap(front_matter);
+
+    // create d-title
+    $('.d-title').changeElementType('d-title');
+
+    // create d-byline
+    var byline = $('<d-byline></d-byline>');
+    $('.d-byline').replaceWith(byline);
+
+    // create d-article
+    var article = $('<d-article></d-article>');
+    $('.d-article').wrap(article).children().unwrap();
+
+    // move posts container into article
+    $('.posts-container').appendTo($('d-article'));
+
+    // create d-appendix
+    $('.d-appendix').changeElementType('d-appendix');
+
+    // flag indicating that we have appendix items
+    var appendix = $('.appendix-bottom').children('h3').length > 0;
+
+    // replace footnotes with <d-footnote>
+    $('.footnote-ref').each(function(i, val) {
+      appendix = true;
+      var href = $(this).attr('href');
+      var id = href.replace('#', '');
+      var fn = $('#' + id);
+      var fn_p = $('#' + id + '>p');
+      fn_p.find('.footnote-back').remove();
+      var text = fn_p.html();
+      var dtfn = $('<d-footnote></d-footnote>');
+      dtfn.html(text);
+      $(this).replaceWith(dtfn);
+    });
+    // remove footnotes
+    $('.footnotes').remove();
+
+    // move refs into #references-listing
+    $('#references-listing').replaceWith($('#refs'));
+
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      var id = $(this).attr('id');
+      $('.d-contents a[href="#' + id + '"]').parent().remove();
+      appendix = true;
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
+    });
+
+    // show d-appendix if we have appendix content
+    $("d-appendix").css('display', appendix ? 'grid' : 'none');
+
+    // localize layout chunks to just output
+    $('.layout-chunk').each(function(i, val) {
+
+      // capture layout
+      var layout = $(this).attr('data-layout');
+
+      // apply layout to markdown level block elements
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
+      elements.each(function(i, el) {
+        var layout_div = $('<div class="' + layout + '"></div>');
+        if (layout_div.hasClass('shaded')) {
+          var shaded_content = $('<div class="shaded-content"></div>');
+          $(this).wrap(shaded_content);
+          $(this).parent().wrap(layout_div);
+        } else {
+          $(this).wrap(layout_div);
+        }
+      });
+
+
+      // unwrap the layout-chunk div
+      $(this).children().unwrap();
+    });
+
+    // remove code block used to force  highlighting css
+    $('.distill-force-highlighting-css').parent().remove();
+
+    // remove empty line numbers inserted by pandoc when using a
+    // custom syntax highlighting theme
+    $('code.sourceCode a:empty').remove();
+
+    // load distill framework
+    load_distill_framework();
+
+    // wait for window.distillRunlevel == 4 to do post processing
+    function distill_post_process() {
+
+      if (!window.distillRunlevel || window.distillRunlevel < 4)
+        return;
+
+      // hide author/affiliations entirely if we have no authors
+      var front_matter = JSON.parse($("#distill-front-matter").html());
+      var have_authors = front_matter.authors && front_matter.authors.length > 0;
+      if (!have_authors)
+        $('d-byline').addClass('hidden');
+
+      // article with toc class
+      $('.d-contents').parent().addClass('d-article-with-toc');
+
+      // strip links that point to #
+      $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
+
+      // add orcid ids
+      $('.authors-affiliations').find('.author').each(function(i, el) {
+        var orcid_id = front_matter.authors[i].orcidID;
+        if (orcid_id) {
+          var a = $('<a></a>');
+          a.attr('href', 'https://orcid.org/' + orcid_id);
+          var img = $('<img></img>');
+          img.addClass('orcid-id');
+          img.attr('alt', 'ORCID ID');
+          img.attr('src','data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg==');
+          a.append(img);
+          $(this).append(a);
+        }
+      });
+
+      // hide elements of author/affiliations grid that have no value
+      function hide_byline_column(caption) {
+        $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
+      }
+
+      // affiliations
+      var have_affiliations = false;
+      for (var i = 0; i<front_matter.authors.length; ++i) {
+        var author = front_matter.authors[i];
+        if (author.affiliation !== "&nbsp;") {
+          have_affiliations = true;
+          break;
+        }
+      }
+      if (!have_affiliations)
+        $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
+
+      // published date
+      if (!front_matter.publishedDate)
+        hide_byline_column("Published");
+
+      // document object identifier
+      var doi = $('d-byline').find('h3:contains("DOI")');
+      var doi_p = doi.next().empty();
+      if (!front_matter.doi) {
+        // if we have a citation and valid citationText then link to that
+        if ($('#citation').length > 0 && front_matter.citationText) {
+          doi.html('Citation');
+          $('<a href="#citation"></a>')
+            .text(front_matter.citationText)
+            .appendTo(doi_p);
+        } else {
+          hide_byline_column("DOI");
+        }
+      } else {
+        $('<a></a>')
+           .attr('href', "https://doi.org/" + front_matter.doi)
+           .html(front_matter.doi)
+           .appendTo(doi_p);
+      }
+
+       // change plural form of authors/affiliations
+      if (front_matter.authors.length === 1) {
+        var grid = $('.authors-affiliations');
+        grid.children('h3:contains("Authors")').text('Author');
+        grid.children('h3:contains("Affiliations")').text('Affiliation');
+      }
+
+      // remove d-appendix and d-footnote-list local styles
+      $('d-appendix > style:first-child').remove();
+      $('d-footnote-list > style:first-child').remove();
+
+      // move appendix-bottom entries to the bottom
+      $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
+      $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
+
+      // clear polling timer
+      clearInterval(tid);
+
+      // show body now that everything is ready
+      on_load_complete();
+    }
+
+    var tid = setInterval(distill_post_process, 50);
+    distill_post_process();
+
+  }
+
+  function init_downlevel() {
+
+    init_common();
+
+     // insert hr after d-title
+    $('.d-title').after($('<hr class="section-separator"/>'));
+
+    // check if we have authors
+    var front_matter = JSON.parse($("#distill-front-matter").html());
+    var have_authors = front_matter.authors && front_matter.authors.length > 0;
+
+    // manage byline/border
+    if (!have_authors)
+      $('.d-byline').remove();
+    $('.d-byline').after($('<hr class="section-separator"/>'));
+    $('.d-byline a').remove();
+
+    // remove toc
+    $('.d-contents').remove();
+
+    // move appendix elements
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
+    });
+
+
+    // inject headers into references and footnotes
+    var refs_header = $('<h3></h3>');
+    refs_header.text('References');
+    $('#refs').prepend(refs_header);
+
+    var footnotes_header = $('<h3></h3');
+    footnotes_header.text('Footnotes');
+    $('.footnotes').children('hr').first().replaceWith(footnotes_header);
+
+    // move appendix-bottom entries to the bottom
+    $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
+    $('.appendix-bottom').remove();
+
+    // remove appendix if it's empty
+    if ($('.d-appendix').children().length === 0)
+      $('.d-appendix').remove();
+
+    // prepend separator above appendix
+    $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
+
+    // trim code
+    $('pre>code').each(function(i, val) {
+      $(this).html($.trim($(this).html()));
+    });
+
+    // move posts-container right before article
+    $('.posts-container').insertBefore($('.d-article'));
+
+    $('body').addClass('downlevel');
+
+    on_load_complete();
+  }
+
+
+  function init_common() {
+
+    // jquery plugin to change element types
+    (function($) {
+      $.fn.changeElementType = function(newType) {
+        var attrs = {};
+
+        $.each(this[0].attributes, function(idx, attr) {
+          attrs[attr.nodeName] = attr.nodeValue;
+        });
+
+        this.replaceWith(function() {
+          return $("<" + newType + "/>", attrs).append($(this).contents());
+        });
+      };
+    })(jQuery);
+
+    // prevent underline for linked images
+    $('a > img').parent().css({'border-bottom' : 'none'});
+
+    // mark non-body figures created by knitr chunks as 100% width
+    $('.layout-chunk').each(function(i, val) {
+      var figures = $(this).find('img, .html-widget');
+      if ($(this).attr('data-layout') !== "l-body") {
+        figures.css('width', '100%');
+      } else {
+        figures.css('max-width', '100%');
+        figures.filter("[width]").each(function(i, val) {
+          var fig = $(this);
+          fig.css('width', fig.attr('width') + 'px');
+        });
+
+      }
+    });
+
+    // auto-append index.html to post-preview links in file: protocol
+    // and in rstudio ide preview
+    $('.post-preview').each(function(i, val) {
+      if (window.location.protocol === "file:")
+        $(this).attr('href', $(this).attr('href') + "index.html");
+    });
+
+    // get rid of index.html references in header
+    if (window.location.protocol !== "file:") {
+      $('.distill-site-header a[href]').each(function(i,val) {
+        $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
+      });
+    }
+
+    // add class to pandoc style tables
+    $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
+    $('.kable-table').children('table').addClass('pandoc-table');
+
+    // add figcaption style to table captions
+    $('caption').parent('table').addClass("figcaption");
+
+    // initialize posts list
+    if (window.init_posts_list)
+      window.init_posts_list();
+
+    // implmement disqus comment link
+    $('.disqus-comment-count').click(function() {
+      window.headroom_prevent_pin = true;
+      $('#disqus_thread').toggleClass('hidden');
+      if (!$('#disqus_thread').hasClass('hidden')) {
+        var offset = $(this).offset();
+        $(window).resize();
+        $('html, body').animate({
+          scrollTop: offset.top - 35
+        });
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (is_downlevel_browser())
+      init_downlevel();
+    else
+      window.addEventListener('WebComponentsReady', init_distill);
+  });
+
+  </script>
+
+  <!--/radix_placeholder_distill-->
+  <script src="1class_files/header-attrs-2.11/header-attrs.js"></script>
+  <script src="1class_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <script src="1class_files/popper-2.6.0/popper.min.js"></script>
+  <link href="1class_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="1class_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="1class_files/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="1class_files/anchor-4.2.2/anchor.min.js"></script>
+  <script src="1class_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="1class_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="1class_files/distill-2.2.21/template.v2.js"></script>
+  <!--radix_placeholder_site_in_header-->
+  <!--/radix_placeholder_site_in_header-->
+
+
+</head>
+
+<body>
+
+<!--radix_placeholder_front_matter-->
+
+<script id="distill-front-matter" type="text/json">
+{"title":"Intro_scRNAseq_QC_PCA","description":"The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA","authors":[{"author":"Tyler Matheny","authorURL":{},"affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2021-11-01T00:00:00.000+00:00","citationText":"Matheny, 2021"}
+</script>
+
+<!--/radix_placeholder_front_matter-->
+<!--radix_placeholder_navigation_before_body-->
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="d-title">
+<h1>Intro_scRNAseq_QC_PCA</h1>
+<!--radix_placeholder_categories-->
+<!--/radix_placeholder_categories-->
+<p>The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA</p>
+</div>
+
+<div class="d-byline">
+  Tyler Matheny true 
+  
+<br/>2021-11-01
+</div>
+
+<div class="d-article">
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<h2 id="intro-to-rbi">intro to RBI</h2>
+<p><strong><a href="mailto:rbi.fellows@ucdenver.edu" class="email">rbi.fellows@ucdenver.edu</a></strong>,</p>
+<p>RC1 South room9101</p>
+<p><a href="https://rnabioco.github.io/rbi-project-summary/office-hours.html">office hours on Thursday afternoons</a></p>
+<h2 id="welcome">Welcome</h2>
+<figure>
+<img src="img/slide1.png" width="600" alt="from seurat pbmc example" /><figcaption aria-hidden="true">from seurat pbmc example</figcaption>
+</figure>
+<p><img src="img/slide2.png" width="800" /></p>
+<h2 id="a-couple-notes-on-programming">A couple notes on programming</h2>
+<p>For some, or many of you, this might be your first time programming. Since you are taking this course, I probably don’t have to spend a ton of time convincing you of the benefits of learning how to code. But I want to briefly touch on just a few of the benefits before proceeding with the lecture material.</p>
+<figure>
+<img src="img/slide3.png" width="600" alt="benefits" /><figcaption aria-hidden="true">benefits</figcaption>
+</figure>
+<figure>
+<img src="img/slide4.png" width="600" alt="learning curve" /><figcaption aria-hidden="true">learning curve</figcaption>
+</figure>
+<h2 id="languages-of-bioinformatics">Languages of Bioinformatics</h2>
+<p>When it comes to bioinformatics, there are really 3 main languages/frameworks you will consistantly work with. These are: bash, R, and python.</p>
+<figure>
+<img src="img/slide5.png" width="600" alt="languages/frameworks" /><figcaption aria-hidden="true">languages/frameworks</figcaption>
+</figure>
+<h2 id="why-r">Why R?</h2>
+<p>In this course, we will almost exclusively be working with R. R is a great first language to learn, because it is primarily used for data cleaning, analysis, visualization, and statistics. It is also a great place to start, because many bioinformatics packages are written in R. Finally, if you have done a lot of work in Excel (as most scientists have), the fundamental concepts and functions in R, should be fairly*** straightforward to pick up.</p>
+<p>***with some practice</p>
+<p><img src="img/slide6.png" width="600" /></p>
+<h2 id="where-to-go-when-you-get-stuck">Where to go when you get stuck</h2>
+<p>One misconception I had when I started programming was that programmers have the knowledge to carry out most analyses prior to writing code. Hollywood has created this archetype of the ‘whiz-kid’ or ‘misunderstood genius hacker’ who write code at lightning speed and who just know what code needs to be written and exactly how to write it. This is not how it works in the real world. Most programmers I know spend far more time googling and thinking than writing code.</p>
+<p>You are going to get stuck a lot.</p>
+<p>You are going to get a lot of error messages.</p>
+<p>You are going to make mistakes.</p>
+<h3 id="the-key-is-to-stick-with-it-and-to-know-where-to-go-when-you-have-problems">The key is to stick with it and to know where to go when you have problems</h3>
+<ol type="1">
+<li><p>Stack overflow</p></li>
+<li><p>RBI</p></li>
+<li><p>Online tutorials</p></li>
+<li><p>Biostars and SeqAnswers</p></li>
+<li><p>Papers</p></li>
+</ol>
+<p>… Now that we’ve covered an overview of programming tips, let’s switch gears and switch gears to the reason you are all here</p>
+<h1 id="single-cell-sequencing">Single-cell Sequencing</h1>
+<p>RNA seq is similar to a fruit smoothie. The individual fruits (strawberries, bananas, apples, oranges) that would make up the smoothie would be analogous to the different cell types in a population. You blend up the fruits into the smoothie (lyse cells, extract RNA, and make libraries), and then you drink it (run it on a sequencer).</p>
+<p>But when you drink a smoothie, its harder to tell which flavors came from which fruits than if you were to eat each fruit individually. Especially if you had something unexpected, like kale***, in the smoothie. This is analogous to bulk RNA-sequencing. In bulk RNA seq, you lose all information about the cell of origin for each read. If you wanted to know the RNA expression in a certain cell type, you had to try to purify that cell type from the smoothie and sequence it. Thereby losing all information about other cell types in your samples.</p>
+<p>***yuck</p>
+<p>Enter single cell seq. Single cell sequencing technologies allow a researcher to tag individual cells with a unique sequence, called a barcode, that allows you to know which cell a read originates from. Therefore, you can computationally parse which reads came.</p>
+<h2 id="commonly-used-paradigms-for-single-cell-preps.">Commonly used paradigms for single cell preps.</h2>
+<h3 id="droplet-based">Droplet based</h3>
+<p>Through microfluics wizardy, cell gets loaded into a droplet with a bead with all the DNA bits needed to do the transcript barcoding</p>
+<figure>
+<img src="img/slide7.png" width="600" alt="TECHNOLOGICAL AWESOMENESS" /><figcaption aria-hidden="true">TECHNOLOGICAL AWESOMENESS</figcaption>
+</figure>
+<h2 id="whats-in-the-drop">What’s in the drop?</h2>
+<p>In theory, each drop will have (1) a cell and (2) a DNA bit that will do the barcoding. This DNA bit contains a unique barcode, a UMI (for correcting PCR amplification), and an oligodT stretch (because mRNA).</p>
+<figure>
+<img src="img/slide10.jpg" width="600" alt="T3 prime 10x chemistry" /><figcaption aria-hidden="true">T3 prime 10x chemistry</figcaption>
+</figure>
+<h3 id="combinatorial-indexing">Combinatorial Indexing</h3>
+<p>Through some clever (simple) math: (1) a small number of cells are loaded into each well a multi-well plate and barcoded. Each well has a different barcode (2) Then they are pooled back together (3) The process is repeated with a plate containing another set of barcodes. The probability that 2 cells pick up the exact same combintation of barcodes becomes vanishingly small.</p>
+<figure>
+<img src="img/slide8.jpg" width="600" alt="MATHEMATICAL AWESOMENESS" /><figcaption aria-hidden="true">MATHEMATICAL AWESOMENESS</figcaption>
+</figure>
+<h3 id="sci-fi-seq">sci-fi seq</h3>
+<p>Combines the two methods and overloads the droplets</p>
+<figure>
+<img src="img/slide9.png" width="600" alt="AWESOMENESS**2" /><figcaption aria-hidden="true">AWESOMENESS**2</figcaption>
+</figure>
+<h2 id="tradeoffs-between-bulk-rna-seq-vs.-single-cell-seq">Tradeoffs between bulk RNA seq vs. single-cell seq</h2>
+<p>“There are no solutions, only trade-offs”. And in the case of bulk RNA seq vs single-cell RNA seq, this is certainly true… for now. The information you gain about the cellular origin read from comes at a price:</p>
+<ol type="1">
+<li><p>only a small portion of the mRNAs from each cell are captured</p></li>
+<li><p>low number of detectable genes, might not detect low expressing genes at all</p></li>
+<li><p>little info outside of gene counts</p></li>
+</ol>
+<h3 id="think-about-the-question-you-are-trying-to-answer-before-running-your-experiment">Think about the question you are trying to answer before running your experiment</h3>
+<ol type="1">
+<li><p>Almost all sequencing experiments fail or succeed at the design step.</p></li>
+<li><p>Programming cannot fix bad data. Crap in crap out.</p></li>
+</ol>
+<h3 id="alignment-pipelines">alignment pipelines</h3>
+<p><a href="https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation">cellranger</a> performs alignment, filtering, UMI counting, clustering, and gene expression analysis.</p>
+<p>Alternatives such as <a href="https://salmon.readthedocs.io/en/latest/alevin.html">Alevin</a>, <a href="https://github.com/alexdobin/STAR/releases">STARsolo</a>, <a href="https://www.kallistobus.tools/">Kallisto</a></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># in terminal</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">cellranger</span> count <span class="at">--id</span><span class="op">=</span>123 <span class="dt">\ </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                 <span class="ex">--transcriptome=/refdata-cellranger-GRCh38-3.0.0</span> <span class="dt">\ </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                 <span class="co"># build new transcriptome if you have GFP/RFP/transgene</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                 <span class="ex">--fastqs=/home/runs/HAT7ADXX/outs/fastq_path</span> <span class="dt">\ </span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                 <span class="co"># a list of fastqs, a folder, or pass table via csv file</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                 <span class="ex">--sample=mysample</span> </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                 <span class="co"># will need additional arguments for feature barcoding</span></span></code></pre></div>
+</div>
+<p>output folder structure</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>KO_1_CDNA</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">|--</span> KO_1_CDNA.mri.tgz</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="sc">|--</span> SC_RNA_COUNTER_CS</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="sc">|</span>   <span class="er">|</span><span class="sc">--</span> CLOUPE_PREPROCESS</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="sc">|</span>   <span class="er">|</span><span class="sc">--</span> EXPAND_SAMPLE_DEF</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="sc">|</span>   <span class="er">|</span><span class="sc">--</span> SC_RNA_COUNTER</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="sc">|</span>   <span class="st">`</span><span class="at">-- fork0</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _cmdline</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _filelist</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _finalstate</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _invocation</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _jobmode</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _log</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _mrosource</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _perf</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _sitecheck</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _tags</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _timestamp</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _uuid</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _vdrkill</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="at">|-- _versions</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="sc">--</span> outs</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> analysis</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> cloupe.cloupe <span class="co"># cloupe file for browser view</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> filtered_feature_bc_matrix <span class="co"># use this fold for seurat</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> filtered_feature_bc_matrix.h5</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> metrics_summary.csv</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> molecule_info.h5</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> possorted_genome_bam.bam</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> possorted_genome_bam.bam.bai</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> raw_feature_bc_matrix <span class="co"># or this for seurat</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="sc">|--</span> raw_feature_bc_matrix.h5</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">-- web_summary.html # qc summary</span></span></code></pre></div>
+</div>
+<p>~ 5-8 hours per sample on biochem department cluster “Bodhi”</p>
+<p>theoretically can be ran locally on linux, but will require at least 32GB of RAM</p>
+<p>other campus options include Rosalind, AWS <a href="https://github.com/rnabioco/cellrangerAWS" class="uri">https://github.com/rnabioco/cellrangerAWS</a></p>
+<p>cellranger output <a href="http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_web_summary.html">html</a> and <a href="http://cf.10xgenomics.com/samples/cell-exp/3.1.0/5k_pbmc_protein_v3/5k_pbmc_protein_v3_cloupe.cloupe">loupe</a> files</p>
+<h2 id="reading-and-making-umi-barcode-elbow-plots">reading and making UMI-barcode elbow plots</h2>
+<figure>
+<img src="img/10xV3_seq.png" width="600" alt="model of final 10x library" /><figcaption aria-hidden="true">model of final 10x library</figcaption>
+</figure>
+<p>The total UMI (unique molecular identifier - represent each transcript) of a cell barcode is used to rank the barcodes determine the UMI threshold for signal vs noise. A plot is generated for cellranger html output, but will also be useful in other situations like hashing and CITE-seq.</p>
+<figure>
+<img src="img/elbowcomp.png" width="400" alt="example of good and bad data" /><figcaption aria-hidden="true">example of good and bad data</figcaption>
+</figure>
+<p>for a standard 10x scRNAseq run:</p>
+<p>        expected range of x axis (barcode) : ~ 10^5 (if using ggplot to visualize, filter)</p>
+<p>        expected inflection point of x axis (cell number): ~ # of loaded cells / 2</p>
+<p>        expected range of y axis (UMI_counts) : ~ 10^4</p>
+<p>        expected inflection point of y axis (cutoff UMI count): ~ 1000</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+<span class='co'># use "raw" instead of "filtered" cellranger output folder</span>
+<span class='va'>data_url</span> <span class='op'>=</span> <span class='st'>"https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"</span>
+<span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/connections.html'>url</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>data_url</span>, <span class='st'>"raw_matrix.rds"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># all genes x all barcodes</span>
+<span class='va'>counts</span> <span class='op'>&lt;-</span> <span class='fu'>Matrix</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/colSums.html'>colSums</a></span><span class='op'>(</span><span class='va'>m1</span><span class='op'>)</span> <span class='co'># calculate total UMI read number for each cell barcode</span>
+<span class='va'>countdf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='va'>counts</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'>as_tibble</span><span class='op'>(</span>rownames <span class='op'>=</span> <span class='st'>"barcode"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>counts</span> <span class='op'>&gt;=</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='co'># throw out cell barcodes with 1 or less UMI, this is mainly for time purposes</span>
+  <span class='fu'>arrange</span><span class='op'>(</span><span class='fu'>desc</span><span class='op'>(</span><span class='va'>counts</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='co'># arrange by descending order</span>
+  <span class='fu'>mutate</span><span class='op'>(</span>rank <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fu'>n</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># rank</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>countdf</span><span class='op'>)</span> <span class='co'># barcodes now ranked by UMI counts</span>
+</code></pre>
+</div>
+<pre><code>#&gt; # A tibble: 6 × 3
+#&gt;   barcode          counts  rank
+#&gt;   &lt;chr&gt;             &lt;dbl&gt; &lt;int&gt;
+#&gt; 1 GCAGCCACATACCGTA  40745     1
+#&gt; 2 ATGGAGGGTGGTAACG  20916     2
+#&gt; 3 GTAACCATCGCTTGAA  19958     3
+#&gt; 4 TTCATGTGTCGTGTTA  19765     4
+#&gt; 5 GAATAGACATCCTGTC  18494     5
+#&gt; 6 GTCTCACGTTGGCCGT  17828     6</code></pre>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>countdf</span>, <span class='fu'>aes</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>rank</span>, y <span class='op'>=</span> <span class='va'>counts</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_point</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>labs</span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>"barcodes"</span>, y <span class='op'>=</span> <span class='st'>"UMI_counts"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>theme_classic</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>scale_x_log10</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>scale_y_log10</span><span class='op'>(</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-3-1.png" width="288" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="creating-a-seurat-object">Creating a Seurat object</h2>
+<p>Single-cell RNA-seq counts are usually stored as a sparse matrix due to the high percentage of zeros. In a sparse matrix zeros are removed and only non-zero values are stored, which saves memory and speeds up operations.</p>
+<p>The <code>Read10X</code> function can be used with the output directory generated by 10X Cell Ranger to load the counts data as a sparse matrix.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># single cell analysis suite</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://satijalab.org/seurat'>Seurat</a></span><span class='op'>)</span>
+<span class='co'># data frame manipulation and %&gt;% functions</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Import matrix of counts</span>
+<span class='va'>pbmc.data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/Read10X.html'>Read10X</a></span><span class='op'>(</span>data.dir <span class='op'>=</span> <span class='st'>"filtered_gene_bc_matrices/hg19/"</span><span class='op'>)</span>
+
+<span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/SeuratObject/man/CreateSeuratObject.html'>CreateSeuratObject</a></span><span class='op'>(</span>counts <span class='op'>=</span> <span class='va'>pbmc.data</span>, project <span class='op'>=</span> <span class='st'>"pbmc3k"</span>, min.cells <span class='op'>=</span> <span class='fl'>3</span>, min.features <span class='op'>=</span> <span class='fl'>200</span><span class='op'>)</span>
+ 
+<span class='co'>#min.cells- Include features detected in at least this many cells. Will subset the counts matrix as well. To reintroduce excluded features, create a new object with a lower cutoff.</span>
+
+
+<span class='co'>#min.features- Include cells where at least this many features are detected.</span>
+
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>@</span><span class='va'>meta.data</span>, <span class='fl'>5</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt; AAACATACAACCAC-1     pbmc3k       2419          779
+#&gt; AAACATTGAGCTAC-1     pbmc3k       4903         1352
+#&gt; AAACATTGATCAGC-1     pbmc3k       3147         1129
+#&gt; AAACCGTGCTTCCG-1     pbmc3k       2639          960
+#&gt; AAACCGTGTATGCG-1     pbmc3k        980          521</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># lets look at come of the count data.  It is called a sparse matrix because zeros are represented as '.' saves memory</span>
+<span class='va'>pbmc.data</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"CD3D"</span>, <span class='st'>"TCL1A"</span>, <span class='st'>"MS4A1"</span><span class='op'>)</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>30</span><span class='op'>]</span>
+</code></pre>
+</div>
+<pre><code>#&gt; 3 x 30 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                                                    
+#&gt; CD3D  4 . 10 . . 1 2 3 1 . . 2 7 1 . . 1 3 . 2  3 . . . . . 3 4 1 5
+#&gt; TCL1A . .  . . . . . . 1 . . . . . . . . . . .  . 1 . . . . . . . .
+#&gt; MS4A1 . 6  . . . . . . 1 1 1 . . . . . . . . . 36 1 2 . . 2 . . . .</code></pre>
+</div>
+<h2 id="digging-into-the-seurat-object.">Digging into the seurat object.</h2>
+<p>At the top level, the Seurat object serves as a collection of Assay and DimReduc objects, representing expression data and dimensionality reductions of the expression data, respectively. The Assay objects are designed to hold expression data of a single type, such as RNA-seq gene expression, CITE-seq ADTs, cell hashtags, or imputed gene values. DimReduc objects represent transformations of the data contained within the Assay object(s) via various dimensional reduction techniques such as PCA.</p>
+See : <a href="https://github.com/satijalab/seurat/wiki/Seurat#slots" class="uri">https://github.com/satijalab/seurat/wiki/Seurat#slots</a> for a more detailed explanation of the Seurat object
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r">
+<span class='va'>pbmc</span>
+</code></pre>
+</div>
+<pre><code>#&gt; An object of class Seurat 
+#&gt; 13714 features across 2700 samples within 1 assay 
+#&gt; Active assay: RNA (13714 features, 0 variable features)</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># dim provides both nrow and ncol at the same time</span>
+<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>pbmc</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; [1] 13714  2700</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Import matrix of counts</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>pbmc</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; [1] &quot;AL627309.1&quot;    &quot;AP006222.2&quot;    &quot;RP11-206L10.2&quot; &quot;RP11-206L10.9&quot;
+#&gt; [5] &quot;LINC00115&quot;     &quot;NOC2L&quot;</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Import matrix of counts</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>pbmc</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; [1] &quot;AAACATACAACCAC-1&quot; &quot;AAACATTGAGCTAC-1&quot; &quot;AAACATTGATCAGC-1&quot;
+#&gt; [4] &quot;AAACCGTGCTTCCG-1&quot; &quot;AAACCGTGTATGCG-1&quot; &quot;AAACGCACTGGTAC-1&quot;</code></pre>
+</div>
+Pulling specific Assay, DimReduc, or Graph objects can be done with the double [[ extract operator. Adding new objects to a Seurat object is also done with the double [[ extract operator; Seurat will figure out where in the Seurat object a new associated object belongs.
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># A vector of names of associated objects can be had with the names function.</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>pbmc</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; [1] &quot;RNA&quot;</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># IThese can be passed to the double [[ extract operator to pull them from the Seurat object</span>
+<span class='va'>pbmc</span><span class='op'>[[</span><span class='st'>'RNA'</span><span class='op'>]</span><span class='op'>]</span>
+</code></pre>
+</div>
+<pre><code>#&gt; Assay data with 13714 features for 2700 cells
+#&gt; First 10 features:
+#&gt;  AL627309.1, AP006222.2, RP11-206L10.2, RP11-206L10.9,
+#&gt; LINC00115, NOC2L, KLHL17, PLEKHN1, RP11-54O7.17, HES4</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Looking at the metadata.  We will add another column to this later when we look at the percentage of reads per cell mapping to mitochondrial transcripts</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>@</span><span class='va'>meta.data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt;                  orig.ident nCount_RNA nFeature_RNA
+#&gt; AAACATACAACCAC-1     pbmc3k       2419          779
+#&gt; AAACATTGAGCTAC-1     pbmc3k       4903         1352
+#&gt; AAACATTGATCAGC-1     pbmc3k       3147         1129
+#&gt; AAACCGTGCTTCCG-1     pbmc3k       2639          960
+#&gt; AAACCGTGTATGCG-1     pbmc3k        980          521
+#&gt; AAACGCACTGGTAC-1     pbmc3k       2163          781</code></pre>
+</div>
+<h2 id="qc-and-selecting-cells-for-further-analysis">QC and selecting cells for further analysis</h2>
+<p>Seurat allows you to easily explore QC metrics and filter cells based on any user-defined criteria. A few QC metrics commonly used by the community include</p>
+<p>The number of unique genes detected in each cell.</p>
+<p>Low-quality cells or empty droplets will often have very few genes.</p>
+<p>Cell doublets or multiplets may exhibit an aberrantly high gene count.</p>
+<p>Similarly, the total number of molecules detected within a cell (correlates strongly with unique genes)</p>
+<h2 id="filtering-mito-genes">Filtering Mito genes</h2>
+<p>The percentage of reads that map to the mitochondrial genome is indicative of dying cells.</p>
+<p>Low-quality / dying cells often exhibit extensive mitochondrial contamination.</p>
+<p>We calculate mitochondrial QC metrics with the PercentageFeatureSet() function, which calculates the percentage of counts originating from a set of features We use the set of all genes starting with MT- as a set of mitochondrial genes</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#We will add a column to the metadata calculating the percentage of genes mapping to mitochondrial transcripts</span>
+<span class='va'>pbmc</span><span class='op'>[[</span><span class='st'>"percent.mt"</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/PercentageFeatureSet.html'>PercentageFeatureSet</a></span><span class='op'>(</span><span class='va'>pbmc</span>, pattern <span class='op'>=</span> <span class='st'>"^MT-"</span><span class='op'>)</span>
+<span class='co'>#We can now see that the metadata now includes the percentage of mitochondrial genes</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>@</span><span class='va'>meta.data</span>, <span class='fl'>5</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt;                  orig.ident nCount_RNA nFeature_RNA percent.mt
+#&gt; AAACATACAACCAC-1     pbmc3k       2419          779  3.0177759
+#&gt; AAACATTGAGCTAC-1     pbmc3k       4903         1352  3.7935958
+#&gt; AAACATTGATCAGC-1     pbmc3k       3147         1129  0.8897363
+#&gt; AAACCGTGCTTCCG-1     pbmc3k       2639          960  1.7430845
+#&gt; AAACCGTGTATGCG-1     pbmc3k        980          521  1.2244898</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#We can also peak into the metadata by examining just a particular column.  Similar to dplyr functions.  Try erasing 'percent mito' and tab completing</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>pbmc</span><span class='op'>$</span><span class='va'>percent.mt</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACATTGATCAGC-1 AAACCGTGCTTCCG-1 
+#&gt;        3.0177759        3.7935958        0.8897363        1.7430845 
+#&gt; AAACCGTGTATGCG-1 AAACGCACTGGTAC-1 
+#&gt;        1.2244898        1.6643551</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Visualize QC metrics as a violin plot</span>
+<span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/VlnPlot.html'>VlnPlot</a></span><span class='op'>(</span><span class='va'>pbmc</span>, features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nFeature_RNA"</span>, <span class='st'>"nCount_RNA"</span>, <span class='st'>"percent.mt"</span><span class='op'>)</span>, ncol <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-16-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="subsetting">Subsetting</h2>
+<p>We want to remove low quality cells for our downstream analyses. Using the plot above, we can draw some cutoffs by eye. Here we will filter out cells by getting rid of cells that have unique feature counts over 2,500 or less than 200. We also filter cells that have &gt;5% mitochondrial counts</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span><span class='op'>(</span><span class='va'>pbmc</span>, subset <span class='op'>=</span> <span class='va'>nFeature_RNA</span> <span class='op'>&gt;</span> <span class='fl'>200</span> <span class='op'>&amp;</span> <span class='va'>nFeature_RNA</span> <span class='op'>&lt;</span> <span class='fl'>2500</span> <span class='op'>&amp;</span> <span class='va'>percent.mt</span> <span class='op'>&lt;</span> <span class='fl'>5</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#Note that some cells were filtered out- We started with 2700</span>
+<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>pbmc</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; [1] 13714  2638</code></pre>
+</div>
+<h2 id="normaliztion">Normaliztion</h2>
+<p>After removing unwanted cells from the dataset, the next step is to normalize the data. By default, we employ a global-scaling normalization method “LogNormalize” that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 by default), and log-transforms the result. Normalized values are stored in pbmc[[“RNA”]]<span class="citation" data-cites="data">@data</span>.</p>
+<p>Think of this step as normalizing expression of each transcripts to the read depth for all genes in that cell. The log transofrmation will compress lowly and highly expressed genes to a more similar scale</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/NormalizeData.html'>NormalizeData</a></span><span class='op'>(</span><span class='va'>pbmc</span>, normalization.method <span class='op'>=</span> <span class='st'>"LogNormalize"</span>, scale.factor <span class='op'>=</span> <span class='fl'>10000</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>[[</span><span class='st'>"RNA"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>@</span><span class='va'>data</span>,<span class='fl'>100</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; 100 x 2638 sparse Matrix of class &quot;dgCMatrix&quot;
+#&gt;                                                                      
+#&gt; AL627309.1    .        .        .        .        . .        .       
+#&gt; AP006222.2    .        .        .        .        . .        .       
+#&gt; RP11-206L10.2 .        .        .        .        . .        .       
+#&gt; RP11-206L10.9 .        .        .        .        . .        .       
+#&gt; LINC00115     .        .        .        .        . .        .       
+#&gt; NOC2L         .        .        .        .        . .        .       
+#&gt; KLHL17        .        .        .        .        . .        .       
+#&gt; PLEKHN1       .        .        .        .        . .        .       
+#&gt; RP11-54O7.17  .        .        .        .        . .        .       
+#&gt; HES4          .        .        .        .        . .        .       
+#&gt; RP11-54O7.11  .        .        .        .        . .        .       
+#&gt; ISG15         .        .        1.429744 3.558310 . 1.726902 .       
+#&gt; AGRN          .        .        .        .        . .        .       
+#&gt; C1orf159      .        .        .        .        . .        .       
+#&gt; TNFRSF18      .        1.625141 .        .        . .        .       
+#&gt; TNFRSF4       .        .        .        .        . .        .       
+#&gt; SDF4          .        .        1.429744 .        . .        .       
+#&gt; B3GALT6       .        .        .        .        . .        1.722356
+#&gt; FAM132A       .        .        .        .        . .        .       
+#&gt; UBE2J2        .        .        .        .        . .        .       
+#&gt; ACAP3         .        .        .        .        . .        .       
+#&gt; PUSL1         .        .        .        .        . .        1.722356
+#&gt; CPSF3L        .        .        .        .        . .        .       
+#&gt; GLTPD1        .        .        .        .        . .        .       
+#&gt; DVL1          .        .        .        .        . .        .       
+#&gt; MXRA8         .        .        .        .        . .        .       
+#&gt; AURKAIP1      .        1.111715 .        1.566387 . .        .       
+#&gt; CCNL2         .        .        .        .        . .        .       
+#&gt; RP4-758J18.2  .        .        .        .        . .        .       
+#&gt; MRPL20        1.635873 .        1.429744 .        . .        .       
+#&gt; ATAD3C        .        .        .        .        . .        .       
+#&gt; ATAD3B        .        .        .        .        . .        .       
+#&gt; ATAD3A        .        .        .        .        . .        .       
+#&gt; SSU72         .        1.111715 .        2.515108 . .        .       
+#&gt; AL645728.1    .        .        .        .        . .        .       
+#&gt; C1orf233      .        .        .        .        . .        .       
+#&gt; RP11-345P4.9  .        .        .        .        . .        .       
+#&gt; MIB2          .        1.625141 .        .        . .        1.722356
+#&gt; MMP23B        .        .        .        .        . .        .       
+#&gt; CDK11B        .        .        .        .        . .        .       
+#&gt; SLC35E2B      .        .        .        .        . .        .       
+#&gt; CDK11A        .        .        .        .        . .        .       
+#&gt; SLC35E2       .        .        .        .        . .        .       
+#&gt; NADK          .        .        .        1.566387 . .        .       
+#&gt; GNB1          .        .        .        .        . .        .       
+#&gt; RP1-140A9.1   .        .        .        .        . .        .       
+#&gt; TMEM52        .        .        .        .        . .        .       
+#&gt; PRKCZ         .        .        .        .        . .        .       
+#&gt; RP5-892K4.1   .        .        .        .        . .        .       
+#&gt; C1orf86       .        .        .        .        . .        .       
+#&gt; AL590822.2    .        .        .        .        . .        .       
+#&gt; SKI           .        .        .        .        . .        .       
+#&gt; RER1          .        1.111715 1.429744 1.566387 . .        .       
+#&gt; PEX10         .        .        .        .        . .        .       
+#&gt; PLCH2         .        .        .        .        . .        .       
+#&gt; PANK4         .        .        1.429744 .        . 1.726902 .       
+#&gt; RP3-395M20.12 .        1.111715 .        .        . .        .       
+#&gt; TNFRSF14      .        .        .        1.566387 . 1.726902 .       
+#&gt; RP3-395M20.9  .        .        .        .        . .        .       
+#&gt; FAM213B       .        .        .        .        . .        .       
+#&gt; MMEL1         .        .        .        .        . .        .       
+#&gt; TTC34         .        .        .        .        . .        .       
+#&gt; MEGF6         .        .        .        .        . .        .       
+#&gt; TPRG1L        .        .        .        .        . .        .       
+#&gt; WRAP73        .        .        .        .        . .        .       
+#&gt; TP73-AS1      .        .        .        .        . .        .       
+#&gt; SMIM1         .        .        .        .        . .        .       
+#&gt; LRRC47        .        .        1.429744 .        . .        .       
+#&gt; CEP104        .        .        .        .        . .        .       
+#&gt; DFFB          .        .        .        .        . .        .       
+#&gt; C1orf174      .        .        .        .        . .        .       
+#&gt; NPHP4         .        .        .        .        . .        .       
+#&gt; KCNAB2        .        .        .        .        . .        .       
+#&gt; RPL22         1.635873 1.962726 1.429744 2.149274 . .        .       
+#&gt; RNF207        .        .        .        .        . .        .       
+#&gt; ICMT          .        .        .        .        . .        .       
+#&gt; GPR153        .        .        .        .        . .        .       
+#&gt; ACOT7         .        .        .        .        . .        1.722356
+#&gt; RP1-202O8.3   .        .        .        .        . .        .       
+#&gt; ESPN          .        .        .        .        . .        .       
+#&gt; TNFRSF25      2.226555 .        .        .        . .        .       
+#&gt; PLEKHG5       .        .        .        .        . .        .       
+#&gt; NOL9          .        .        .        .        . .        .       
+#&gt; ZBTB48        .        .        .        .        . .        .       
+#&gt; KLHL21        .        .        .        .        . .        .       
+#&gt; PHF13         .        .        .        .        . .        .       
+#&gt; THAP3         .        .        .        .        . .        .       
+#&gt; DNAJC11       .        .        .        .        . .        .       
+#&gt; RP11-312B8.1  .        .        .        .        . .        .       
+#&gt; CAMTA1        .        1.111715 .        .        . .        .       
+#&gt; VAMP3         .        .        .        .        . .        .       
+#&gt; PER3          .        .        .        .        . .        .       
+#&gt; UTS2          .        .        .        .        . .        .       
+#&gt; TNFRSF9       .        .        .        .        . .        .       
+#&gt; PARK7         .        .        1.995416 .        . .        .       
+#&gt; SLC45A1       .        .        .        .        . .        .       
+#&gt; RERE          .        .        .        .        . .        1.722356
+#&gt; RP5-1115A15.1 .        .        .        .        . .        .       
+#&gt; ENO1          .        1.625141 1.995416 2.149274 . .        1.722356
+#&gt; ENO1-AS1      .        .        .        .        . .        .       
+#&gt;                                                                    
+#&gt; AL627309.1    .        .        .        .        .        .       
+#&gt; AP006222.2    .        .        .        .        .        .       
+#&gt; RP11-206L10.2 .        .        .        .        .        .       
+#&gt; RP11-206L10.9 .        .        .        .        .        .       
+#&gt; LINC00115     .        .        .        .        .        .       
+#&gt; NOC2L         .        .        .        .        1.646272 .       
+#&gt; KLHL17        .        .        .        .        .        .       
+#&gt; PLEKHN1       .        .        .        .        .        .       
+#&gt; RP11-54O7.17  .        .        .        .        .        .       
+#&gt; HES4          .        .        .        .        .        .       
+#&gt; RP11-54O7.11  .        .        .        .        .        .       
+#&gt; ISG15         .        .        3.339271 .        .        1.638876
+#&gt; AGRN          .        .        .        .        .        .       
+#&gt; C1orf159      .        .        .        .        .        .       
+#&gt; TNFRSF18      .        .        .        .        .        .       
+#&gt; TNFRSF4       .        2.179642 .        .        .        .       
+#&gt; SDF4          .        .        .        .        .        .       
+#&gt; B3GALT6       .        .        .        .        .        .       
+#&gt; FAM132A       .        .        .        .        .        .       
+#&gt; UBE2J2        .        2.179642 .        1.268336 .        .       
+#&gt; ACAP3         .        .        .        .        .        .       
+#&gt; PUSL1         .        .        .        .        .        .       
+#&gt; CPSF3L        .        .        .        1.268336 .        .       
+#&gt; GLTPD1        .        .        .        .        .        .       
+#&gt; DVL1          .        .        .        .        .        .       
+#&gt; MXRA8         .        .        .        .        .        .       
+#&gt; AURKAIP1      1.690977 .        .        1.809904 .        2.229881
+#&gt; CCNL2         .        .        .        .        .        .       
+#&gt; RP4-758J18.2  .        .        .        1.268336 .        .       
+#&gt; MRPL20        1.690977 .        .        1.809904 .        .       
+#&gt; ATAD3C        .        .        .        .        .        .       
+#&gt; ATAD3B        .        .        .        .        1.646272 .       
+#&gt; ATAD3A        .        .        .        .        .        .       
+#&gt; SSU72         .        .        .        .        .        .       
+#&gt; AL645728.1    .        .        .        .        .        .       
+#&gt; C1orf233      .        .        .        .        .        .       
+#&gt; RP11-345P4.9  .        .        .        .        .        .       
+#&gt; MIB2          .        .        .        .        .        .       
+#&gt; MMP23B        .        .        .        .        .        .       
+#&gt; CDK11B        .        .        .        .        .        .       
+#&gt; SLC35E2B      .        .        .        .        .        .       
+#&gt; CDK11A        .        .        .        .        .        .       
+#&gt; SLC35E2       .        .        .        .        .        .       
+#&gt; NADK          .        .        .        .        .        .       
+#&gt; GNB1          .        2.179642 .        .        .        .       
+#&gt; RP1-140A9.1   .        .        .        .        .        .       
+#&gt; TMEM52        .        .        .        .        .        .       
+#&gt; PRKCZ         .        .        .        .        .        .       
+#&gt; RP5-892K4.1   .        .        .        .        .        .       
+#&gt; C1orf86       .        2.179642 .        .        .        .       
+#&gt; AL590822.2    .        .        .        .        .        .       
+#&gt; SKI           .        .        .        .        .        .       
+#&gt; RER1          .        .        .        .        1.646272 .       
+#&gt; PEX10         .        .        .        .        .        .       
+#&gt; PLCH2         .        .        .        .        .        .       
+#&gt; PANK4         .        .        .        .        .        .       
+#&gt; RP3-395M20.12 .        .        .        .        .        .       
+#&gt; TNFRSF14      .        .        .        1.268336 .        .       
+#&gt; RP3-395M20.9  .        .        .        .        .        .       
+#&gt; FAM213B       .        .        .        .        .        .       
+#&gt; MMEL1         .        .        .        .        .        .       
+#&gt; TTC34         .        .        .        .        .        .       
+#&gt; MEGF6         .        .        .        .        .        .       
+#&gt; TPRG1L        .        .        .        .        .        .       
+#&gt; WRAP73        .        .        .        .        .        .       
+#&gt; TP73-AS1      .        .        .        .        1.646272 .       
+#&gt; SMIM1         .        .        .        .        .        .       
+#&gt; LRRC47        .        .        .        .        .        .       
+#&gt; CEP104        .        .        .        .        .        .       
+#&gt; DFFB          .        .        .        .        .        .       
+#&gt; C1orf174      .        2.179642 .        .        .        .       
+#&gt; NPHP4         .        .        .        .        .        .       
+#&gt; KCNAB2        .        .        .        .        .        .       
+#&gt; RPL22         1.690977 .        .        2.159268 2.238069 2.229881
+#&gt; RNF207        .        .        .        .        .        .       
+#&gt; ICMT          .        .        .        .        .        .       
+#&gt; GPR153        .        .        .        .        .        .       
+#&gt; ACOT7         .        .        .        .        .        .       
+#&gt; RP1-202O8.3   .        .        .        .        .        .       
+#&gt; ESPN          .        .        .        .        .        .       
+#&gt; TNFRSF25      1.690977 .        .        .        .        .       
+#&gt; PLEKHG5       .        .        .        .        .        .       
+#&gt; NOL9          .        .        .        .        .        .       
+#&gt; ZBTB48        .        .        .        .        .        .       
+#&gt; KLHL21        .        .        .        .        .        .       
+#&gt; PHF13         .        .        .        .        .        .       
+#&gt; THAP3         1.690977 .        .        .        .        .       
+#&gt; DNAJC11       .        .        .        .        .        .       
+#&gt; RP11-312B8.1  .        .        .        .        .        .       
+#&gt; CAMTA1        .        .        .        .        .        .       
+#&gt; VAMP3         .        .        .        .        .        .       
+#&gt; PER3          .        .        .        .        .        .       
+#&gt; UTS2          .        .        .        .        .        .       
+#&gt; TNFRSF9       .        .        .        .        .        .       
+#&gt; PARK7         .        .        2.309182 1.268336 .        2.229881
+#&gt; SLC45A1       .        .        .        .        .        .       
+#&gt; RERE          .        .        .        .        .        .       
+#&gt; RP5-1115A15.1 .        .        .        .        .        .       
+#&gt; ENO1          .        .        .        1.268336 .        .       
+#&gt; ENO1-AS1      .        .        .        .        .        .       
+#&gt;                                                                    
+#&gt; AL627309.1    .        .        .        .        .        .       
+#&gt; AP006222.2    .        .        .        .        .        .       
+#&gt; RP11-206L10.2 .        .        .        .        .        .       
+#&gt; RP11-206L10.9 .        .        .        .        .        .       
+#&gt; LINC00115     .        .        .        .        .        .       
+#&gt; NOC2L         .        .        .        .        .        .       
+#&gt; KLHL17        .        .        .        .        .        .       
+#&gt; PLEKHN1       .        .        .        .        .        .       
+#&gt; RP11-54O7.17  .        .        .        .        .        .       
+#&gt; HES4          .        .        .        1.157353 .        .       
+#&gt; RP11-54O7.11  .        .        .        .        .        .       
+#&gt; ISG15         2.861362 .        3.267762 1.157353 .        .       
+#&gt; AGRN          .        .        .        .        .        .       
+#&gt; C1orf159      .        .        .        .        .        .       
+#&gt; TNFRSF18      .        .        .        .        .        .       
+#&gt; TNFRSF4       .        .        .        .        3.737279 .       
+#&gt; SDF4          .        .        .        .        1.485076 1.102225
+#&gt; B3GALT6       .        .        .        .        .        .       
+#&gt; FAM132A       .        .        .        .        .        .       
+#&gt; UBE2J2        1.457932 .        .        .        1.485076 .       
+#&gt; ACAP3         .        2.270898 .        .        .        .       
+#&gt; PUSL1         .        .        .        .        .        .       
+#&gt; CPSF3L        .        .        .        .        .        .       
+#&gt; GLTPD1        .        .        .        .        .        .       
+#&gt; DVL1          .        .        .        .        .        .       
+#&gt; MXRA8         .        .        .        .        .        .       
+#&gt; AURKAIP1      1.457932 .        .        .        .        .       
+#&gt; CCNL2         1.457932 .        .        1.679524 1.485076 .       
+#&gt; RP4-758J18.2  .        .        .        .        .        .       
+#&gt; MRPL20        1.457932 .        .        .        1.485076 .       
+#&gt; ATAD3C        .        .        .        .        .        .       
+#&gt; ATAD3B        .        .        .        .        .        1.102225
+#&gt; ATAD3A        .        .        .        .        .        .       
+#&gt; SSU72         1.457932 .        .        2.020819 .        1.613772
+#&gt; AL645728.1    .        .        .        .        .        .       
+#&gt; C1orf233      .        .        .        .        .        .       
+#&gt; RP11-345P4.9  .        .        .        .        .        .       
+#&gt; MIB2          1.457932 .        .        .        .        .       
+#&gt; MMP23B        .        .        .        .        .        .       
+#&gt; CDK11B        .        .        .        .        .        .       
+#&gt; SLC35E2B      .        .        .        .        .        .       
+#&gt; CDK11A        1.457932 .        .        .        .        .       
+#&gt; SLC35E2       .        .        .        .        .        .       
+#&gt; NADK          2.027376 .        .        .        .        .       
+#&gt; GNB1          .        .        .        1.157353 .        1.102225
+#&gt; RP1-140A9.1   .        .        .        .        .        .       
+#&gt; TMEM52        .        .        .        .        .        .       
+#&gt; PRKCZ         .        .        .        .        .        .       
+#&gt; RP5-892K4.1   .        .        .        .        .        .       
+#&gt; C1orf86       .        .        .        .        .        .       
+#&gt; AL590822.2    .        .        .        .        .        .       
+#&gt; SKI           .        .        .        .        .        .       
+#&gt; RER1          1.457932 .        .        1.679524 .        .       
+#&gt; PEX10         .        .        .        .        .        .       
+#&gt; PLCH2         .        .        .        .        .        .       
+#&gt; PANK4         .        .        .        .        .        .       
+#&gt; RP3-395M20.12 .        .        .        .        .        .       
+#&gt; TNFRSF14      .        .        .        1.157353 .        .       
+#&gt; RP3-395M20.9  .        .        .        .        .        .       
+#&gt; FAM213B       .        .        .        .        .        .       
+#&gt; MMEL1         .        .        .        .        .        .       
+#&gt; TTC34         .        .        .        .        .        .       
+#&gt; MEGF6         .        .        .        .        .        .       
+#&gt; TPRG1L        .        .        .        .        .        .       
+#&gt; WRAP73        .        .        .        .        .        .       
+#&gt; TP73-AS1      .        .        .        .        .        .       
+#&gt; SMIM1         .        .        .        .        .        .       
+#&gt; LRRC47        .        .        .        .        .        .       
+#&gt; CEP104        .        .        .        .        .        .       
+#&gt; DFFB          .        .        .        .        .        .       
+#&gt; C1orf174      .        .        .        .        .        1.102225
+#&gt; NPHP4         .        .        .        .        .        .       
+#&gt; KCNAB2        .        .        .        1.157353 .        1.102225
+#&gt; RPL22         1.457932 2.270898 3.267762 2.274803 1.485076 2.569949
+#&gt; RNF207        .        .        .        .        .        .       
+#&gt; ICMT          .        .        .        .        .        .       
+#&gt; GPR153        .        .        .        .        .        .       
+#&gt; ACOT7         .        .        .        .        .        .       
+#&gt; RP1-202O8.3   .        .        .        .        .        .       
+#&gt; ESPN          .        .        .        .        .        .       
+#&gt; TNFRSF25      .        .        .        .        .        .       
+#&gt; PLEKHG5       .        .        .        .        .        .       
+#&gt; NOL9          .        .        .        .        .        .       
+#&gt; ZBTB48        .        .        .        .        .        .       
+#&gt; KLHL21        .        .        .        .        .        .       
+#&gt; PHF13         .        .        .        .        .        .       
+#&gt; THAP3         1.457932 .        .        .        .        .       
+#&gt; DNAJC11       .        .        .        .        .        .       
+#&gt; RP11-312B8.1  .        .        .        .        .        .       
+#&gt; CAMTA1        .        .        .        .        .        .       
+#&gt; VAMP3         1.457932 .        .        .        .        .       
+#&gt; PER3          .        .        .        .        .        .       
+#&gt; UTS2          .        .        .        .        .        .       
+#&gt; TNFRSF9       .        .        .        .        .        .       
+#&gt; PARK7         .        .        .        2.020819 1.485076 1.950553
+#&gt; SLC45A1       .        .        .        .        .        .       
+#&gt; RERE          .        .        .        .        .        .       
+#&gt; RP5-1115A15.1 .        .        .        .        .        .       
+#&gt; ENO1          1.457932 .        .        2.645395 1.485076 2.202039
+#&gt; ENO1-AS1      .        .        .        .        .        .       
+#&gt;                                                                    
+#&gt; AL627309.1    .        .        .        .        .        .       
+#&gt; AP006222.2    .        .        .        .        .        .       
+#&gt; RP11-206L10.2 .        .        .        .        .        .       
+#&gt; RP11-206L10.9 .        .        .        .        .        .       
+#&gt; LINC00115     .        .        .        .        .        .       
+#&gt; NOC2L         .        1.398186 .        .        .        .       
+#&gt; KLHL17        .        .        .        .        .        .       
+#&gt; PLEKHN1       .        .        .        .        .        .       
+#&gt; RP11-54O7.17  .        .        .        .        .        .       
+#&gt; HES4          .        .        .        .        .        .       
+#&gt; RP11-54O7.11  .        .        .        .        .        .       
+#&gt; ISG15         .        1.398186 .        1.553327 1.670007 .       
+#&gt; AGRN          .        .        .        .        .        .       
+#&gt; C1orf159      .        .        .        .        .        .       
+#&gt; TNFRSF18      .        .        .        .        .        .       
+#&gt; TNFRSF4       .        .        .        .        .        .       
+#&gt; SDF4          .        .        .        .        1.670007 .       
+#&gt; B3GALT6       .        .        .        .        .        .       
+#&gt; FAM132A       .        .        .        .        .        .       
+#&gt; UBE2J2        .        .        .        .        .        .       
+#&gt; ACAP3         .        .        .        .        .        .       
+#&gt; PUSL1         .        .        .        .        .        .       
+#&gt; CPSF3L        .        .        .        .        .        .       
+#&gt; GLTPD1        .        .        .        .        .        .       
+#&gt; DVL1          .        .        .        .        .        .       
+#&gt; MXRA8         .        .        .        .        .        .       
+#&gt; AURKAIP1      .        1.398186 .        1.553327 .        .       
+#&gt; CCNL2         .        .        .        .        .        .       
+#&gt; RP4-758J18.2  .        .        .        .        .        .       
+#&gt; MRPL20        .        .        .        1.553327 .        .       
+#&gt; ATAD3C        .        .        .        .        .        .       
+#&gt; ATAD3B        .        .        .        .        .        .       
+#&gt; ATAD3A        .        .        .        .        .        .       
+#&gt; SSU72         .        .        2.309999 .        .        2.089658
+#&gt; AL645728.1    .        .        .        .        .        .       
+#&gt; C1orf233      .        .        .        .        .        .       
+#&gt; RP11-345P4.9  .        .        .        .        .        .       
+#&gt; MIB2          .        .        .        .        .        .       
+#&gt; MMP23B        .        .        .        .        .        .       
+#&gt; CDK11B        .        .        .        1.553327 .        .       
+#&gt; SLC35E2B      .        .        .        .        .        .       
+#&gt; CDK11A        .        .        .        1.553327 .        .       
+#&gt; SLC35E2       .        .        .        .        .        .       
+#&gt; NADK          .        .        .        .        .        .       
+#&gt; GNB1          .        .        .        .        1.670007 .       
+#&gt; RP1-140A9.1   .        .        .        .        .        .       
+#&gt; TMEM52        .        .        .        .        .        .       
+#&gt; PRKCZ         .        .        .        .        .        .       
+#&gt; RP5-892K4.1   .        .        .        .        .        .       
+#&gt; C1orf86       .        .        .        .        .        .       
+#&gt; AL590822.2    .        .        .        .        .        .       
+#&gt; SKI           .        .        .        .        .        .       
+#&gt; RER1          .        .        .        .        .        .       
+#&gt; PEX10         .        .        .        .        .        .       
+#&gt; PLCH2         .        .        .        .        .        .       
+#&gt; PANK4         .        .        .        .        .        .       
+#&gt; RP3-395M20.12 .        .        .        .        .        .       
+#&gt; TNFRSF14      2.184526 .        .        .        1.670007 .       
+#&gt; RP3-395M20.9  .        .        .        .        .        .       
+#&gt; FAM213B       .        .        .        .        .        .       
+#&gt; MMEL1         .        .        .        .        .        .       
+#&gt; TTC34         .        .        .        .        .        .       
+#&gt; MEGF6         .        .        .        .        .        .       
+#&gt; TPRG1L        .        .        .        .        .        .       
+#&gt; WRAP73        .        .        .        .        .        .       
+#&gt; TP73-AS1      .        .        .        .        .        .       
+#&gt; SMIM1         .        .        .        .        .        .       
+#&gt; LRRC47        .        .        .        .        .        .       
+#&gt; CEP104        .        .        .        .        .        .       
+#&gt; DFFB          .        .        .        .        .        .       
+#&gt; C1orf174      .        .        .        .        .        2.089658
+#&gt; NPHP4         .        .        .        .        .        .       
+#&gt; KCNAB2        .        .        .        .        .        2.718944
+#&gt; RPL22         3.482647 2.579565 .        1.553327 2.264302 2.089658
+#&gt; RNF207        .        .        .        .        .        .       
+#&gt; ICMT          .        .        .        .        .        .       
+#&gt; GPR153        .        .        .        .        .        .       
+#&gt; ACOT7         .        .        .        .        .        .       
+#&gt; RP1-202O8.3   .        .        .        .        .        .       
+#&gt; ESPN          .        .        .        .        .        .       
+#&gt; TNFRSF25      .        .        .        .        .        .       
+#&gt; PLEKHG5       .        .        .        .        .        .       
+#&gt; NOL9          .        .        .        .        .        .       
+#&gt; ZBTB48        .        .        .        .        .        .       
+#&gt; KLHL21        .        .        .        .        .        .       
+#&gt; PHF13         .        .        .        .        .        .       
+#&gt; THAP3         .        .        .        .        .        .       
+#&gt; DNAJC11       .        .        .        .        .        .       
+#&gt; RP11-312B8.1  .        .        .        .        .        .       
+#&gt; CAMTA1        .        .        .        .        .        4.533330
+#&gt; VAMP3         .        .        .        .        .        .       
+#&gt; PER3          .        .        .        .        .        .       
+#&gt; UTS2          .        .        .        .        .        .       
+#&gt; TNFRSF9       .        .        .        .        .        .       
+#&gt; PARK7         .        1.398186 .        .        .        .       
+#&gt; SLC45A1       .        .        .        .        .        .       
+#&gt; RERE          .        .        .        .        .        .       
+#&gt; RP5-1115A15.1 .        .        .        .        .        .       
+#&gt; ENO1          .        1.959489 .        .        1.670007 .       
+#&gt; ENO1-AS1      .        .        .        .        .        .       
+#&gt;                                                
+#&gt; AL627309.1    .        .        .        ......
+#&gt; AP006222.2    .        .        .        ......
+#&gt; RP11-206L10.2 .        .        .        ......
+#&gt; RP11-206L10.9 .        .        .        ......
+#&gt; LINC00115     .        .        .        ......
+#&gt; NOC2L         .        .        .        ......
+#&gt; KLHL17        .        .        .        ......
+#&gt; PLEKHN1       .        .        .        ......
+#&gt; RP11-54O7.17  .        1.015884 .        ......
+#&gt; HES4          .        .        .        ......
+#&gt; RP11-54O7.11  .        .        .        ......
+#&gt; ISG15         .        1.509310 .        ......
+#&gt; AGRN          .        .        .        ......
+#&gt; C1orf159      .        .        .        ......
+#&gt; TNFRSF18      .        .        .        ......
+#&gt; TNFRSF4       .        .        .        ......
+#&gt; SDF4          .        .        .        ......
+#&gt; B3GALT6       .        .        .        ......
+#&gt; FAM132A       .        .        .        ......
+#&gt; UBE2J2        .        1.015884 .        ......
+#&gt; ACAP3         .        .        .        ......
+#&gt; PUSL1         .        .        .        ......
+#&gt; CPSF3L        .        .        .        ......
+#&gt; GLTPD1        .        .        .        ......
+#&gt; DVL1          .        .        .        ......
+#&gt; MXRA8         .        .        .        ......
+#&gt; AURKAIP1      .        1.015884 .        ......
+#&gt; CCNL2         .        .        .        ......
+#&gt; RP4-758J18.2  .        .        .        ......
+#&gt; MRPL20        .        .        .        ......
+#&gt; ATAD3C        .        .        .        ......
+#&gt; ATAD3B        .        .        .        ......
+#&gt; ATAD3A        .        .        1.355669 ......
+#&gt; SSU72         .        .        .        ......
+#&gt; AL645728.1    .        .        .        ......
+#&gt; C1orf233      .        1.015884 .        ......
+#&gt; RP11-345P4.9  .        .        .        ......
+#&gt; MIB2          .        .        .        ......
+#&gt; MMP23B        .        .        .        ......
+#&gt; CDK11B        .        .        .        ......
+#&gt; SLC35E2B      .        .        .        ......
+#&gt; CDK11A        .        1.015884 .        ......
+#&gt; SLC35E2       .        .        .        ......
+#&gt; NADK          .        .        .        ......
+#&gt; GNB1          .        .        .        ......
+#&gt; RP1-140A9.1   .        .        .        ......
+#&gt; TMEM52        .        .        .        ......
+#&gt; PRKCZ         .        .        .        ......
+#&gt; RP5-892K4.1   .        .        .        ......
+#&gt; C1orf86       .        1.838231 .        ......
+#&gt; AL590822.2    .        .        .        ......
+#&gt; SKI           .        .        .        ......
+#&gt; RER1          .        .        1.355669 ......
+#&gt; PEX10         .        .        .        ......
+#&gt; PLCH2         .        .        .        ......
+#&gt; PANK4         .        .        .        ......
+#&gt; RP3-395M20.12 .        .        .        ......
+#&gt; TNFRSF14      .        1.015884 .        ......
+#&gt; RP3-395M20.9  .        .        .        ......
+#&gt; FAM213B       .        .        .        ......
+#&gt; MMEL1         .        .        .        ......
+#&gt; TTC34         .        .        .        ......
+#&gt; MEGF6         .        .        .        ......
+#&gt; TPRG1L        .        .        .        ......
+#&gt; WRAP73        .        .        .        ......
+#&gt; TP73-AS1      .        .        .        ......
+#&gt; SMIM1         .        .        .        ......
+#&gt; LRRC47        .        .        .        ......
+#&gt; CEP104        .        .        .        ......
+#&gt; DFFB          .        .        .        ......
+#&gt; C1orf174      .        .        .        ......
+#&gt; NPHP4         .        .        .        ......
+#&gt; KCNAB2        .        .        .        ......
+#&gt; RPL22         2.726919 1.509310 3.051899 ......
+#&gt; RNF207        .        .        .        ......
+#&gt; ICMT          .        .        .        ......
+#&gt; GPR153        .        .        .        ......
+#&gt; ACOT7         .        .        .        ......
+#&gt; RP1-202O8.3   .        .        .        ......
+#&gt; ESPN          .        .        .        ......
+#&gt; TNFRSF25      .        .        .        ......
+#&gt; PLEKHG5       .        .        .        ......
+#&gt; NOL9          .        .        .        ......
+#&gt; ZBTB48        .        .        .        ......
+#&gt; KLHL21        .        .        .        ......
+#&gt; PHF13         .        .        .        ......
+#&gt; THAP3         .        .        .        ......
+#&gt; DNAJC11       .        .        .        ......
+#&gt; RP11-312B8.1  .        .        .        ......
+#&gt; CAMTA1        .        .        1.910832 ......
+#&gt; VAMP3         .        .        .        ......
+#&gt; PER3          .        .        .        ......
+#&gt; UTS2          .        .        .        ......
+#&gt; TNFRSF9       .        .        .        ......
+#&gt; PARK7         .        1.838231 1.355669 ......
+#&gt; SLC45A1       .        .        .        ......
+#&gt; RERE          .        .        .        ......
+#&gt; RP5-1115A15.1 .        .        .        ......
+#&gt; ENO1          .        1.509310 1.355669 ......
+#&gt; ENO1-AS1      .        .        .        ......
+#&gt; 
+#&gt;  .....suppressing 2610 columns in show(); maybe adjust &#39;options(max.print= *, width = *)&#39;
+#&gt;  ..............................</code></pre>
+</div>
+<h2 id="identification-of-highly-variable-features-feature-selection">Identification of highly variable features (feature selection)</h2>
+<p>We next calculate a subset of features that exhibit high cell-to-cell variation in the dataset (i.e, they are highly expressed in some cells, and lowly expressed in others). This analysis helps to highlight biological signal in single-cell datasets.</p>
+<p>We will use theFindVariableFeatures() function. By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.</p>
+<p>Why do you think it is important to look only at the most variable genes? Any ideas based off the pre class lecture?</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/FindVariableFeatures.html'>FindVariableFeatures</a></span><span class='op'>(</span><span class='va'>pbmc</span>, selection.method <span class='op'>=</span> <span class='st'>"vst"</span>, nfeatures <span class='op'>=</span> <span class='fl'>2000</span><span class='op'>)</span>
+
+<span class='co'># Identify the 10 most highly variable genes</span>
+<span class='va'>top10</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/SeuratObject/man/VariableFeatures.html'>VariableFeatures</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>)</span>, <span class='fl'>10</span><span class='op'>)</span>
+
+<span class='co'># plot variable features with and without labels</span>
+<span class='va'>plot1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/VariableFeaturePlot.html'>VariableFeaturePlot</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>)</span>
+<span class='va'>plot2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/LabelPoints.html'>LabelPoints</a></span><span class='op'>(</span>plot <span class='op'>=</span> <span class='va'>plot1</span>, points <span class='op'>=</span> <span class='va'>top10</span>, repel <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='va'>plot2</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-20-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<h2 id="scaling-the-data">Scaling the data</h2>
+<p>Next, we apply a linear transformation (‘scaling’) that is a standard pre-processing step prior to dimensional reduction techniques like PCA. The ScaleData() function:</p>
+<p>Shifts the expression of each gene, so that the mean expression across cells is 0 Scales the expression of each gene, so that the variance across cells is 1 This step gives equal weight in downstream analyses, so that highly-expressed genes do not dominate The results of this are stored in pbmc[[“RNA”]]<span class="citation" data-cites="scale.data">@scale.data</span></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>all.genes</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>)</span>
+<span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/ScaleData.html'>ScaleData</a></span><span class='op'>(</span><span class='va'>pbmc</span>, features <span class='op'>=</span> <span class='va'>all.genes</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/View.html'>View</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>[[</span><span class='st'>"RNA"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>@</span><span class='va'>scale.data</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<h2 id="pca">PCA</h2>
+<p>Finally, we are ready to run PCA. This can be achieved using the RunPCA() command.</p>
+<p>After running PCA, we will want to determine how important each gene is in determining each PC. This might give us ideas about marker genes to use for downstream exploration. To determine each genes contribution, we want to visualize their loading scores. I touch on this in the PCA video here: <a href="https://www.youtube.com/watch?v=GtKBZGJbnAg" class="uri">https://www.youtube.com/watch?v=GtKBZGJbnAg</a>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/RunPCA.html'>RunPCA</a></span><span class='op'>(</span><span class='va'>pbmc</span>, features <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/SeuratObject/man/VariableFeatures.html'>VariableFeatures</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>pbmc</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># Examine and visualize PCA results a few different ways</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>[[</span><span class='st'>"pca"</span><span class='op'>]</span><span class='op'>]</span>, dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, nfeatures <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>#&gt; PC_ 1 
+#&gt; Positive:  CST3, TYROBP, LST1, AIF1, FTL 
+#&gt; Negative:  MALAT1, LTB, IL32, IL7R, CD2 
+#&gt; PC_ 2 
+#&gt; Positive:  CD79A, MS4A1, TCL1A, HLA-DQA1, HLA-DQB1 
+#&gt; Negative:  NKG7, PRF1, CST7, GZMB, GZMA 
+#&gt; PC_ 3 
+#&gt; Positive:  HLA-DQA1, CD79A, CD79B, HLA-DQB1, HLA-DPB1 
+#&gt; Negative:  PPBP, PF4, SDPR, SPARC, GNG11 
+#&gt; PC_ 4 
+#&gt; Positive:  HLA-DQA1, CD79B, CD79A, MS4A1, HLA-DQB1 
+#&gt; Negative:  VIM, IL7R, S100A6, IL32, S100A8 
+#&gt; PC_ 5 
+#&gt; Positive:  GZMB, NKG7, S100A8, FGFBP2, GNLY 
+#&gt; Negative:  LTB, IL7R, CKB, VIM, MS4A7</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#Let's take a look at the loadings</span>
+<span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/VizDimLoadings.html'>VizDimLoadings</a></span><span class='op'>(</span><span class='va'>pbmc</span>, dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, reduction <span class='op'>=</span> <span class='st'>"pca"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-23-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>In particular DimHeatmap() allows for easy exploration of the primary sources of heterogeneity in a dataset, and can be useful when trying to decide which PCs to include for further downstream analyses. Both cells and features are ordered according to their PCA scores. Setting cells to a number plots the ‘extreme’ cells on both ends of the spectrum, which dramatically speeds plotting for large datasets. Though clearly a supervised analysis, we find this to be a valuable tool for exploring correlated feature sets.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimHeatmap.html'>DimHeatmap</a></span><span class='op'>(</span><span class='va'>pbmc</span>, dims <span class='op'>=</span> <span class='fl'>1</span>, cells <span class='op'>=</span> <span class='fl'>500</span>, balanced <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-24-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimHeatmap.html'>DimHeatmap</a></span><span class='op'>(</span><span class='va'>pbmc</span>, dims <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>15</span>, cells <span class='op'>=</span> <span class='fl'>500</span>, balanced <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-25-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>As can be seen above, by PC10, the heatmaps are staring to show less defined clustering. This can be useful info when we decide how many PCs to carry over in future dimensionality reduction methods like UMAP and T-SNE</p>
+<p>An Elbow plot can also be informative, and is very similar to the scree plot I showed in the video on PCA</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/ElbowPlot.html'>ElbowPlot</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-26-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>Finally we can visualize how well our first two principle components segregate our data</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/DimPlot.html'>DimPlot</a></span><span class='op'>(</span><span class='va'>pbmc</span>, reduction <span class='op'>=</span> <span class='st'>"pca"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-27-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<p>We are starting to see some separation of data, but we can probably cluster these cells better. Tomorrow we will review PCA and look into UMAP and T-SNE, which will do a better job at clustering our data.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/Seurat/man/ElbowPlot.html'>ElbowPlot</a></span><span class='op'>(</span><span class='va'>pbmc</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="1class_files/figure-html5/unnamed-chunk-28-1.png" width="624" style="display: block; margin: auto;" /></p>
+</div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<!--radix_placeholder_article_footer-->
+<!--/radix_placeholder_article_footer-->
+</div>
+
+<div class="d-appendix">
+</div>
+
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_appendices-->
+<div class="appendix-bottom"></div>
+<!--/radix_placeholder_appendices-->
+<!--radix_placeholder_navigation_after_body-->
+<!--/radix_placeholder_navigation_after_body-->
+
+</body>
+
+</html>

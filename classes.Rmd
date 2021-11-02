@@ -8,7 +8,7 @@ listing:
     - 2021-10-20-working-with-your-own-single-cell-data
     - 2021-10-21-prerequisite-material
     - 2021-10-21-interacting-with-r-in-rstudio
-    - 2021-10-27-multi-modal
     - 2021-11-3-class-2
     - 2021-10-26-class-3
+    - 2021-10-27-multi-modal
 ---
