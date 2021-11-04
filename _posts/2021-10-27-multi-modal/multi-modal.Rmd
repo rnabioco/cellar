@@ -1,7 +1,7 @@
 ---
-title: "Working with Multi-modal data"
+title: "Class 4: Multi-modal data"
 description: |
-  A short tutorial describing a basic CITE-seq analysis workflow.
+  This tutorial describes a basic CITE-seq analysis workflow.
 author:
   - name: "Kent Riemondy"
     url: https://github.com/kriemo
@@ -19,12 +19,14 @@ output:
     self_contained: false
 draft: false
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
+
+Download the Rmarkdown [here](https://raw.githubusercontent.com/rnabioco/cellar/master/_posts/2021-10-27-multi-modal/multi-modal.Rmd)
 
 ## Experimental design
 
-### CITE-seq enables detection of cell surface proteins AND gene expression
+CITE-seq enables detection of cell surface proteins and gene expression
 
 ![](img/cite-seq.png)
 
@@ -32,8 +34,8 @@ editor_options:
 
 Biolegend is the main company selling CITE-seq and cell hashing antibodies ([TotalSeq](https://www.biolegend.com/en-us/totalseq)). Biolegend reagents are divided into three product lines:
 
-* TotalSeq-A: 3' gene expression, v2 and v3 chemistry
-* TotalSeq-B: 3' gene expression, v3 chemistry 
+* TotalSeq-A: 3' gene expression (v2 and v3 chemistry)
+* TotalSeq-B: 3' gene expression (v3 and v3.1 chemistry) 
 * TotalSeq-C: 5' gene expression and V(D)J
 
 ![](img/Totalseq_compatibility_figure_V1.png)
@@ -52,6 +54,8 @@ TotalSeq-C reagents use the same PCR handle for CITE-seq and cell hashing antibo
 
 [MULTI-seq](https://www.nature.com/articles/s41592-019-0433-8) uses lipid- and cholesterol-modified oligonucleotides.
 
+[CellPlex](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cellplex) was developed by 10x Genomics and is similar to MULTI-seq.
+
 <br>
 
 ## Creating a Seurat object with multiple assays
@@ -68,7 +72,7 @@ We have three files that we will work with:
 * CITEseq_ADT.csv.gz: Antibody count data
 * CITEseq_HTO.csv.gz: Hashtag count data
 
-```{r setup, include = FALSE}
+```{r "setup", include = FALSE}
 knitr::opts_chunk$set(
   message     = FALSE,
   warning     = FALSE,
@@ -83,7 +87,7 @@ library(tidyverse)
 library(cowplot)
 ```
 
-```{r "Load data"}
+```{r "load data"}
 # Data URL
 data_url <- "https://scrnaseq-workshop.s3-us-west-2.amazonaws.com"
 
@@ -116,7 +120,7 @@ hto_mtx[, 1:10]
 
 When adding multiple assays to a Seurat object, we first must identify cell barcodes that are present in all of the datasets. If one of the assays has a different number of cell barcodes Seurat will throw an error.
 
-```{r "Create Seurat object"}
+```{r "Seurat object"}
 # Get list of common cell barcodes
 rna_bcs <- colnames(rna_mtx)
 adt_bcs <- colnames(adt_mtx)
@@ -127,8 +131,8 @@ merged_bcs <- rna_bcs %>%
   intersect(hto_bcs)
 
 # Create Seurat object
-sobj <-  CreateSeuratObject(
-  counts    = rna_mtx[, merged_bcs], 
+sobj <- CreateSeuratObject(
+  counts    = rna_mtx[, merged_bcs],
   min.cells = 5
 )
 
@@ -152,7 +156,7 @@ To account for differences in antibody binding efficiency, CITE-seq and cell has
 
 Note that the best approach for normalizing CITE-seq data has not been settled. For a more detailed discussion, and alternative approaches, see the Normalization chapter from the [Orchestrating Single Cell Analysis eBook](https://bioconductor.org/books/release/OSCA/integrating-with-protein-abundance.html#normalization-1) from Bioconductor.
 
-```{r "Normalize HTO counts"}
+```{r "normalize HTO"}
 # Normalize HTO counts
 sobj <- sobj %>%
   NormalizeData(
@@ -163,7 +167,7 @@ sobj <- sobj %>%
 
 ### Sample demultiplexing and identification of doublets
 
-To demultiplex hashed samples, the `HTODemux` function uses the normalized HTO counts for k-medoids clustering. This results in a cluster for each HTO. A background signal is then calculated for each HTO using cells that are not present in the HTO-specific cluster. Outlier cells from this background signal are then classified as being "positive" for the HTO if they are above a cutoff quantile value (~97% of background).
+To demultiplex hashed samples, the `HTODemux` function uses the normalized HTO counts for k-medoids clustering. This results in a cluster for each HTO. A background signal is then calculated for each HTO using cells that are not present in the HTO-specific cluster. Outlier cells from this background signal are then classified as being "positive" for the HTO if they are above a cutoff quantile.
 
 Cells that are positive for multiple HTOs are classified as doublets and cells that are not positive for any HTO are classified as "negative" cells.
 
@@ -173,7 +177,7 @@ The `HTODemux` function automatically adds several columns to the object meta.da
 * HTO_classification.global: singlet classification (singlet, doublet, negative)
 * hash.ID: final HTO assignment including doublet and negative classifications
 
-```{r "Demultiplex samples", fig.width = 11, fig.height = 8}
+```{r "demultiplex samples", fig.width = 11, fig.height = 8}
 # Demultiplex samples
 # By default HTODemux will look for the "HTO" assay
 sobj <- sobj %>%
@@ -193,9 +197,9 @@ sobj %>%
   )
 ```
 
-### Compare the number of cells with each hash.ID and calculate the doublet rate
+### Compare the number of cells with each hash.ID
 
-```{r fig.width = 9, fig.height = 4}
+```{r "bar graphs", fig.width = 9, fig.height = 4}
 # Calculate doublet rate
 sobj@meta.data %>%
   group_by(HTO_classification.global) %>% 
@@ -235,11 +239,11 @@ plot_grid(
 
 ## Filtering data and assessing quality
 
-Now that we have assigned each cell to the appropriate sample we can continue with processing the `RNA` data in the same manner as before. 
+Now that we have assigned each cell to the appropriate sample we can continue processing the gene expression data.
 
 ### Assessing data quality
 
-```{r "Create RNA violin plots", fig.width = 11, fig.height = 5}
+```{r "RNA violins", fig.width = 11, fig.height = 5}
 # Add mitochondrial percentage to meta.data table
 sobj <- sobj %>%
   PercentageFeatureSet(
@@ -257,7 +261,7 @@ sobj %>%
   )
 ```
 
-```{r "Create ADT and HTO violin plots", fig.width = 8, fig.height = 5}
+```{r "ADT violins", fig.width = 8, fig.height = 5}
 # Aim to sequence CITE-seq libraries at 2k-5k reads/cell, cell hashing 1k-2k reads/cell
 sobj %>%
   VlnPlot(
@@ -268,7 +272,7 @@ sobj %>%
   )
 ```
 
-```{r "Filter cells"}
+```{r "filter cells"}
 # Filter cells based on HTO class, number of genes, and percent mito UMIs
 filt_so <-  sobj %>%
   subset(
@@ -299,17 +303,17 @@ head(filt_so@meta.data, 2)
 
 ## Process gene expression data
 
-To review the basic Seurat processing workflow, see if you can complete the following steps for our gene expression data:
+To review the basic Seurat processing workflow, see if you can complete the following steps for the gene expression data:
 
-* LogNormalize the counts (NormalizeData)
-* Find variable features (FindVariableFeatures)
-* Scale the data (ScaleData)
-* Perform PCA (RunPCA)
-* Cluster the cells (FindNeighbors, FindClusters)
-* Run UMAP and plot clusters (RunUMAP)
+* LogNormalize the counts (`NormalizeData`)
+* Find variable features (`FindVariableFeatures`)
+* Scale the data (`ScaleData`)
+* Perform PCA (`RunPCA`)
+* Cluster the cells (`FindNeighbors`, `FindClusters`)
+* Run UMAP and plot clusters (`RunUMAP`)
 
 ```{r "EXERCISE 1", eval = FALSE}
-# Write your answer here
+# Add your commands here
 #
 #
 #
@@ -324,72 +328,42 @@ To review the basic Seurat processing workflow, see if you can complete the foll
 
 ```{r "normalize RNA", include = FALSE}
 # Normalize gene expression data
-filt_so <-  filt_so %>%
-  NormalizeData(
-    assay                = "RNA",
-    normalization.method = "LogNormalize",
-    verbose              = FALSE
-  ) %>%
-  FindVariableFeatures(
-    assay   = "RNA",
-    verbose = FALSE
-  ) %>%
-  ScaleData(
-    assay   = "RNA",
-    verbose = FALSE
-  )
+filt_so <- filt_so %>%
+  NormalizeData() %>%
+  FindVariableFeatures() %>%
+  ScaleData()
 ```
 
 ```{r "RNA PCA", fig.width = 11.5, fig.height = 5, include = FALSE}
 # Perform principal component analysis
 # By default only variable features are used for PCA, this uses only the RNA data
-filt_so <- filt_so %>%
-  RunPCA(
-    assay   = "RNA",
-    verbose = FALSE
-  )
+filt_so <- RunPCA(filt_so)
 
 # Create elbow and PCA plot
 el_plot <- filt_so %>%
   ElbowPlot(ndims = 50)
 
-pca_plot <- filt_so %>%
-  DimPlot(reduction = "pca")
+pca_plot <- DimPlot(filt_so)
 
 plot_grid(
   el_plot, pca_plot,
-  nrow       = 1,
   rel_widths = c(0.45, 0.55)
 )
 ```
 
 ```{r "RNA clustering", fig.width = 6, fig.height = 5, include = FALSE}
-# Cluster cells
+# Cluster cells and run UMAP
 filt_so <- filt_so %>%
-  FindNeighbors(
-    reduction = "pca",
-    dims      = 1:20
-  ) %>%
-  FindClusters(
-    graph.name = "RNA_snn",
-    resolution = 0.2,
-    verbose    = FALSE
-  )
-
-# For clarity store clusters in meta.data as 'RNA_clusters'
-filt_so$RNA_clusters <- filt_so$RNA_snn_res.0.2
-
-# Run UMAP
-# use same PCs as clustering
-filt_so <- filt_so %>%
-  RunUMAP(
-    reduction = "pca",
-    dims      = 1:20
-  )
+  FindNeighbors(dims = 1:20) %>%
+  FindClusters(resolution = 0.2) %>%
+  RunUMAP(dims = 1:20)
 
 # Create UMAP
 filt_so %>%
   DimPlot(reduction = "umap")
+
+# For clarity store clusters in meta.data as 'RNA_clusters'
+filt_so$RNA_clusters <- filt_so$RNA_snn_res.0.2
 ```
 
 <br>
@@ -400,54 +374,57 @@ filt_so %>%
 
 Before clustering, we first want to normalize our CITE-seq data. Like cell hashing data, CITE-seq counts can be normalized by performing a centered log-ratio transformation.
 
-```{r "Normalize data", results = FALSE}
+```{r "normalize ADT", results = FALSE}
+# Set active.assay to ADT
+# if you do not change the active.assay, you must specify the assay for
+# each Seurat command
+filt_so@active.assay <- "ADT"
+
 # Normalize CITE-seq data
 filt_so <-  filt_so %>%
   NormalizeData(
     assay                = "ADT",
-    normalization.method = "CLR",
-    verbose              = FALSE
+    normalization.method = "CLR"
   ) %>%  
-  ScaleData(
-    assay   = "ADT",
-    verbose = FALSE
-  )
+  ScaleData(assay = "ADT")
 ```
 
 ### Cluster cells using antibody signal
 
-Since there are only a few antibodies and not many dimensions, instead of performing PCA we can just use the scaled matrix for clustering directly. In contrast to the gene expression data, we have already done feature selection and dimensionality reduction by choosing (for very practical reasons) to only stain cells with a few antibodies that discriminate cell populations. However, if you stained cells with many (>100s) antibodies, then you may want to select variable antibodies, and use PCA for clustering.
+Since there are only a few antibodies and not many dimensions, instead of performing PCA we can just use the scaled matrix for clustering directly. In contrast to the gene expression data, we have already done feature selection and dimensionality reduction by choosing (for very practical reasons) to only stain cells with a few antibodies that discriminate cell populations. However, if you stained cells with many (>100) antibodies, then you may want to select variable antibodies, and use PCA for clustering.
 
-We will directly pass the `scaled.data` matrix from the ADT assay to the `FindNeighbors` function, which creates a Shared Nearest Neighbor (SNN) graph that is used for clustering.
+We will directly pass the ADT data to the `FindNeighbors` function, which creates a Shared Nearest Neighbor (SNN) graph that is used for clustering.
 
-```{r "Cluster cells using antibody data", results = FALSE}
+```{r "ADT clustering", results = FALSE}
 # Cluster cells
 filt_so <- filt_so %>%
   FindNeighbors(
-    assay      = "ADT",
-    reduction  = NULL,                       # we are not using a reduction
-    dims       = NULL,                       # we do not specify dims
-    features   = rownames(filt_so[["ADT"]])  # specify features to use the scaled data
+    assay     = "ADT",
+    reduction = NULL,                        # we are not using a reduction
+    dims      = NULL,                        # we do not specify dims
+    features  = rownames(filt_so[["ADT"]])   # specify features to use
   ) %>%
   FindClusters(
-    resolution = 0.2,
+    resolution = 1,
     graph.name = "ADT_snn"
   )
 
 # For clarity store clusters in meta.data as 'ADT_clusters'
-filt_so$ADT_clusters <- filt_so$ADT_snn_res.0.2
+filt_so$ADT_clusters <- filt_so$ADT_snn_res.1
 ```
 
 ### Run UMAP using antibody signal
 
-```{r "Run UMAP for antibody data", fig.width = 11.5, fig.height = 5}
+```{r "ADT UMAP", fig.width = 11.5, fig.height = 5}
 # Run UMAP
 filt_so <- filt_so %>%
   RunUMAP(
     assay          = "ADT",
-    graph          = "ADT_snn",
+    reduction      = NULL,
+    dims           = NULL,
+    features       = rownames(filt_so[["ADT"]]),
     reduction.name = "adt_umap",
-    reduction.key  = "ADTUMAP_"
+    reduction.key  = "adtUMAP_"
   )
 
 # Plot UMAPs
@@ -469,7 +446,7 @@ ADT_markers <- filt_so %>%
     only.pos = TRUE
   )
 
-ADT_markers
+ADT_markers[-c(1, 7)]
 ```
 
 <br>
@@ -478,16 +455,14 @@ ADT_markers
 
 ### Overlay antibody signal on UMAPs
 
-```{r "Overlay antibody signal on UMAPs", fig.width = 10, fig.height = 8.5}
-# Set active.assay to ADT
-filt_so@active.assay <- "ADT"
-
-# Overlay antibody signal on gene expression UMAP
+```{r "ADT signal UMAPs", fig.width = 10, fig.height = 8.5}
+# CITE-seq features to plot
 feats <- c(
-  "adt-CD4", "CD4",
-  "adt-CD8", "CD8A"
+  "adt-CD4", "rna_CD4",
+  "adt-CD8", "rna_CD8A"
 )
 
+# Overlay antibody signal on gene expression UMAP
 filt_so %>%
   FeaturePlot(
     reduction = "umap",
@@ -504,7 +479,7 @@ filt_so %>%
 
 ### Ridge plots
 
-```{r "Create ridge plots", fig.width = 15, fig.height = 8}
+```{r "ADT signal ridges", fig.width = 15, fig.height = 8}
 # Create ridge plot
 feats <- c(
   "adt-CD14", "adt-CD45",
@@ -518,7 +493,7 @@ filt_so %>%
 
 ### Violin plots
 
-```{r "Create violinplots", fig.width = 8, fig.height = 8}
+```{r "ADT signal violins", fig.width = 8, fig.height = 8}
 # Create violin plots
 feats <- c(
   "adt-CD4",  "rna_CD4",
@@ -536,13 +511,13 @@ filt_so %>%
 
 ## Classifying cells based on antibody signal
 
-We can use 2D scatterplots to derive "gates" to assign cell types in the same manner as done for flow cytometry analysis. Generally the CITE-seq signal has lower dynamic range and signal-to-noise compared to flow cytometry, but the overall patterns seen with flow cytometry are also seen with CITE-seq.
+We can use 2D scatter plots to derive "gates" to assign cell types in the same manner as done for flow cytometry analysis. Generally the CITE-seq signal has lower dynamic range and signal-to-noise compared to flow cytometry, but the overall patterns seen with flow cytometry are also seen with CITE-seq.
 
 ### Identify CD19+ cells
 
-CD19 is a marker of B-cells, whereas CD3 is a marker of T-cells. We can compare their expression to classify B-cells. 
+CD19 is a marker of B cells, whereas CD3 is a marker of T cells. We can compare their expression to classify B-cells. 
 
-```{r "Filter using antibody signal", fig.width = 6, fig.height = 5}
+```{r "CD19 scatter", fig.width = 6, fig.height = 5}
 # Plot CD3 and CD19 signal
 CD19_plot <- filt_so %>%
   FeatureScatter("adt-CD3", "adt-CD19")
@@ -550,7 +525,7 @@ CD19_plot <- filt_so %>%
 CD19_plot
 ```
 
-```{r, fig.width = 6, fig.height = 5}
+```{r "CD19 class", fig.width = 7, fig.height = 5}
 # Identify CD19+ cells using antibody signal
 CD19_cells <- filt_so %>%
   subset(`adt-CD19` > 2.5 & `adt-CD3` < 1) %>%
@@ -571,9 +546,11 @@ labeled_so %>%
   DimPlot(reduction = "adt_umap")
 ```
 
-### Label cells using CellSelector()
+### Label cells using CellSelector
 
-```{r "Filter using CellSelector()", eval = FALSE}
+The `CellSelector` function allows you to interactively select cells from a scatter plot.
+
+```{r "CellSelector", eval = FALSE}
 # Identify CD19+ cells using antibody signal
 labeled_so <- filt_so %>%
   SetIdent(value = "Other")
@@ -591,16 +568,16 @@ labeled_so %>%
 
 ### Identify CD4+ and CD8+ cells
 
-Identify CD4+ and CD8+ cells using one of the methods shown above.
+Identify CD4+ and CD8+ cells using one of the methods discussed above.
 
-```{r, fig.width = 6, fig.height = 5, echo = FALSE}
+```{r "CD4 CD8 scatter", fig.width = 6, fig.height = 5, echo = FALSE}
 # Compare CD4 and CD8 signal
 filt_so %>%
   FeatureScatter("adt-CD4", "adt-CD8")
 ```
 
 ```{r "EXERCISE 2", eval = FALSE}
-# Write your answer here
+# Add your commands here
 #
 #
 #
@@ -615,16 +592,17 @@ filt_so %>%
 
 ```{r "EXERCISE 2 ANSWER", fig.width = 6, fig.height = 5, include = FALSE}
 # Identify CD4+ and CD8+ cells using antibody signal
-CD4_cells <- labeled_so %>%
+CD4_cells <- filt_so %>%
   subset(`adt-CD4` > 2.5 & `adt-CD8` < 1) %>%
   Cells()
 
-CD8_cells <- labeled_so %>%
+CD8_cells <- filt_so %>%
   subset(`adt-CD8` > 1.5 & `adt-CD4` < 1) %>%
   Cells()
 
 # Set cell identities
-labeled_so <- labeled_so %>%
+labeled_so <- filt_so %>%
+  SetIdent(value = "Other") %>%
   SetIdent(value = "CD4+", cells = CD4_cells) %>%
   SetIdent(value = "CD8+", cells = CD8_cells)
 
@@ -638,28 +616,16 @@ labeled_so %>%
 
 <br>
 
-### Examine CITE-seq derived cell labels on gene expression umap
+### Examine CITE-seq derived cell labels on UMAPs
 
-```{r, fig.width = 6, fig.height = 5}
-labeled_so %>%
-  DimPlot( 
-    reduction = "umap",
-    group.by  = "cell_label"
-  )
-```
+```{r "ADT labels UMAP", fig.width = 13, fig.height = 5}
+rna_umap <- labeled_so %>%
+  DimPlot(reduction = "umap")
 
-```{r,  fig.width = 10, fig.height = 13, include = FALSE}
-feats <- c(
-  "adt-CD4",  "CD4",
-  "adt-CD8",  "CD8A", 
-  "adt-CD19", "CD19"
-)
+adt_umap <- labeled_so %>%
+  DimPlot(reduction = "adt_umap")
 
-filt_so %>%
-  FeaturePlot(
-    reduction = "umap",
-    features  = feats
-  )
+plot_grid(rna_umap, adt_umap)
 ```
 
 <br>
@@ -670,43 +636,45 @@ The authors of Seurat have implemented a new algorithm for combined data from di
 
 The basic idea is that we want to cluster and visualize the data using **both** the RNA and antibody data. How to do this?
 
-We could literally just merge the two datasets together then run them through Seurat. This will however end up downweighting the contribution of the antibody data because there are so few antibodies(~8) compared to RNA features (~10,000)
+We could literally just merge the two datasets together then run them through Seurat. This will however end up downweighting the contribution of the antibody data because there are so few antibodies (8) compared to RNA features (~10,000)
 
-Seurat has implemented a "Weighted Nearest Neighbor" approach that will combine the nearest neighbor graphs from the RNA data with the antibody data. The algorithm will calculate relative weights for the RNA or the Protein data for each cell and use these new weights to constuct a shared graph. The related weights are calculated based on the relative information content of neighboring cells in each modalitly. So if the data from one modality provides more information, it is weighted higher. 
+Seurat has implemented a "Weighted Nearest Neighbor" approach that will combine dimensional reductions from the RNA data with the antibody data. The algorithm will calculate relative weights for the RNA and antibody data for each cell and use these new weights to construct a shared nearest neighbor graph. The related weights are calculated based on the relative information content of neighboring cells in each modality. So if the data from one modality is better at distinguishing the cells, it is weighted higher.
 
-```{r}
+```{r "WNN"}
 # Need to run PCA on the antibody data
-labeled_so <- labeled_so %>%
-  RunPCA( 
-    assay          = "ADT", 
-    features       = rownames(labeled_so[["ADT"]]),
-    reduction.name = "adt_pca"
+filt_so <- filt_so %>%
+  RunPCA(
+    features       = rownames(filt_so[["ADT"]]),
+    reduction.name = "adt_pca",
+    reduction.key  = "adtPC_",
+    assay          = "ADT",
+    maxit          = 4000
   )
 
-labeled_so <- labeled_so %>%
+filt_so <- filt_so %>%
   FindMultiModalNeighbors(
     reduction.list       = list("pca", "adt_pca"),
     dims.list            = list(1:20, 1:6),
-    modality.weight.name = "RNA.weight"
+    modality.weight.name = c("RNA.weight", "ADT.weight")
   )
 
-labeled_so <- labeled_so %>%
+filt_so <- filt_so %>%
   RunUMAP(
-    nn.name        = "weighted.nn", 
+    nn.name        = "weighted.nn",
     reduction.name = "wnn.umap", 
     reduction.key  = "wnnUMAP_"
   )
 ```
 
-```{r, fig.width = 18, fig.height = 5}
-rna_umap  <- DimPlot(labeled_so, reduction = "umap")
-adt_umap  <- DimPlot(labeled_so, reduction = "adt_umap")
-both_umap <- DimPlot(labeled_so, reduction = "wnn.umap")
+```{r "WNN UMAPs", fig.width = 18, fig.height = 5}
+rna_umap  <- DimPlot(filt_so, reduction = "umap",     group.by = "ADT_clusters")
+adt_umap  <- DimPlot(filt_so, reduction = "adt_umap", group.by = "ADT_clusters")
+both_umap <- DimPlot(filt_so, reduction = "wnn.umap", group.by = "ADT_clusters")
 
 plot_grid(
   rna_umap, adt_umap, both_umap,
   labels = c("RNA", "ADT", "Both"),
-  ncol   = 3
+  nrow   = 1
 )
 ```
 
@@ -717,7 +685,7 @@ plot_grid(
 The UCSC [Cell Browser](http://www.genome.ucsc.edu/singlecell.html) allows you to easily explore and share single-cell data. With the Cell Browser you can:
 
 * View t-SNE or UMAP projections
-* Color cells by metadata and gene expression
+* Color cells by meta.data and gene expression
 * View cluster marker genes
 * Rename clusters and add custom annotations to selected sets of cells
 
@@ -727,9 +695,9 @@ UCSC hosts a [large collection of cellbrowsers](http://cells.ucsc.edu/) for vari
 
 We won't be generating these browsers in the class, however below is an example of how to build a browser. The first step is to combine the gene expression and antibody data into a single matrix.  
 
-```{r "Merge RNA and ADT matrices", eval = FALSE}
+```{r "merge matrices", eval = FALSE}
 # Combine RNA and ADT matrices
-merged_so   <- labeled_so
+merged_so   <- filt_so
 RNA_data    <- merged_so[["RNA"]]@data
 ADT_data    <- merged_so[["ADT"]]@data
 merged_data <- rbind(RNA_data, ADT_data)
@@ -745,7 +713,7 @@ merged_so@active.assay <- "RNA"
 
 To create the files needed for the session, we can use the make_cellbrowser function from the [scbp](https://github.com/rnabioco/scbp) package written by Kent Riemondy. This function extracts the required data from our Seurat object and generates configuration files needed to build the session. To include both the gene expression and antibody UMAPs, we generate separate sets of files for each.
 
-```{r "Create gene expression Cell Browser files", eval = FALSE}
+```{r "RNA browser files", eval = FALSE}
 # Create Cell Browser directories for gene expression data
 dir.create(
   path      = "cellbrowser",
@@ -778,7 +746,7 @@ merged_so %>%
   )
 ```
 
-```{r "Create ADT Cell Browser files", eval = FALSE}
+```{r "ADT browser files", eval = FALSE}
 # Create Cell Browser files for antibody data
 merged_so %>%
   make_cellbrowser(
@@ -793,7 +761,7 @@ merged_so %>%
 
 To build the cell browser session, install [cbBuild](https://cellbrowser.readthedocs.io). This tool will build the session using the configuration files generated in the previous step.
 
-```{bash "Build Cell Browser session", eval = FALSE}
+```{bash "Build browser", eval = FALSE}
 mkdir -p cellbrowser/browser
 
 cbBuild \
