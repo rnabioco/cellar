@@ -1,0 +1,74 @@
+---
+title: "FAQ"
+description: |
+  Answers to common questions
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Where to get more information on single cell data analyses?
+
+The [Orchestrating Single Cell Analysis](https://bioconductor.org/books/3.14/OSCA/)  eBook from bioconductor provides detailed discussion of the analysis approaches used for single cell sequencing analysis.  
+
+## Ligand-Receptor interaction infererence  
+
+  There are many tools, the python package [cellphonedb](https://github.com/Teichlab/cellphonedb) is popular. However there are R packages as well ([scTensor](https://www.bioconductor.org/packages/release/bioc/html/scTensor.html), [SCA-IRCM](https://github.com/SCA-IRCM), [liana](https://github.com/saezlab/liana), [CellChat](https://github.com/sqjin/CellChat)).    
+  
+## Should I use Seurat or Bioconductor?  
+
+Use both, or either. The fellows use a mix of both and also the `scanpy` python single cell toolkit. Spend time exploring your data with whatever platform feels most intuitive. Inevitably you will gain experience in with multiple platforms due to the large # of tools that you will want to try out for your analysis. 
+
+## How to convert between platforms?
+
+If you need to convert between R and python you can use the R package [zellkonverter](https://bioconductor.org/packages/release/bioc/html/zellkonverter.html).
+
+If you need to convert between Seurat or SingleCellExperiment, you can use the `as.SingleCellExperiment()` or `as.Seurat()` functions. It is also sometimes easiest to simply create the objects manually using the `SingleCellExperiment` or `CreateSeuratObject` functions.   
+
+## How to load multiple samples in Seurat and annotate the samples
+
+If you have multiple samples you can load these into Seurat using the `Read10X` and `CreateSeuratObject` functions. If you provide a name for each dataset (using `names()`), these names can be extracted and placed into the `orig.ident` column in the `meta.data`. 
+
+```r
+# vector of paths to each sample
+data_dirs <- c('path/to/dataset1/', 'path/to/dataset2/')
+
+# give each sample a name
+names(data_dirs) <- c("expt1", "extp2")
+
+# read in the matrices
+mats <- Read10X(data_dirs)
+
+# the cells will now be renamed to include the "expt1/2" prefixes
+# e.g.
+# "expt1_cellbarcode1
+# "expt1_cellbarcode2
+# ...
+# "expt2_cellbarcode1
+# "expt2_cellbarcode2
+# ...
+
+# CreateSeuratObject can now be used to pull out part of the cell 
+# barcode and add it to the meta.data as the orig.ident
+seurat_object <- CreateSeuratObject(mats, names.field = 1, names.delim = "_")
+
+# expt1 and expt2 should now be listed in the orig.ident
+head(seurat_object@meta.data$orig.ident)
+```
+
+## Advice for managing analysis projects and R package dependencies
+
+Organization is key to managing multiple analysis projects. We recommend making a new Rstudio project for each data analysis project. This helps with navigate to the relevant files for each project, and makes it easy to quickly jump between projects.
+
+Managing R package versions can be challenging if you work on many projects, because you may need to use different versions of packages for different projects. This is especially important if you need to return to an analysis 6 months or a year later. If you constantly update the packages, you can run into problems with reproducing the original analysis. The [renv](https://rstudio.github.io/renv/articles/renv.html) R package is a package manager for R built by the Rstudio organization. When you set up an R project, you can select `use renv with project` to set up `renv` to track dependencies for each project separately. 
+
+```{r}
+knitr::include_graphics("renv.png")
+```
+
+
