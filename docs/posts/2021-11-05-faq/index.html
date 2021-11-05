@@ -56,7 +56,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { color: #20794d; } /* Attribute */
+code span.at { } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
 code span.cf { color: #007ba5; } /* ControlFlow */
@@ -77,7 +77,7 @@ code span.kw { color: #007ba5; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
 code span.ot { color: #007ba5; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
-code span.sc { color: #20794d; } /* SpecialChar */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
 code span.st { color: #20794d; } /* String */
 code span.va { color: #111111; } /* Variable */
@@ -85,39 +85,39 @@ code span.vs { color: #20794d; } /* VerbatimString */
 code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
-  <!--radix_placeholder_meta_tags-->
-<title>single cell RNA-seq workshop: Interacting with R in Rstudio</title>
 
-<meta property="description" itemprop="description" content="A tutorial for navigating the Rstudio IDE, RMarkdown,&#10;and setting up Rstudio projects to organize each class."/>
+  <!--radix_placeholder_meta_tags-->
+<title>single cell RNA-seq workshop: FAQ</title>
+
+<meta property="description" itemprop="description" content="Answers to common questions"/>
 
 
 <!--  https://schema.org/Article -->
-<meta property="article:published" itemprop="datePublished" content="2021-10-21"/>
-<meta property="article:created" itemprop="dateCreated" content="2021-10-21"/>
-<meta name="article:author" content="Kent Riemondy"/>
+<meta property="article:published" itemprop="datePublished" content="2021-11-05"/>
+<meta property="article:created" itemprop="dateCreated" content="2021-11-05"/>
 
 <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-<meta property="og:title" content="single cell RNA-seq workshop: Interacting with R in Rstudio"/>
+<meta property="og:title" content="single cell RNA-seq workshop: FAQ"/>
 <meta property="og:type" content="article"/>
-<meta property="og:description" content="A tutorial for navigating the Rstudio IDE, RMarkdown,&#10;and setting up Rstudio projects to organize each class."/>
+<meta property="og:description" content="Answers to common questions"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:site_name" content="single cell RNA-seq workshop"/>
 
 <!--  https://dev.twitter.com/cards/types/summary -->
 <meta property="twitter:card" content="summary"/>
-<meta property="twitter:title" content="single cell RNA-seq workshop: Interacting with R in Rstudio"/>
-<meta property="twitter:description" content="A tutorial for navigating the Rstudio IDE, RMarkdown,&#10;and setting up Rstudio projects to organize each class."/>
+<meta property="twitter:title" content="single cell RNA-seq workshop: FAQ"/>
+<meta property="twitter:description" content="Answers to common questions"/>
 
 <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
 <script type="text/json" id="radix-rmarkdown-metadata">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","preview"]}},"value":[{"type":"character","attributes":{},"value":["Interacting with R in Rstudio"]},{"type":"character","attributes":{},"value":["A tutorial for navigating the Rstudio IDE, RMarkdown,\nand setting up Rstudio projects to organize each class."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Kent Riemondy"]},{"type":"character","attributes":{},"value":["https://github.com/kriemo"]},{"type":"character","attributes":{},"value":["RNA Bioscience Initiative"]},{"type":"character","attributes":{},"value":["https://medschool.cuanschutz.edu/rbi"]},{"type":"character","attributes":{},"value":["0000-0003-0750-1273"]}]}]},{"type":"character","attributes":{},"value":["10-21-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["rstudio.png"]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output","date"]}},"value":[{"type":"character","attributes":{},"value":["FAQ"]},{"type":"character","attributes":{},"value":["Answers to common questions"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["11-05-2021"]}]}
 </script>
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["rstudio.png"]}
+  {"type":"character","attributes":{},"value":["renv.png"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../.."/>
@@ -1806,7 +1806,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Interacting with R in Rstudio","description":"A tutorial for navigating the Rstudio IDE, RMarkdown,\nand setting up Rstudio projects to organize each class.","authors":[{"author":"Kent Riemondy","authorURL":"https://github.com/kriemo","affiliation":"RNA Bioscience Initiative","affiliationURL":"https://medschool.cuanschutz.edu/rbi","orcidID":"0000-0003-0750-1273"}],"publishedDate":"2021-10-21T00:00:00.000-06:00","citationText":"Riemondy, 2021"}
+{"title":"FAQ","description":"Answers to common questions","authors":[],"publishedDate":"2021-11-05T00:00:00.000-06:00"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1835,22 +1835,56 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>Interacting with R in Rstudio</h1>
+<h1>FAQ</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>A tutorial for navigating the Rstudio IDE, RMarkdown, and setting up Rstudio projects to organize each class.</p></p>
+<p><p>Answers to common questions</p></p>
 </div>
 
-<div class="d-byline">
-  Kent Riemondy <a href="https://github.com/kriemo" class="uri">https://github.com/kriemo</a> (RNA Bioscience Initiative)<a href="https://medschool.cuanschutz.edu/rbi" class="uri">https://medschool.cuanschutz.edu/rbi</a>
-  
-<br/>10-21-2021
-</div>
 
 <div class="d-article">
-<p><a href="https://www.rstudio.com/">Rstudio</a> is one of the most popular Integrated Development Environments (IDE) for working in R. It provides many useful tools to help conduct, document, and manage your analyses.</p>
-<p>If you are unfamilar with Rstudio, the Rmarkdown format, or setting up projects in Rstudio, please watch a tutorial video (<a href="https://www.dropbox.com/s/alrmoszei1ou6vr/intro-to-rstudio.mov?dl=0">.mov format</a> , <a href="https://www.dropbox.com/s/zuh153mlp7w2fio/intro-to-rstudio.mp4?dl=0">.mp4</a>) (~20 min) to help you get oriented.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h2 id="where-to-get-more-information-on-single-cell-data-analyses">Where to get more information on single cell data analyses?</h2>
+<p>The <a href="https://bioconductor.org/books/3.14/OSCA/">Orchestrating Single Cell Analysis</a> eBook from bioconductor provides detailed discussion of the analysis approaches used for single cell sequencing analysis.</p>
+<h2 id="ligand-receptor-interaction-infererence">Ligand-Receptor interaction infererence</h2>
+<p>There are many tools, the python package <a href="https://github.com/Teichlab/cellphonedb">cellphonedb</a> is popular. However there are R packages as well (<a href="https://www.bioconductor.org/packages/release/bioc/html/scTensor.html">scTensor</a>, <a href="https://github.com/SCA-IRCM">SCA-IRCM</a>, <a href="https://github.com/saezlab/liana">liana</a>, <a href="https://github.com/sqjin/CellChat">CellChat</a>).</p>
+<h2 id="should-i-use-seurat-or-bioconductor">Should I use Seurat or Bioconductor?</h2>
+<p>Use both, or either. The fellows use a mix of both and also the <code>scanpy</code> python single cell toolkit. Spend time exploring your data with whatever platform feels most intuitive. Inevitably you will gain experience in with multiple platforms due to the large # of tools that you will want to try out for your analysis.</p>
+<h2 id="how-to-convert-between-platforms">How to convert between platforms?</h2>
+<p>If you need to convert between R and python you can use the R package <a href="https://bioconductor.org/packages/release/bioc/html/zellkonverter.html">zellkonverter</a>.</p>
+<p>If you need to convert between Seurat or SingleCellExperiment, you can use the <code>as.SingleCellExperiment()</code> or <code>as.Seurat()</code> functions. It is also sometimes easiest to simply create the objects manually using the <code>SingleCellExperiment</code> or <code>CreateSeuratObject</code> functions.</p>
+<h2 id="how-to-load-multiple-samples-in-seurat-and-annotate-the-samples">How to load multiple samples in Seurat and annotate the samples</h2>
+<p>If you have multiple samples you can load these into Seurat using the <code>Read10X</code> and <code>CreateSeuratObject</code> functions. If you provide a name for each dataset (using <code>names()</code>), these names can be extracted and placed into the <code>orig.ident</code> column in the <code>meta.data</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># vector of paths to each sample</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data_dirs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;path/to/dataset1/&#39;</span>, <span class="st">&#39;path/to/dataset2/&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># give each sample a name</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(data_dirs) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;expt1&quot;</span>, <span class="st">&quot;extp2&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the matrices</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mats <span class="ot">&lt;-</span> <span class="fu">Read10X</span>(data_dirs)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># the cells will now be renamed to include the &quot;expt1/2&quot; prefixes</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g.</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt1_cellbarcode1</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt1_cellbarcode2</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt2_cellbarcode1</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt2_cellbarcode2</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># CreateSeuratObject can now be used to pull out part of the cell </span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># barcode and add it to the meta.data as the orig.ident</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>seurat_object <span class="ot">&lt;-</span> <span class="fu">CreateSeuratObject</span>(mats, <span class="at">names.field =</span> <span class="dv">1</span>, <span class="at">names.delim =</span> <span class="st">&quot;_&quot;</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># expt1 and expt2 should now be listed in the orig.ident</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(seurat_object<span class="sc">@</span>meta.data<span class="sc">$</span>orig.ident)</span></code></pre></div>
+<h2 id="advice-for-managing-analysis-projects-and-r-package-dependencies">Advice for managing analysis projects and R package dependencies</h2>
+<p>Organization is key to managing multiple analysis projects. We recommend making a new Rstudio project for each data analysis project. This helps with navigate to the relevant files for each project, and makes it easy to quickly jump between projects.</p>
+<p>Managing R package versions can be challenging if you work on many projects, because you may need to use different versions of packages for different projects. This is especially important if you need to return to an analysis 6 months or a year later. If you constantly update the packages, you can run into problems with reproducing the original analysis. The <a href="https://rstudio.github.io/renv/articles/renv.html">renv</a> R package is a package manager for R built by the Rstudio organization. When you set up an R project, you can select <code>use renv with project</code> to set up <code>renv</code> to track dependencies for each project separately.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="renv.png" width="533" /></p>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>

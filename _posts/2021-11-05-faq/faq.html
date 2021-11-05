@@ -87,376 +87,38 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 
   <!--radix_placeholder_meta_tags-->
-  <title>single cell RNA-seq workshop</title>
+  <title>FAQ</title>
+
+  <meta property="description" itemprop="description" content="Answers to common questions"/>
 
 
-
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2021-11-05"/>
+  <meta property="article:created" itemprop="dateCreated" content="2021-11-05"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="single cell RNA-seq workshop"/>
+  <meta property="og:title" content="FAQ"/>
   <meta property="og:type" content="article"/>
+  <meta property="og:description" content="Answers to common questions"/>
   <meta property="og:locale" content="en_US"/>
-  <meta property="og:site_name" content="single cell RNA-seq workshop"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="single cell RNA-seq workshop"/>
+  <meta property="twitter:title" content="FAQ"/>
+  <meta property="twitter:description" content="Answers to common questions"/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","site","listing"]}},"value":[{"type":"character","attributes":{},"value":["single cell RNA-seq workshop"]},{"type":"character","attributes":{},"value":["distill::distill_website"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["posts"]}},"value":[{"type":"character","attributes":{},"value":["2021-10-14-r-installation","2021-10-15-running-rrstudio-with-docker","2021-10-20-working-with-your-own-single-cell-data","2021-10-21-prerequisite-material","2021-10-21-interacting-with-r-in-rstudio","2021-11-01-1class","2021-11-3-class-2","2021-10-26-class-3","2021-10-27-multi-modal","2021-11-05-faq"]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","output","date"]}},"value":[{"type":"character","attributes":{},"value":["FAQ"]},{"type":"character","attributes":{},"value":["Answers to common questions\n"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["11-05-2021"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
-  <!--radix_placeholder_navigation_in_header-->
-  <meta name="distill:offset" content=""/>
-
-  <script type="application/javascript">
-
-    window.headroom_prevent_pin = false;
-
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-
-      // initialize headroom for banner
-      var header = $('header').get(0);
-      var headerHeight = header.offsetHeight;
-      var headroom = new Headroom(header, {
-        tolerance: 5,
-        onPin : function() {
-          if (window.headroom_prevent_pin) {
-            window.headroom_prevent_pin = false;
-            headroom.unpin();
-          }
-        }
-      });
-      headroom.init();
-      if(window.location.hash)
-        headroom.unpin();
-      $(header).addClass('headroom--transition');
-
-      // offset scroll location for banner on hash change
-      // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
-      window.addEventListener("hashchange", function(event) {
-        window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
-      });
-
-      // responsive menu
-      $('.distill-site-header').each(function(i, val) {
-        var topnav = $(this);
-        var toggle = topnav.find('.nav-toggle');
-        toggle.on('click', function() {
-          topnav.toggleClass('responsive');
-        });
-      });
-
-      // nav dropdowns
-      $('.nav-dropbtn').click(function(e) {
-        $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
-        $(this).parent().siblings('.nav-dropdown')
-           .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $("body").click(function(e){
-        $('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $(".nav-dropdown").click(function(e){
-        e.stopPropagation();
-      });
-    });
+  
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["renv.png"]}
   </script>
-
-  <style type="text/css">
-
-  /* Theme (user-documented overrideables for nav appearance) */
-
-  .distill-site-nav {
-    color: rgba(255, 255, 255, 0.8);
-    background-color: #0F2E3D;
-    font-size: 15px;
-    font-weight: 300;
-  }
-
-  .distill-site-nav a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .distill-site-nav a:hover {
-    color: white;
-  }
-
-  @media print {
-    .distill-site-nav {
-      display: none;
-    }
-  }
-
-  .distill-site-header {
-
-  }
-
-  .distill-site-footer {
-
-  }
-
-
-  /* Site Header */
-
-  .distill-site-header {
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 3;
-  }
-
-  .distill-site-header .nav-left {
-    display: inline-block;
-    margin-left: 8px;
-  }
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header .nav-left {
-      margin-left: 0;
-    }
-  }
-
-
-  .distill-site-header .nav-right {
-    float: right;
-    margin-right: 8px;
-  }
-
-  .distill-site-header a,
-  .distill-site-header .title {
-    display: inline-block;
-    text-align: center;
-    padding: 14px 10px 14px 10px;
-  }
-
-  .distill-site-header .title {
-    font-size: 18px;
-    min-width: 150px;
-  }
-
-  .distill-site-header .logo {
-    padding: 0;
-  }
-
-  .distill-site-header .logo img {
-    display: none;
-    max-height: 20px;
-    width: auto;
-    margin-bottom: -4px;
-  }
-
-  .distill-site-header .nav-image img {
-    max-height: 18px;
-    width: auto;
-    display: inline-block;
-    margin-bottom: -3px;
-  }
-
-
-
-  @media screen and (min-width: 1000px) {
-    .distill-site-header .logo img {
-      display: inline-block;
-    }
-    .distill-site-header .nav-left {
-      margin-left: 20px;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 20px;
-    }
-    .distill-site-header .title {
-      padding-left: 12px;
-    }
-  }
-
-
-  .distill-site-header .nav-toggle {
-    display: none;
-  }
-
-  .nav-dropdown {
-    display: inline-block;
-    position: relative;
-  }
-
-  .nav-dropdown .nav-dropbtn {
-    border: none;
-    outline: none;
-    color: rgba(255, 255, 255, 0.8);
-    padding: 16px 10px;
-    background-color: transparent;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    margin: 0;
-    margin-top: 1px;
-    z-index: 2;
-  }
-
-  .nav-dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 200px;
-    border: 1px solid rgba(0,0,0,0.15);
-    border-radius: 4px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
-    z-index: 1;
-    margin-top: 2px;
-    white-space: nowrap;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-
-  .nav-dropdown-content hr {
-    margin-top: 4px;
-    margin-bottom: 4px;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .nav-dropdown-active {
-    display: block;
-  }
-
-  .nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
-    color: black;
-    padding: 6px 24px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-  }
-
-  .nav-dropdown-content .nav-dropdown-header {
-    display: block;
-    padding: 5px 24px;
-    padding-bottom: 0;
-    text-transform: uppercase;
-    font-size: 14px;
-    color: #999999;
-    white-space: nowrap;
-  }
-
-  .nav-dropdown:hover .nav-dropbtn {
-    color: white;
-  }
-
-  .nav-dropdown-content a:hover {
-    background-color: #ddd;
-    color: black;
-  }
-
-  .nav-right .nav-dropdown-content {
-    margin-left: -45%;
-    right: 0;
-  }
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
-    .distill-site-header a.nav-toggle {
-      float: right;
-      display: block;
-    }
-    .distill-site-header .title {
-      margin-left: 0;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 0;
-    }
-    .distill-site-header {
-      overflow: hidden;
-    }
-    .nav-right .nav-dropdown-content {
-      margin-left: 0;
-    }
-  }
-
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header.responsive {position: relative; min-height: 500px; }
-    .distill-site-header.responsive a.nav-toggle {
-      position: absolute;
-      right: 0;
-      top: 0;
-    }
-    .distill-site-header.responsive a,
-    .distill-site-header.responsive .nav-dropdown {
-      display: block;
-      text-align: left;
-    }
-    .distill-site-header.responsive .nav-left,
-    .distill-site-header.responsive .nav-right {
-      width: 100%;
-    }
-    .distill-site-header.responsive .nav-dropdown {float: none;}
-    .distill-site-header.responsive .nav-dropdown-content {position: relative;}
-    .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
-      display: block;
-      width: 100%;
-      text-align: left;
-    }
-  }
-
-  /* Site Footer */
-
-  .distill-site-footer {
-    width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-    z-index: 3;
-    margin-top: 30px;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    text-align: center;
-  }
-
-  /* Headroom */
-
-  d-title {
-    padding-top: 6rem;
-  }
-
-  @media print {
-    d-title {
-      padding-top: 4rem;
-    }
-  }
-
-  .headroom {
-    z-index: 1000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .headroom--transition {
-    transition: all .4s ease-in-out;
-  }
-
-  .headroom--unpinned {
-    top: -100px;
-  }
-
-  .headroom--pinned {
-    top: 0;
-  }
-
-  /* adjust viewport for navbar height */
-  /* helps vertically center bootstrap (non-distill) content */
-  .min-vh-100 {
-    min-height: calc(100vh - 100px) !important;
-  }
-
-  </style>
-
-  <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-  <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
-  <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
-  <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
+  <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
   <!--radix_placeholder_distill-->
 
@@ -1775,379 +1437,87 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
-  <script src="site_libs/popper-2.6.0/popper.min.js"></script>
-  <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
-  <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
-  <script src="site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
-  <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
-  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
-  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
-  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
+  <script src="faq_files/header-attrs-2.11/header-attrs.js"></script>
+  <script src="faq_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <script src="faq_files/popper-2.6.0/popper.min.js"></script>
+  <link href="faq_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="faq_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="faq_files/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="faq_files/anchor-4.2.2/anchor.min.js"></script>
+  <script src="faq_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="faq_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="faq_files/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
   <!--/radix_placeholder_site_in_header-->
 
 
 </head>
 
-<body class="layout-listing">
+<body>
 
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"single cell RNA-seq workshop","authors":[]}
+{"title":"FAQ","description":"Answers to common questions","authors":[],"publishedDate":"2021-11-05T00:00:00.000-06:00"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
 <!--radix_placeholder_navigation_before_body-->
-<header class="header header--fixed" role="banner">
-<nav class="distill-site-nav distill-site-header">
-<div class="nav-left">
-<a class="logo">
-<img src="img/logo.png" alt="Logo"/>
-</a>
-<a href="index.html" class="title">single cell RNA-seq workshop</a>
-</div>
-<div class="nav-right">
-<a href="index.html">Workshop overview</a>
-<a href="classes.html">Classes</a>
-<a href="previous.html">Previous-workshops</a>
-<a href="https://github.com/rnabioco/cellar" aria-label="Link to source">
-<i class="fab fa-github" aria-hidden="true"></i>
-</a>
-<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
-</div>
-</nav>
-</header>
 <!--/radix_placeholder_navigation_before_body-->
 <!--radix_placeholder_site_before_body-->
 <!--/radix_placeholder_site_before_body-->
-<!--radix_placeholder_article_listing-->
-
-
-<script type="application/javascript">
-
-function init_posts_list() {
-
-  function load_image(img) {
-    var src = $(img).attr('data-src');
-    if (src) {
-      $(img).attr('src', src);
-      $(img).on("load", function() {
-        img.removeAttribute('data-src');
-      });
-    }
-  }
-
-  function set_posts_visible(posts, visible) {
-    if (visible) {
-
-      // show bottom border by default
-      $(posts).removeClass('post-preview-last');
-
-      // apply limits if need be
-      var max_posts = 25;
-      var apply_limits = $('.posts-container').hasClass('posts-apply-limit');
-      if (apply_limits && posts.length > max_posts) {
-        posts = $(posts).slice(0, max_posts);
-      } else {
-        $('.posts-more a').addClass('hidden');
-      }
-
-      // apply last style
-      $(posts.slice(-1)[0]).addClass('post-preview-last');
-
-      $(posts).removeClass('hidden');
-      $(posts).find('img[data-src]').each(function(i, img) {
-        load_image(img);
-      });
-    } else {
-      $(posts).addClass('hidden');
-    }
-  }
-
-  function apply_hash_filter() {
-
-    // clear active state
-    $('.categories .active').removeClass('active');
-
-    // mark all posts invisible to start
-    set_posts_visible($('.posts-list').children('a'), false);
-
-    // if we have a hash filter
-    if (window.location.hash && window.location.hash.startsWith("#category:")) {
-
-      // mark posts that match the category visible
-      var page_category = window.location.hash.replace(/^#category:/, "");
-      page_category = decodeURIComponent(page_category)
-      var posts = $('.post-metadata').map(function(idx, script) {
-        var metadata = $.parseJSON($(script).html());
-        var post = null;
-        $.each(metadata.categories, function(idx, category) {
-          category = category.replace(/ /g,"_");
-          if ((page_category || '').toLowerCase() === "articles" || category === page_category) {
-            post = $(script).parent().get();
-            return false;
-          }
-        });
-        return post;
-      });
-      set_posts_visible(posts, true);
-
-      // mark the hash active
-      $('.categories li>a[href="' + decodeURIComponent(window.location.hash) + '"]').addClass('active');
-
-      // update the list_caption
-      var list_caption = $('.posts-list-caption');
-      var caption = (page_category || '').toLowerCase() === "articles"
-        ? list_caption.attr('data-caption')
-        : ('Category: ' + page_category.replace(/_/g," "));
-      list_caption.text(caption);
-
-    } else {
-
-      // no hash filter, make all posts visible (subject to max display)
-      set_posts_visible($('.posts-list').children(), true);
-
-      // reset list caption
-      var list_caption = $('.posts-list-caption');
-      list_caption.text(list_caption.attr('data-caption'));
-
-
-    }
-  }
-
-  // more articles
-  function apply_post_limits(apply) {
-    if (apply) {
-      $('.posts-container').addClass('posts-apply-limit');
-      $('.posts-more a').removeClass('hidden');
-    } else {
-      $('.posts-container').removeClass('posts-apply-limit');
-      $('.posts-more a').addClass('hidden');
-    }
-  }
-
-  // click handling for tags
-  $('.dt-tag').click(function(ev) {
-    window.location.hash = '#category:' + $(this).text().replace(/ /g, "_");
-    return false;
-  })
-
-  // hash filter handling
-  apply_hash_filter();
-  $(window).on('hashchange',function() {
-    apply_post_limits(true);
-    apply_hash_filter();
-  });
-
-  // more articles link
-  $('.posts-more a').click(function(e) {
-    e.preventDefault();
-    apply_post_limits(false);
-    apply_hash_filter();
-    return false;
-  });
-
-}
-
-</script>
-
-
-
-<div class="posts-container posts-apply-limit l-page">
-<div class="posts-list">
-<h1 class="posts-list-caption" data-caption="single cell RNA-seq workshop">single cell RNA-seq workshop</h1>
-<a href="posts/2021-10-14-r-installation/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 27, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Kent Riemondy</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>R installation</h2>
-<div class="dt-tags"></div>
-<p></p>
-</div>
-</a>
-<a href="posts/2021-10-15-running-rrstudio-with-docker/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 15, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Kent Riemondy</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2021-10-15-running-rrstudio-with-docker/img/open-in-browser.png"/>
-</div>
-<div class="description">
-<h2>Running R/Rstudio with docker</h2>
-<div class="dt-tags"></div>
-<p>In this post we will discuss how to use docker
-to run R and Rstudio in a standardized environment.</p>
-</div>
-</a>
-<a href="posts/2021-10-20-working-with-your-own-single-cell-data/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 20, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Kent Riemondy</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Working with your own single cell data</h2>
-<div class="dt-tags"></div>
-<p>Guidelines for datasets to work with in the workshop, 
-information on where to get public datasets, and 
-examples of how to load different data formats into R.</p>
-</div>
-</a>
-<a href="posts/2021-10-21-prerequisite-material/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 21, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Kent Riemondy</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2021-10-21-prerequisite-material/example_plot.png"/>
-</div>
-<div class="description">
-<h2>Prerequisite material</h2>
-<div class="dt-tags"></div>
-<p></p>
-</div>
-</a>
-<a href="posts/2021-10-21-interacting-with-r-in-rstudio/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 21, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Kent Riemondy</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2021-10-21-interacting-with-r-in-rstudio/rstudio.png"/>
-</div>
-<div class="description">
-<h2>Interacting with R in Rstudio</h2>
-<div class="dt-tags"></div>
-<p>A tutorial for navigating the Rstudio IDE, RMarkdown,
-and setting up Rstudio projects to organize each class.</p>
-</div>
-</a>
-<a href="posts/2021-11-01-1class/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Nov. 1, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Tyler Matheny</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2021-11-01-1class/img/slide1.png"/>
-</div>
-<div class="description">
-<h2>Intro_scRNAseq_QC_PCA</h2>
-<div class="dt-tags"></div>
-<p>The goal of this lecture is to give an overview of scRNA seq, quality control, filtering, and briefly touch on PCA</p>
-</div>
-</a>
-<a href="posts/2021-11-3-class-2/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Nov. 3, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Rui Fu</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2021-11-3-class-2/class-2_files/figure-html5/pkg_data-1.png"/>
-</div>
-<div class="description">
-<h2>Class 2: Dimensionality reduction, clustering, differential expression, cell type annotation</h2>
-<div class="dt-tags"></div>
-<p>In this class we will discuss scRNA-seq data processing for visualization and defining transcriptome features.</p>
-</div>
-</a>
-<a href="posts/2021-10-26-class-3/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 26, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Kristen Wells</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2021-10-26-class-3/class-3_files/figure-html5/set-colors-batch-1.png"/>
-</div>
-<div class="description">
-<h2>Class 3: Batch correction and pseudotime</h2>
-<div class="dt-tags"></div>
-<p>This tutorial walks through batch correction between two samples from different groups with some overlapping cell types using harmony. In the second half of the tutorial, we use timecourse data to run and evaluate pseudotime using slingshot.</p>
-</div>
-</a>
-<a href="posts/2021-10-27-multi-modal/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 13, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Kent Riemondy</div>
-<div class="dt-author">Ryan Sheridan</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Class 4: Multi-modal data</h2>
-<div class="dt-tags"></div>
-<p>This tutorial describes a basic CITE-seq analysis workflow.</p>
-</div>
-</a>
-<a href="posts/2021-11-05-faq/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Nov. 5, 2021</div>
-<div class="dt-authors"></div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2021-11-05-faq/renv.png"/>
-</div>
-<div class="description">
-<h2>FAQ</h2>
-<div class="dt-tags"></div>
-<p>Answers to common questions</p>
-</div>
-</a>
-</div>
-<div class="posts-more">
-<a href="#">More articles &raquo;</a>
-</div>
-</div>
-<!--/radix_placeholder_article_listing-->
 
 <div class="d-title">
-<h1>single cell RNA-seq workshop</h1>
+<h1>FAQ</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-
+<p><p>Answers to common questions</p></p>
 </div>
 
 
 <div class="d-article">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h2 id="where-to-get-more-information-on-single-cell-data-analyses">Where to get more information on single cell data analyses?</h2>
+<p>The <a href="https://bioconductor.org/books/3.14/OSCA/">Orchestrating Single Cell Analysis</a> eBook from bioconductor provides detailed discussion of the analysis approaches used for single cell sequencing analysis.</p>
+<h2 id="ligand-receptor-interaction-infererence">Ligand-Receptor interaction infererence</h2>
+<p>There are many tools, the python package <a href="https://github.com/Teichlab/cellphonedb">cellphonedb</a> is popular. However there are R packages as well (<a href="https://www.bioconductor.org/packages/release/bioc/html/scTensor.html">scTensor</a>, <a href="https://github.com/SCA-IRCM">SCA-IRCM</a>, <a href="https://github.com/saezlab/liana">liana</a>, <a href="https://github.com/sqjin/CellChat">CellChat</a>).</p>
+<h2 id="should-i-use-seurat-or-bioconductor">Should I use Seurat or Bioconductor?</h2>
+<p>Use both, or either. The fellows use a mix of both and also the <code>scanpy</code> python single cell toolkit. Spend time exploring your data with whatever platform feels most intuitive. Inevitably you will gain experience in with multiple platforms due to the large # of tools that you will want to try out for your analysis.</p>
+<h2 id="how-to-convert-between-platforms">How to convert between platforms?</h2>
+<p>If you need to convert between R and python you can use the R package <a href="https://bioconductor.org/packages/release/bioc/html/zellkonverter.html">zellkonverter</a>.</p>
+<p>If you need to convert between Seurat or SingleCellExperiment, you can use the <code>as.SingleCellExperiment()</code> or <code>as.Seurat()</code> functions. It is also sometimes easiest to simply create the objects manually using the <code>SingleCellExperiment</code> or <code>CreateSeuratObject</code> functions.</p>
+<h2 id="how-to-load-multiple-samples-in-seurat-and-annotate-the-samples">How to load multiple samples in Seurat and annotate the samples</h2>
+<p>If you have multiple samples you can load these into Seurat using the <code>Read10X</code> and <code>CreateSeuratObject</code> functions. If you provide a name for each dataset (using <code>names()</code>), these names can be extracted and placed into the <code>orig.ident</code> column in the <code>meta.data</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># vector of paths to each sample</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data_dirs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;path/to/dataset1/&#39;</span>, <span class="st">&#39;path/to/dataset2/&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># give each sample a name</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(data_dirs) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;expt1&quot;</span>, <span class="st">&quot;extp2&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the matrices</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mats <span class="ot">&lt;-</span> <span class="fu">Read10X</span>(data_dirs)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># the cells will now be renamed to include the &quot;expt1/2&quot; prefixes</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># e.g.</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt1_cellbarcode1</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt1_cellbarcode2</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt2_cellbarcode1</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;expt2_cellbarcode2</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># CreateSeuratObject can now be used to pull out part of the cell </span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># barcode and add it to the meta.data as the orig.ident</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>seurat_object <span class="ot">&lt;-</span> <span class="fu">CreateSeuratObject</span>(mats, <span class="at">names.field =</span> <span class="dv">1</span>, <span class="at">names.delim =</span> <span class="st">&quot;_&quot;</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># expt1 and expt2 should now be listed in the orig.ident</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(seurat_object<span class="sc">@</span>meta.data<span class="sc">$</span>orig.ident)</span></code></pre></div>
+<h2 id="advice-for-managing-analysis-projects-and-r-package-dependencies">Advice for managing analysis projects and R package dependencies</h2>
+<p>Organization is key to managing multiple analysis projects. We recommend making a new Rstudio project for each data analysis project. This helps with navigate to the relevant files for each project, and makes it easy to quickly jump between projects.</p>
+<p>Managing R package versions can be challenging if you work on many projects, because you may need to use different versions of packages for different projects. This is especially important if you need to return to an analysis 6 months or a year later. If you constantly update the packages, you can run into problems with reproducing the original analysis. The <a href="https://rstudio.github.io/renv/articles/renv.html">renv</a> R package is a package manager for R built by the Rstudio organization. When you set up an R project, you can select <code>use renv with project</code> to set up <code>renv</code> to track dependencies for each project separately.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="renv.png" width="533" /></p>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
